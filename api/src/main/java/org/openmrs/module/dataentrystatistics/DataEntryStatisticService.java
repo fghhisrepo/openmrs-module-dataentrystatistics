@@ -16,7 +16,10 @@ package org.openmrs.module.dataentrystatistics;
 import java.util.Date;
 import java.util.List;
 
+import org.openmrs.Location;
+import org.openmrs.Provider;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.api.db.DAOException;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,4 +50,10 @@ public interface DataEntryStatisticService extends OpenmrsService {
 	 * @return the dao
 	 */
 	public DataEntryStatisticDAO getDao();
+	
+	public List<Location> getAllOfLocation()
+			throws DAOException;
+	
+	public List<Provider> findAllProvider()throws DAOException;
+
 }

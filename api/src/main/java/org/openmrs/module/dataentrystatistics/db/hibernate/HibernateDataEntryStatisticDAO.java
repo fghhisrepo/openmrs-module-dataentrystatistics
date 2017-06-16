@@ -20,42 +20,62 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Expression;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
+import org.openmrs.Location;
 import org.openmrs.Person;
+import org.openmrs.Provider;
 import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
+import org.openmrs.module.dataentrystatistics.PersonObsData;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 
 /**
  * Database methods for the DataEntryStatisticService
  */
 public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
-	
-	protected Log log = LogFactory.getLog(getClass());
-	
-	/**
-	 * Hibernate session factory
-	 */
-	private SessionFactory sessionFactory;
 
-	/**
-	 * @see DataEntryStatisiticDAO#getDataEntryStatistics(Date, Date, String, String, String)
-	 */
+	protected Log log = LogFactory.getLog(getClass());
+
+	SessionFactory sessionFactory;
+
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+
+	private org.hibernate.Session getCurrentSession() {
+		try {
+			return sessionFactory.getCurrentSession();
+		} catch (NoSuchMethodError ex) {
+			try {
+				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
+				return (org.hibernate.Session) method.invoke(sessionFactory, null);
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to get the current hibernate session", e);
+			}
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<DataEntryStatistic> getDataEntryStatistics(Date fromDate, Date toDate, String encounterColumn,
-	                                                       String orderColumn, String groupBy) throws DAOException {
-		
+			String orderColumn, String groupBy) throws DAOException {
+
 		// for all encounters, find user, form name, and number of entries
-		
+
 		// default userColumn to creator
 		if (encounterColumn == null)
 			encounterColumn = "creator";
 		encounterColumn = encounterColumn.toLowerCase();
-		
+
 		List<DataEntryStatistic> ret = new ArrayList<DataEntryStatistic>();
 
 		// data entry stats with extended info
@@ -65,9 +85,10 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		if (groupBy.length() != 0)
 			groupBy = "e." + groupBy + ", ";
 		log.debug("GROUP BY IS " + groupBy);
-		
+
 		String hql = "select " + groupBy + "e." + encounterColumn + ", e.encounterType"
-		        + ", e.form, count(distinct e.encounterId), count(o.obsId) " + "from Obs o right join o.encounter as e ";
+				+ ", e.form, count(distinct e.encounterId), count(o.obsId) "
+				+ "from Obs o right join o.encounter as e ";
 		if (fromDate != null || toDate != null) {
 			String s = "where ";
 			if (fromDate != null)
@@ -79,17 +100,15 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 			}
 			hql += s;
 		}
-		
-		//remove voided obs and encounters.
+
+		// remove voided obs and encounters.
 		if (fromDate != null || toDate != null) {
 			hql += " and ";
-		}
-		else {
+		} else {
 			hql += " where ";
 		}
 		hql += " e.voided = :voided and o.voided = :voided ";
-		
-		
+
 		hql += "group by ";
 		if (groupBy.length() > 0)
 			hql += groupBy + " ";
@@ -99,9 +118,9 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 			q.setParameter("fromDate", fromDate);
 		if (toDate != null)
 			q.setParameter("toDate", toDate);
-		
+
 		q.setParameter("voided", false);
-		
+
 		List<Object[]> l = q.list();
 		for (Object[] holder : l) {
 			DataEntryStatistic s = new DataEntryStatistic();
@@ -121,19 +140,22 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 			s.setEntryType(form != null ? form.getName() : (encType != null ? encType.getName() : "null"));
 			int numEncounters = ((Number) holder[3 + offset]).intValue();
 			int numObs = ((Number) holder[4 + offset]).intValue();
-			s.setNumberOfEntries(numEncounters); // not sure why this comes out as a Long instead of an Integer
+			s.setNumberOfEntries(numEncounters); // not sure why this comes out
+													// as a Long instead of an
+													// Integer
 			log.debug("NEW Num encounters is " + numEncounters);
 			s.setNumberOfObs(numObs);
 			log.debug("NEW Num obs is " + numObs);
 			ret.add(s);
 		}
-		
+
 		// default userColumn to creator
 		if (orderColumn == null)
 			orderColumn = "creator";
 		orderColumn = orderColumn.toLowerCase();
-		
-		// for orders, count how many were created. (should eventually count something with voided/changed)
+
+		// for orders, count how many were created. (should eventually count
+		// something with voided/changed)
 		hql = "select o." + orderColumn + ", o.orderType.name, count(*) " + "from Order o ";
 		if (fromDate != null || toDate != null) {
 			String s = "where ";
@@ -146,25 +168,24 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 			}
 			hql += s;
 		}
-		
-		//remove voided orders.
+
+		// remove voided orders.
 		if (fromDate != null || toDate != null) {
 			hql += " and ";
-		}
-		else {
+		} else {
 			hql += " where ";
 		}
 		hql += " o.voided = :voided ";
-		
+
 		hql += "group by o." + orderColumn + ", o.orderType.name ";
 		q = getCurrentSession().createQuery(hql);
 		if (fromDate != null)
 			q.setParameter("fromDate", fromDate);
 		if (toDate != null)
 			q.setParameter("toDate", toDate);
-		
+
 		q.setParameter("voided", false);
-		
+
 		l = q.list();
 		for (Object[] holder : l) {
 			DataEntryStatistic s = new DataEntryStatistic();
@@ -174,45 +195,37 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 			else
 				s.setUser((Person) temp);
 			s.setEntryType((String) holder[1]);
-			s.setNumberOfEntries(((Number) holder[2]).intValue()); // not sure why this comes out as a Long instead of an Integer
+			s.setNumberOfEntries(((Number) holder[2]).intValue()); // not sure
+																	// why this
+																	// comes out
+																	// as a Long
+																	// instead
+																	// of an
+																	// Integer
 			s.setNumberOfObs(0);
 			ret.add(s);
 		}
-		
 		return ret;
 	}
 
-	/**
-	 * @return the sessionFactory
-	 */
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
+	public List<Location> getAllOfLocation() throws DAOException {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PersonObsData.class);
+		criteria.add(Expression.eq("voided", Boolean.valueOf(false)));
+		return criteria.list();
 	}
 
-	/**
-	 * @param sessionFactory the sessionFactory to set
-	 */
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
+	@Override
+	public List<Provider> findAllProvider() {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(Provider.class);
+		return criteria.list();
+
 	}
-	
-	/**
-	 * Gets the current hibernate session while taking care of the hibernate 3 and 4 differences.
-	 * 
-	 * @return the current hibernate session.
-	 */
-	private org.hibernate.Session getCurrentSession() {
-		try {
-			return sessionFactory.getCurrentSession();
-		}
-		catch (NoSuchMethodError ex) {
-			try {
-				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
-				return (org.hibernate.Session)method.invoke(sessionFactory, null);
-			}
-			catch (Exception e) {
-				throw new RuntimeException("Failed to get the current hibernate session", e);
-			}
-		}
+
+	@Override
+	public List<PersonObsData> findAllObsByProvider(Provider provider) {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PersonObsData.class);
+		criteria.add(Expression.eq("voided", Boolean.valueOf(false)));
+		criteria.add(Expression.eq("provider", provider));
+		return criteria.list();
 	}
 }

@@ -89,12 +89,12 @@
 		</testResources>
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<artifactId>maven-resources-plugin</artifactId>
-					<configuration>
-						<includeEmptyDirs>true</includeEmptyDirs>
-					</configuration>
-				</plugin>
+<!-- 				<plugin> -->
+<!-- 					<artifactId>maven-resources-plugin</artifactId> -->
+<!-- 					<configuration> -->
+<!-- 						<includeEmptyDirs>true</includeEmptyDirs> -->
+<!-- 					</configuration> -->
+<!-- 				</plugin> -->
 			</plugins>
 		</pluginManagement>
 		<plugins>

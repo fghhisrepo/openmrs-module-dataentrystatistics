@@ -16,10 +16,14 @@ package org.openmrs.module.dataentrystatistics.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.openmrs.Location;
+import org.openmrs.Provider;
 import org.openmrs.api.APIException;
+import org.openmrs.api.db.DAOException;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
+import org.openmrs.module.dataentrystatistics.PersonObsData;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,14 +32,14 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements DataEntryStatisticService {
-	
+
 	protected DataEntryStatisticDAO dao;
-	
+
 	/**
 	 * @see DataEntryStatisticService#getDataEntryStatistics(Date,Date,String,String,String)
 	 */
 	public List<DataEntryStatistic> getDataEntryStatistics(Date fromDate, Date toDate, String encounterUserColumn,
-	                                                       String orderUserColumn, String groupBy) throws APIException {
+			String orderUserColumn, String groupBy) throws APIException {
 		return dao.getDataEntryStatistics(fromDate, toDate, encounterUserColumn, orderUserColumn, groupBy);
 	}
 
@@ -47,9 +51,22 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	}
 
 	/**
-	 * @param dao the dao to set
+	 * @param dao
+	 *            the dao to set
 	 */
 	public void setDao(DataEntryStatisticDAO dao) {
 		this.dao = dao;
 	}
+
+	@Override
+	public List<Location> getAllOfLocation(){
+
+		return dao.getAllOfLocation();
+	}
+
+	@Override
+	public List<Provider> findAllProvider() throws DAOException {
+		return dao.findAllProvider();
+	}
+
 }
