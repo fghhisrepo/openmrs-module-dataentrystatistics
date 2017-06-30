@@ -21,6 +21,7 @@ import org.openmrs.Provider;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.PersonObsData;
+import org.openmrs.module.dataentrystatistics.UserDate;
 
 /**
  * Database methods for the DataEntryStatisticService
@@ -39,5 +40,7 @@ public interface DataEntryStatisticDAO {
 	public List<Provider> findAllProvider();
 
 	public List<PersonObsData> findAllObsByProvider(Provider provider);
+	
+	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate);
 
 }

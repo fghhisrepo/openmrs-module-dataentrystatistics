@@ -35,10 +35,6 @@
 						<bean
 							class="org.springframework.transaction.annotation.AnnotationTransactionAttributeSource" />
 					</property>
-					<property name="personObsData">
-						<bean class="@MODULE_PACKAGE@.dataentrystatistics.PersonObsData" />
-					</property>
-
 				</bean>
 			</list>
 		</property>

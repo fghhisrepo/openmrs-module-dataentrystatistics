@@ -55,5 +55,7 @@ public interface DataEntryStatisticService extends OpenmrsService {
 			throws DAOException;
 	
 	public List<Provider> findAllProvider()throws DAOException;
+	
+	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate);
 
 }

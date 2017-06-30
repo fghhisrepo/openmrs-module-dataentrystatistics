@@ -23,7 +23,7 @@ import org.openmrs.api.db.DAOException;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
-import org.openmrs.module.dataentrystatistics.PersonObsData;
+import org.openmrs.module.dataentrystatistics.UserDate;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +67,11 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	@Override
 	public List<Provider> findAllProvider() throws DAOException {
 		return dao.findAllProvider();
+	}
+
+	@Override
+	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate) {
+		return dao.getAllObsByUsersAndDate(fromDate, toDate);
 	}
 
 }

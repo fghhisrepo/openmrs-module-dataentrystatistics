@@ -33,6 +33,7 @@ import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.PersonObsData;
+import org.openmrs.module.dataentrystatistics.UserDate;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 
 /**
@@ -227,5 +228,32 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		criteria.add(Expression.eq("voided", Boolean.valueOf(false)));
 		criteria.add(Expression.eq("provider", provider));
 		return criteria.list();
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate) {
+
+		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), u.username FROM  Obs o inner join o.creator u where o.dateCreated BETWEEN :fromDate AND :toDate GROUP BY DATE(o.dateCreated), u.username";
+
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("fromDate", fromDate);
+		query.setParameter("toDate", toDate);
+
+		List<Object[]> list = query.list();
+		
+		List<UserDate> userDates = new ArrayList<UserDate>();
+
+		for (Object[] object : list) {
+			UserDate userDate = new UserDate();
+
+			userDate.setUser((String) object[2]);
+			userDate.setDate((Date) object[0]);
+			userDate.setTotalObs((Long) object[1]);
+
+			userDates.add(userDate);
+		}
+
+		return userDates;
 	}
 }

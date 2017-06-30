@@ -14,42 +14,34 @@
 package org.openmrs.module.dataentrystatistics.web.controller;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Location;
-import org.openmrs.Provider;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
-import org.openmrs.module.dataentrystatistics.DataTable;
-import org.openmrs.module.dataentrystatistics.PersonObsData;
+import org.openmrs.module.dataentrystatistics.UserDate;
 import org.openmrs.module.dataentrystatistics.web.model.StatisticsCommand;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindException;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
 @SuppressWarnings("deprecation")
-@Controller
-@RequestMapping(value = "/register")
 public class DataEntryStatisticsController extends SimpleFormController {
 
 	protected final Log log = LogFactory.getLog(getClass());
-
-	private List<Location> locations;
-	private List<Provider> providers;
+	private ModelMap modelMap = new ModelMap();
 
 	protected void initBinder(HttpServletRequest request, ServletRequestDataBinder binder) throws Exception {
 		super.initBinder(request, binder);
@@ -60,39 +52,47 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 	protected Object formBackingObject(HttpServletRequest request) throws ServletException {
 
-		ModelAndView modelAndView = new ModelAndView();
+		return new StatisticsCommand();
 
-		DataEntryStatisticService svc = (DataEntryStatisticService) Context.getService(DataEntryStatisticService.class);
-
-		PersonObsData data = new PersonObsData();
-
-	
-		locations = new ArrayList<Location>();
-
-		providers = new ArrayList<Provider>();
-
-		providers.addAll(svc.findAllProvider());
-		locations.addAll(svc.getAllOfLocation());
-
-		modelAndView.addObject("providers", providers);
-
-		return data;
 	}
 
-	protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object commandObj,
-			BindException errors) throws Exception {
+	@SuppressWarnings("rawtypes")
+	protected Map referenceData(HttpServletRequest request) throws Exception {
 
-		DataEntryStatisticService svc = (DataEntryStatisticService) Context.getService(DataEntryStatisticService.class);
+		Calendar c = Calendar.getInstance();
+		c.set(2016, 7, 01);
 
-		StatisticsCommand command = (StatisticsCommand) commandObj;
-		Date toDateToUse = command.getToDate() != null ? OpenmrsUtil.getLastMomentOfDay(command.getToDate()) : null;
-		String encUserColumn = command.getEncUserColumn();
-		String orderUserColumn = command.getOrderUserColumn();
-		List<DataEntryStatistic> stats = svc.getDataEntryStatistics(command.getFromDate(), toDateToUse, encUserColumn,
-				orderUserColumn, command.getGroupBy());
-		DataTable table = DataEntryStatistic.tableByUserAndType(stats, command.getHideAverageObs());
-		command.setTable(table);
-		return showForm(request, response, errors);
+		Calendar c1 = Calendar.getInstance();
+		c1.set(2016, 7, 31);
+
+		DataEntryStatisticService svc = Context.getService(DataEntryStatisticService.class);
+
+		Set<String> nomes = new HashSet<>();
+
+		Map<String, Long> maps = new HashMap<>();
+
+		Map<Date, String> m = new HashMap<>();
+
+		List<UserDate> userDates = svc.getAllObsByUsersAndDate(c.getTime(), c1.getTime());
+
+		for (UserDate userDate : userDates) {
+
+			nomes.add(userDate.getUser());
+			maps.put(userDate.getUser(), userDate.getTotalObs());
+			m.put(userDate.getDate(), userDate.getUser());
+			
+			Long [] positions = new Long[3];
+			
+			for (int i = 0; i < positions.length; i++) {
+				
+			}
+
+		}
+
+		request.setAttribute("nomes", nomes);
+		request.setAttribute("m", m);
+
+		return modelMap;
 	}
 
 }
