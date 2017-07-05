@@ -20,25 +20,15 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Expression;
-import org.openmrs.EncounterType;
-import org.openmrs.Form;
-import org.openmrs.Location;
-import org.openmrs.Person;
-import org.openmrs.Provider;
-import org.openmrs.User;
-import org.openmrs.api.db.DAOException;
-import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
-import org.openmrs.module.dataentrystatistics.PersonObsData;
 import org.openmrs.module.dataentrystatistics.UserDate;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 
 /**
  * Database methods for the DataEntryStatisticService
  */
+@SuppressWarnings({ "unchecked" })
 public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	protected Log log = LogFactory.getLog(getClass());
@@ -66,182 +56,19 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<DataEntryStatistic> getDataEntryStatistics(Date fromDate, Date toDate, String encounterColumn,
-			String orderColumn, String groupBy) throws DAOException {
-
-		// for all encounters, find user, form name, and number of entries
-
-		// default userColumn to creator
-		if (encounterColumn == null)
-			encounterColumn = "creator";
-		encounterColumn = encounterColumn.toLowerCase();
-
-		List<DataEntryStatistic> ret = new ArrayList<DataEntryStatistic>();
-
-		// data entry stats with extended info
-		// check if there's anything else to group by
-		if (groupBy == null)
-			groupBy = "";
-		if (groupBy.length() != 0)
-			groupBy = "e." + groupBy + ", ";
-		log.debug("GROUP BY IS " + groupBy);
-
-		String hql = "select " + groupBy + "e." + encounterColumn + ", e.encounterType"
-				+ ", e.form, count(distinct e.encounterId), count(o.obsId) "
-				+ "from Obs o right join o.encounter as e ";
-		if (fromDate != null || toDate != null) {
-			String s = "where ";
-			if (fromDate != null)
-				s += "e.dateCreated >= :fromDate ";
-			if (toDate != null) {
-				if (fromDate != null)
-					s += "and ";
-				s += "e.dateCreated <= :toDate ";
-			}
-			hql += s;
-		}
-
-		// remove voided obs and encounters.
-		if (fromDate != null || toDate != null) {
-			hql += " and ";
-		} else {
-			hql += " where ";
-		}
-		hql += " e.voided = :voided and o.voided = :voided ";
-
-		hql += "group by ";
-		if (groupBy.length() > 0)
-			hql += groupBy + " ";
-		hql += "e." + encounterColumn + ", e.encounterType, e.form ";
-		Query q = getCurrentSession().createQuery(hql);
-		if (fromDate != null)
-			q.setParameter("fromDate", fromDate);
-		if (toDate != null)
-			q.setParameter("toDate", toDate);
-
-		q.setParameter("voided", false);
-
-		List<Object[]> l = q.list();
-		for (Object[] holder : l) {
-			DataEntryStatistic s = new DataEntryStatistic();
-			int offset = 0;
-			if (groupBy.length() > 0) {
-				s.setGroupBy(holder[0]);
-				offset = 1;
-			}
-
-			Object temp = holder[0 + offset];
-			if (temp instanceof User)
-				s.setUser(((User) temp).getPerson());
-			else
-				s.setUser((Person) holder[0 + offset]);
-			EncounterType encType = ((EncounterType) holder[1 + offset]);
-			Form form = ((Form) holder[2 + offset]);
-			s.setEntryType(form != null ? form.getName() : (encType != null ? encType.getName() : "null"));
-			int numEncounters = ((Number) holder[3 + offset]).intValue();
-			int numObs = ((Number) holder[4 + offset]).intValue();
-			s.setNumberOfEntries(numEncounters); // not sure why this comes out
-													// as a Long instead of an
-													// Integer
-			log.debug("NEW Num encounters is " + numEncounters);
-			s.setNumberOfObs(numObs);
-			log.debug("NEW Num obs is " + numObs);
-			ret.add(s);
-		}
-
-		// default userColumn to creator
-		if (orderColumn == null)
-			orderColumn = "creator";
-		orderColumn = orderColumn.toLowerCase();
-
-		// for orders, count how many were created. (should eventually count
-		// something with voided/changed)
-		hql = "select o." + orderColumn + ", o.orderType.name, count(*) " + "from Order o ";
-		if (fromDate != null || toDate != null) {
-			String s = "where ";
-			if (fromDate != null)
-				s += "o.dateCreated >= :fromDate ";
-			if (toDate != null) {
-				if (fromDate != null)
-					s += "and ";
-				s += "o.dateCreated <= :toDate ";
-			}
-			hql += s;
-		}
-
-		// remove voided orders.
-		if (fromDate != null || toDate != null) {
-			hql += " and ";
-		} else {
-			hql += " where ";
-		}
-		hql += " o.voided = :voided ";
-
-		hql += "group by o." + orderColumn + ", o.orderType.name ";
-		q = getCurrentSession().createQuery(hql);
-		if (fromDate != null)
-			q.setParameter("fromDate", fromDate);
-		if (toDate != null)
-			q.setParameter("toDate", toDate);
-
-		q.setParameter("voided", false);
-
-		l = q.list();
-		for (Object[] holder : l) {
-			DataEntryStatistic s = new DataEntryStatistic();
-			Object temp = holder[0];
-			if (temp instanceof User)
-				s.setUser(((User) temp).getPerson());
-			else
-				s.setUser((Person) temp);
-			s.setEntryType((String) holder[1]);
-			s.setNumberOfEntries(((Number) holder[2]).intValue()); // not sure
-																	// why this
-																	// comes out
-																	// as a Long
-																	// instead
-																	// of an
-																	// Integer
-			s.setNumberOfObs(0);
-			ret.add(s);
-		}
-		return ret;
-	}
-
-	public List<Location> getAllOfLocation() throws DAOException {
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PersonObsData.class);
-		criteria.add(Expression.eq("voided", Boolean.valueOf(false)));
-		return criteria.list();
-	}
-
 	@Override
-	public List<Provider> findAllProvider() {
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(Provider.class);
-		return criteria.list();
+	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
 
-	}
-
-	@Override
-	public List<PersonObsData> findAllObsByProvider(Provider provider) {
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PersonObsData.class);
-		criteria.add(Expression.eq("voided", Boolean.valueOf(false)));
-		criteria.add(Expression.eq("provider", provider));
-		return criteria.list();
-	}
-
-	@SuppressWarnings({ "unchecked" })
-	@Override
-	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate) {
-
-		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), u.username FROM  Obs o inner join o.creator u where o.dateCreated BETWEEN :fromDate AND :toDate GROUP BY DATE(o.dateCreated), u.username";
+		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), u.username FROM  Obs o inner join o.creator u inner join o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY DATE(o.dateCreated), u.username ORDER BY DATE(o.dateCreated) ASC ";
 
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
 		query.setParameter("toDate", toDate);
+		query.setParameter("location", location);
+
 
 		List<Object[]> list = query.list();
-		
+
 		List<UserDate> userDates = new ArrayList<UserDate>();
 
 		for (Object[] object : list) {

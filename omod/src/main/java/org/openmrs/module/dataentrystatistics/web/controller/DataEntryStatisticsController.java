@@ -14,30 +14,29 @@
 package org.openmrs.module.dataentrystatistics.web.controller;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
-import org.openmrs.module.dataentrystatistics.UserDate;
+import org.openmrs.module.dataentrystatistics.DataTable;
 import org.openmrs.module.dataentrystatistics.web.model.StatisticsCommand;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({ "rawtypes", "deprecation" })
 public class DataEntryStatisticsController extends SimpleFormController {
 
 	protected final Log log = LogFactory.getLog(getClass());
@@ -56,43 +55,28 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 	}
 
-	@SuppressWarnings("rawtypes")
 	protected Map referenceData(HttpServletRequest request) throws Exception {
-
-		Calendar c = Calendar.getInstance();
-		c.set(2016, 7, 01);
-
-		Calendar c1 = Calendar.getInstance();
-		c1.set(2016, 7, 31);
-
-		DataEntryStatisticService svc = Context.getService(DataEntryStatisticService.class);
-
-		Set<String> nomes = new HashSet<>();
-
-		Map<String, Long> maps = new HashMap<>();
-
-		Map<Date, String> m = new HashMap<>();
-
-		List<UserDate> userDates = svc.getAllObsByUsersAndDate(c.getTime(), c1.getTime());
-
-		for (UserDate userDate : userDates) {
-
-			nomes.add(userDate.getUser());
-			maps.put(userDate.getUser(), userDate.getTotalObs());
-			m.put(userDate.getDate(), userDate.getUser());
-			
-			Long [] positions = new Long[3];
-			
-			for (int i = 0; i < positions.length; i++) {
-				
-			}
-
-		}
-
-		request.setAttribute("nomes", nomes);
-		request.setAttribute("m", m);
-
+		
+		List<Integer> years  = new ArrayList<>();
+		
+		
+		
 		return modelMap;
+	}
+
+	protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object commandObj,
+			BindException errors) throws Exception {
+
+		DataEntryStatisticService svc = (DataEntryStatisticService) Context.getService(DataEntryStatisticService.class);
+
+		StatisticsCommand command = (StatisticsCommand) commandObj;
+
+		int locationId = Integer.parseInt(command.getLocation());
+
+		DataTable table = DataEntryStatistic
+				.tableByDateAndObs(svc.getAllObsByUsersAndDate(command.getFromDate(), command.getToDate(), locationId));
+		command.setTable(table);
+		return showForm(request, response, errors);
 	}
 
 }

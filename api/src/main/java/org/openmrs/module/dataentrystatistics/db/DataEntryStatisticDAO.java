@@ -16,11 +16,6 @@ package org.openmrs.module.dataentrystatistics.db;
 import java.util.Date;
 import java.util.List;
 
-import org.openmrs.Location;
-import org.openmrs.Provider;
-import org.openmrs.api.db.DAOException;
-import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
-import org.openmrs.module.dataentrystatistics.PersonObsData;
 import org.openmrs.module.dataentrystatistics.UserDate;
 
 /**
@@ -28,19 +23,6 @@ import org.openmrs.module.dataentrystatistics.UserDate;
  */
 public interface DataEntryStatisticDAO {
 
-	/**
-	 * @see DataEntryStatisticService#getDataEntryStatistics(.Date,Date, String,
-	 *      String, String)
-	 */
-	public List<DataEntryStatistic> getDataEntryStatistics(Date fromDate, Date toDate, String encounterUserColumn,
-			String orderUserColumn, String groupBy) throws DAOException;
-
-	public List<Location> getAllOfLocation() throws DAOException;
-
-	public List<Provider> findAllProvider();
-
-	public List<PersonObsData> findAllObsByProvider(Provider provider);
-	
-	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate);
+	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location);
 
 }

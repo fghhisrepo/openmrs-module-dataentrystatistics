@@ -16,11 +16,7 @@ package org.openmrs.module.dataentrystatistics;
 import java.util.Date;
 import java.util.List;
 
-import org.openmrs.Location;
-import org.openmrs.Provider;
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.api.db.DAOException;
-import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -28,34 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public interface DataEntryStatisticService extends OpenmrsService {
-	
-	/**
-	 * Creates a list of data entry stats from <code>fromDate</code> to <code>toDate</code>
-	 * EncounterUserColumn is a column in the encounter table like <code>creator</code>,
-	 * <code>provider</code>, etc (defaults to creator) EncounterUserColumn is a column in the
-	 * encounter table like <code>creator</code>, <code>orderer</code>, etc (defaults to orderer)
-	 * 
-	 * @param fromDate
-	 * @param toDate
-	 * @param encounterUserColumn
-	 * @param orderUserColumn
-	 * @param groupBy (optional)
-	 * @return the list of DataEntryStatistics
-	 */
-	// Authorization?
-	public List<DataEntryStatistic> getDataEntryStatistics(Date fromDate, Date toDate, String encounterUserColumn,
-	                                                       String orderUserColumn, String groupBy);
-	
-	/**
-	 * @return the dao
-	 */
-	public DataEntryStatisticDAO getDao();
-	
-	public List<Location> getAllOfLocation()
-			throws DAOException;
-	
-	public List<Provider> findAllProvider()throws DAOException;
-	
-	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate);
+
+	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location);
 
 }

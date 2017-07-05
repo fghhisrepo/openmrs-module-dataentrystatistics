@@ -16,9 +16,27 @@ public class StatisticsCommand {
 
 	private String orderUserColumn;
 
-	private String groupBy;
+	private int year;
 
-	private Boolean hideAverageObs = false;
+	private int month;
+
+	private String location;
+
+	public int getYear() {
+		return year;
+	}
+
+	public void setYear(int year) {
+		this.year = year;
+	}
+
+	public int getMonth() {
+		return month;
+	}
+
+	public void setMonth(int month) {
+		this.month = month;
+	}
 
 	public StatisticsCommand() {
 	}
@@ -63,19 +81,12 @@ public class StatisticsCommand {
 		this.orderUserColumn = orderUserColumn;
 	}
 
-	public String getGroupBy() {
-		return groupBy;
+	public String getLocation() {
+		return location;
 	}
 
-	public void setGroupBy(String groupBy) {
-		this.groupBy = groupBy;
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
-	public Boolean getHideAverageObs() {
-		return hideAverageObs;
-	}
-
-	public void setHideAverageObs(Boolean hideAverageObs) {
-		this.hideAverageObs = hideAverageObs;
-	}
 }
