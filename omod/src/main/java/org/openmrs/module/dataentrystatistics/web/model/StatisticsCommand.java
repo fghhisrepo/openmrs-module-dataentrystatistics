@@ -12,29 +12,27 @@ public class StatisticsCommand {
 
 	private DataTable table;
 
-	private String encUserColumn;
+	private String obsCreator;
 
-	private String orderUserColumn;
+	private Integer year;
 
-	private int year;
-
-	private int month;
+	private Integer month;
 
 	private String location;
 
-	public int getYear() {
+	public Integer getYear() {
 		return year;
 	}
 
-	public void setYear(int year) {
+	public void setYear(Integer year) {
 		this.year = year;
 	}
 
-	public int getMonth() {
+	public Integer getMonth() {
 		return month;
 	}
 
-	public void setMonth(int month) {
+	public void setMonth(Integer month) {
 		this.month = month;
 	}
 
@@ -65,28 +63,20 @@ public class StatisticsCommand {
 		this.toDate = toDate;
 	}
 
-	public String getEncUserColumn() {
-		return encUserColumn;
-	}
-
-	public void setEncUserColumn(String encUserColumn) {
-		this.encUserColumn = encUserColumn;
-	}
-
-	public String getOrderUserColumn() {
-		return orderUserColumn;
-	}
-
-	public void setOrderUserColumn(String orderUserColumn) {
-		this.orderUserColumn = orderUserColumn;
-	}
-
 	public String getLocation() {
 		return location;
 	}
 
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	public String getObsCreator() {
+		return obsCreator;
+	}
+
+	public void setObsCreator(String obsCreator) {
+		this.obsCreator = obsCreator;
 	}
 
 }

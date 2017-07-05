@@ -18,10 +18,9 @@
 	<tr>
 		<td><spring:message code="dataentrystatistics.obsCreator"/>:</td>
 		<td>
-			<spring:bind path="command.encUserColumn">			
+			<spring:bind path="command.obsCreator">			
 				<select name="${status.expression}" width="10">
-					<option value="creator" <c:if test="${command.encUserColumn=='creator'}">selected</c:if>><spring:message code="dataentrystatistics.encounterCreator"/></option>
-					<option value="provider" <c:if test="${command.encUserColumn=='provider'}">selected</c:if>><spring:message code="dataentrystatistics.encounterProvider"/></option>
+					<option value="creator" <c:if test="${command.obsCreator=='creator'}">selected</c:if>><spring:message code="dataentrystatistics.encounterCreator"/></option>
 				</select>
 				<c:if test="${status.errorMessage != ''}"><span class="error">${status.errorMessage}</span></c:if> 
 			</spring:bind>
