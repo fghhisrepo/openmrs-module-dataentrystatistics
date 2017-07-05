@@ -16,6 +16,7 @@ package org.openmrs.module.dataentrystatistics.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.openmrs.Role;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
 import org.openmrs.module.dataentrystatistics.UserDate;
@@ -48,6 +49,11 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	@Override
 	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
 		return dao.getAllObsByUsersAndDate(fromDate, toDate, location);
+	}
+
+	@Override
+	public List<Role> getAllRoles() {
+		return dao.getAllRoles();
 	}
 
 }

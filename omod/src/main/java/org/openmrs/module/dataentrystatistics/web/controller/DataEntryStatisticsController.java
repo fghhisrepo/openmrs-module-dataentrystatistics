@@ -15,7 +15,6 @@ package org.openmrs.module.dataentrystatistics.web.controller;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Role;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
@@ -57,16 +57,15 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 	}
 
-	public List<Integer> addYears() {
-		return null;
-
-	}
-
 	protected Map referenceData(HttpServletRequest request) throws Exception {
+
+		DataEntryStatisticService svc = (DataEntryStatisticService) Context.getService(DataEntryStatisticService.class);
 
 		List<Integer> years = new ArrayList<>();
 
 		List<Integer> months = new ArrayList<>();
+
+		List<Role> roles = svc.getAllRoles();
 
 		for (int x = 2000; x <= 2017; x++) {
 			years.add(x);
@@ -74,20 +73,21 @@ public class DataEntryStatisticsController extends SimpleFormController {
 		for (int x = 1; x <= 31; x++) {
 			months.add(x);
 		}
-
+		
+		request.setAttribute("roles", roles);
 		request.setAttribute("years", years);
 		request.setAttribute("months", months);
 
 		return modelMap;
 	}
 
-	@SuppressWarnings("static-access")
 	public Calendar VerifyNullAtributesFromObject(StatisticsCommand command) {
+	
 		Calendar getDataForYearAndMonth = Calendar.getInstance();
 
 		if (command.getYear() != null && command.getMonth() != null) {
 
-			getDataForYearAndMonth.set(command.getYear(), command.getMonth() - getDataForYearAndMonth.MONTH);
+			getDataForYearAndMonth.set(command.getYear(), command.getMonth());
 		}
 		return getDataForYearAndMonth;
 	}
@@ -98,14 +98,8 @@ public class DataEntryStatisticsController extends SimpleFormController {
 		DataEntryStatisticService svc = (DataEntryStatisticService) Context.getService(DataEntryStatisticService.class);
 
 		StatisticsCommand command = (StatisticsCommand) commandObj;
-		
+
 		int locationId = Integer.parseInt(command.getLocation());
-
-		if (command.getYear() != null && command.getMonth() != null) {
-			Calendar c = new GregorianCalendar();
-			c.set(command.getYear(), command.getMonth());
-
-		}
 
 		DataTable table = DataEntryStatistic
 				.tableByDateAndObs(svc.getAllObsByUsersAndDate(command.getFromDate(), command.getToDate(), locationId));

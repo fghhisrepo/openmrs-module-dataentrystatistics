@@ -16,6 +16,7 @@ package org.openmrs.module.dataentrystatistics;
 import java.util.Date;
 import java.util.List;
 
+import org.openmrs.Role;
 import org.openmrs.api.OpenmrsService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,5 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 public interface DataEntryStatisticService extends OpenmrsService {
 
 	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location);
+	public List<Role> getAllRoles();
 
 }

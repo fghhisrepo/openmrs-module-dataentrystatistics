@@ -22,13 +22,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.openmrs.Role;
 import org.openmrs.module.dataentrystatistics.UserDate;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 
 /**
  * Database methods for the DataEntryStatisticService
  */
-@SuppressWarnings({ "unchecked" })
 public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	protected Log log = LogFactory.getLog(getClass());
@@ -56,16 +56,16 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
 
-		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), u.username FROM  Obs o inner join o.creator u inner join o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY DATE(o.dateCreated), u.username ORDER BY DATE(o.dateCreated) ASC ";
+		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), u.username FROM  Obs o INNER JOIN o.creator u INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY DATE(o.dateCreated),  u.username ORDER BY DATE(o.dateCreated) ASC ";
 
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
 		query.setParameter("toDate", toDate);
 		query.setParameter("location", location);
-
 
 		List<Object[]> list = query.list();
 
@@ -82,5 +82,14 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		}
 
 		return userDates;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Role> getAllRoles() {
+		String hql = "SELECT  r FROM Role r ";
+		Query query = getCurrentSession().createQuery(hql);
+		return query.list();
+
 	}
 }

@@ -16,6 +16,7 @@ package org.openmrs.module.dataentrystatistics.db;
 import java.util.Date;
 import java.util.List;
 
+import org.openmrs.Role;
 import org.openmrs.module.dataentrystatistics.UserDate;
 
 /**
@@ -24,5 +25,7 @@ import org.openmrs.module.dataentrystatistics.UserDate;
 public interface DataEntryStatisticDAO {
 
 	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location);
+	public List<Role> getAllRoles();
+
 
 }

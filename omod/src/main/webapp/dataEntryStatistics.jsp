@@ -13,16 +13,20 @@
 <h2><spring:message code="dataentrystatistics.title"/></h2>
 
 <form method="post">
+
+	<p align="right"><a href="/downloadCSV">Download CSV</a></p>
+
 <fieldset>
-	<table  style="width: 20%; height:10%">
+	<table  style="width: 30%;">
 	<tr>
 		<td><spring:message code="dataentrystatistics.obsCreator"/>:</td>
 		<td>
 			<spring:bind path="command.obsCreator">			
 				<select name="${status.expression}" width="10">
-					<option value="creator" <c:if test="${command.obsCreator=='creator'}">selected</c:if>><spring:message code="dataentrystatistics.encounterCreator"/></option>
+					<c:forEach items="${roles}" var="role">
+		                <option>${role}</option>
+		            </c:forEach>
 				</select>
-				<c:if test="${status.errorMessage != ''}"><span class="error">${status.errorMessage}</span></c:if> 
 			</spring:bind>
 		</td>
 	</tr>
@@ -58,23 +62,24 @@
 			</spring:bind>
 		</td>
 	</tr>
+	
 		<tr>
 		<td><spring:message code="dataentrystatistics.month"/>:</td>
 		<td>
 			<spring:bind path="command.month">			
-				<select name="${status.expression}" width="10">
+				<select name="${status.expression}" width="60%">
 				<c:forEach items="${months}" var="month">
 	                <option>${month}</option>
 	            </c:forEach>
-				
 				</select>
 			</spring:bind>
 		</td>
+		
 		<td><spring:message code="dataentrystatistics.year"/>:</td>
 		
 		<td>
 			<spring:bind path="command.year">			
-				<select name="${status.expression}" width="10">
+				<select name="${status.expression}" width="60%">
 				<c:forEach items="${years}" var="year">
 	                <option>${year}</option>
 	            </c:forEach>
@@ -82,6 +87,7 @@
 			</spring:bind>
 		</td>
 	</tr>
+	
 	<tr>
 		<td></td>
 		<td><input type="submit" value="<spring:message code="general.view"/>" /></td>
