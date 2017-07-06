@@ -14,7 +14,6 @@
 package org.openmrs.module.dataentrystatistics.web.controller;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +29,7 @@ import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
 import org.openmrs.module.dataentrystatistics.DataTable;
 import org.openmrs.module.dataentrystatistics.web.model.StatisticsCommand;
+import org.openmrs.module.dataentrystatistics.web.util.ReportType;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.ui.ModelMap;
@@ -61,35 +61,18 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		DataEntryStatisticService svc = (DataEntryStatisticService) Context.getService(DataEntryStatisticService.class);
 
-		List<Integer> years = new ArrayList<>();
-
-		List<Integer> months = new ArrayList<>();
+		List<String> reportTypes = new ArrayList<>();
 
 		List<Role> roles = svc.getAllRoles();
 
-		for (int x = 2000; x <= 2017; x++) {
-			years.add(x);
+		for (ReportType type : ReportType.values()) {
+			reportTypes.add(type.name());
 		}
-		for (int x = 1; x <= 31; x++) {
-			months.add(x);
-		}
-		
+
+		request.setAttribute("reportTypes", reportTypes);
 		request.setAttribute("roles", roles);
-		request.setAttribute("years", years);
-		request.setAttribute("months", months);
 
 		return modelMap;
-	}
-
-	public Calendar VerifyNullAtributesFromObject(StatisticsCommand command) {
-	
-		Calendar getDataForYearAndMonth = Calendar.getInstance();
-
-		if (command.getYear() != null && command.getMonth() != null) {
-
-			getDataForYearAndMonth.set(command.getYear(), command.getMonth());
-		}
-		return getDataForYearAndMonth;
 	}
 
 	protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object commandObj,

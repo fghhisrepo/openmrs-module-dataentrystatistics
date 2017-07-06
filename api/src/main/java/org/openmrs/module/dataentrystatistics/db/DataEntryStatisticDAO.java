@@ -17,14 +17,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.openmrs.Role;
-import org.openmrs.module.dataentrystatistics.UserDate;
+import org.openmrs.module.dataentrystatistics.CalculateUserDateForObsCollectedByUser;
 
 /**
  * Database methods for the DataEntryStatisticService
  */
 public interface DataEntryStatisticDAO {
 
-	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location);
+	public List<CalculateUserDateForObsCollectedByUser> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location);
 	public List<Role> getAllRoles();
 
 

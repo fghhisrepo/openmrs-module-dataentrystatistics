@@ -129,7 +129,7 @@ public class DataTable {
 			Collections.sort(columns);
 		}
 		StringBuilder sb = new StringBuilder();
-		sb.append("<table border=\"1\" cellspacing=\"0\" cellpadding=\"2\">");
+		sb.append("<table id=\"example\" class=\"display nowrap\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">");
 		sb.append("<thead><tr>");
 		for (String colName : columns) {
 			sb.append("<th>").append(colName).append("</th>");

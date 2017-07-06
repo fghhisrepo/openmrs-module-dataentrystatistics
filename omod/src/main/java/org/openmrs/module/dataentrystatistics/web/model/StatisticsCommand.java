@@ -19,6 +19,10 @@ public class StatisticsCommand {
 	private Integer month;
 
 	private String location;
+	
+	private String period;
+	
+	private String reportType;
 
 	public Integer getYear() {
 		return year;
@@ -77,6 +81,22 @@ public class StatisticsCommand {
 
 	public void setObsCreator(String obsCreator) {
 		this.obsCreator = obsCreator;
+	}
+
+	public String getPeriod() {
+		return period;
+	}
+
+	public void setPeriod(String period) {
+		this.period = period;
+	}
+
+	public String getReportType() {
+		return reportType;
+	}
+
+	public void setReportType(String reportType) {
+		this.reportType = reportType;
 	}
 
 }

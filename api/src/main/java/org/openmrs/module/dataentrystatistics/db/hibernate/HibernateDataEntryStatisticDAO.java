@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.openmrs.Role;
-import org.openmrs.module.dataentrystatistics.UserDate;
+import org.openmrs.module.dataentrystatistics.CalculateUserDateForObsCollectedByUser;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 
 /**
@@ -58,7 +58,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<UserDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
+	public List<CalculateUserDateForObsCollectedByUser> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
 
 		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), u.username FROM  Obs o INNER JOIN o.creator u INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY DATE(o.dateCreated),  u.username ORDER BY DATE(o.dateCreated) ASC ";
 
@@ -69,10 +69,10 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		List<Object[]> list = query.list();
 
-		List<UserDate> userDates = new ArrayList<UserDate>();
+		List<CalculateUserDateForObsCollectedByUser> userDates = new ArrayList<CalculateUserDateForObsCollectedByUser>();
 
 		for (Object[] object : list) {
-			UserDate userDate = new UserDate();
+			CalculateUserDateForObsCollectedByUser userDate = new CalculateUserDateForObsCollectedByUser();
 
 			userDate.setUser((String) object[2]);
 			userDate.setDate((Date) object[0]);

@@ -22,7 +22,7 @@
 		<td><spring:message code="dataentrystatistics.obsCreator"/>:</td>
 		<td>
 			<spring:bind path="command.obsCreator">			
-				<select name="${status.expression}" width="10">
+				<select name="${status.expression}">
 					<c:forEach items="${roles}" var="role">
 		                <option>${role}</option>
 		            </c:forEach>
@@ -41,9 +41,10 @@
 						</c:if>
 					</spring:bind></td>
 			</tr>
-	<tr>
-	
-		<td><spring:message code="general.fromDate"/>:</td>
+		<tr>
+		
+		<tr>
+			<td><spring:message code="dataentrystatistics.startDate"/>:</td>
 		<td>
 			<spring:bind path="command.fromDate">
 				<input type="text" name="${status.expression}" size="10" 
@@ -53,7 +54,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td><spring:message code="general.toDate"/>:</td>
+		<td><spring:message code="dataentrystatistics.endDate"/>:</td>
 		<td>
 			<spring:bind path="command.toDate">
 				<input type="text" name="${status.expression}" size="10" 
@@ -62,26 +63,14 @@
 			</spring:bind>
 		</td>
 	</tr>
-	
-		<tr>
-		<td><spring:message code="dataentrystatistics.month"/>:</td>
-		<td>
-			<spring:bind path="command.month">			
-				<select name="${status.expression}" width="60%">
-				<c:forEach items="${months}" var="month">
-	                <option>${month}</option>
-	            </c:forEach>
-				</select>
-			</spring:bind>
-		</td>
 		
-		<td><spring:message code="dataentrystatistics.year"/>:</td>
-		
+	<tr>
+		<td><spring:message code="dataentrystatistics.type"/>:</td>
 		<td>
-			<spring:bind path="command.year">			
+			<spring:bind path="command.reportType">			
 				<select name="${status.expression}" width="60%">
-				<c:forEach items="${years}" var="year">
-	                <option>${year}</option>
+				<c:forEach items="${reportTypes}" var="reportType">
+	                <option>${reportType}</option>
 	            </c:forEach>
 				</select>
 			</spring:bind>

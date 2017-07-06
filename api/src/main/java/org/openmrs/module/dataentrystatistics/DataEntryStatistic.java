@@ -27,8 +27,8 @@ public class DataEntryStatistic {
 
 	protected final Log log = LogFactory.getLog(getClass());
 
-
-	public static DataTable tableByDateAndObs(List<UserDate> userDates) {
+	public static DataTable tableByDateAndObs(
+			List<CalculateUserDateForObsCollectedByUser> calculateUserDateForObsCollectedByUsers) {
 
 		List<String> users = new ArrayList<String>();
 
@@ -36,10 +36,10 @@ public class DataEntryStatistic {
 
 		DataTable table = new DataTable();
 
-		for (UserDate userDate : userDates) {
+		for (CalculateUserDateForObsCollectedByUser calculateUserDateForObsCollectedByUser : calculateUserDateForObsCollectedByUsers) {
 
-			dates.add(userDate.getDate());
-			users.add(userDate.getUser());
+			dates.add(calculateUserDateForObsCollectedByUser.getDate());
+			users.add(calculateUserDateForObsCollectedByUser.getUser());
 
 		}
 
@@ -53,7 +53,7 @@ public class DataEntryStatistic {
 
 			for (String user : users) {
 
-				Long total = getTotalObsPerUserAndDate(date, user, userDates);
+				Long total = getTotalObsPerUserAndDate(date, user, calculateUserDateForObsCollectedByUsers);
 				tableRow.put(user, total);
 
 			}
@@ -64,18 +64,19 @@ public class DataEntryStatistic {
 		return table;
 	}
 
-	private static Long getTotalObsPerUserAndDate(Date date, String user, List<UserDate> userDates) {
+	private static Long getTotalObsPerUserAndDate(Date date, String user,
+			List<CalculateUserDateForObsCollectedByUser> calculateUserDateForObsCollectedByUsers) {
 
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		
+
 		String formatedDate = format.format(date);
 
-		for (UserDate userDate : userDates) {
+		for (CalculateUserDateForObsCollectedByUser calculateUserDateForObsCollectedByUser : calculateUserDateForObsCollectedByUsers) {
 
-			String dataUSer = format.format(userDate.getDate());
+			String dataUser = format.format(calculateUserDateForObsCollectedByUser.getDate());
 
-			if (formatedDate.equals(dataUSer) && user.equals(userDate.getUser())) {
-				return userDate.getTotalObs();
+			if (formatedDate.equals(dataUser) && user.equals(calculateUserDateForObsCollectedByUser.getUser())) {
+				return calculateUserDateForObsCollectedByUser.getTotalObs();
 			}
 		}
 
