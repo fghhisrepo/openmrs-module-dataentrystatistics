@@ -28,7 +28,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
 import org.openmrs.module.dataentrystatistics.DataTable;
-import org.openmrs.module.dataentrystatistics.web.model.StatisticsCommand;
+import org.openmrs.module.dataentrystatistics.web.model.EntryObject;
 import org.openmrs.module.dataentrystatistics.web.util.ReportType;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -53,7 +53,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 	protected Object formBackingObject(HttpServletRequest request) throws ServletException {
 
-		return new StatisticsCommand();
+		return new EntryObject();
 
 	}
 
@@ -80,14 +80,22 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		DataEntryStatisticService svc = (DataEntryStatisticService) Context.getService(DataEntryStatisticService.class);
 
-		StatisticsCommand command = (StatisticsCommand) commandObj;
+		EntryObject entryObject = (EntryObject) commandObj;
 
-		int locationId = Integer.parseInt(command.getLocation());
+		if (entryObject.getFromDate() != null && entryObject.getToDate() != null) {
 
-		DataTable table = DataEntryStatistic
-				.tableByDateAndObs(svc.getAllObsByUsersAndDate(command.getFromDate(), command.getToDate(), locationId));
+			if (entryObject.getLocation() != null) {
+				
+				Integer locationId = Integer.parseInt(entryObject.getLocation());
 
-		command.setTable(table);
+				DataTable table = DataEntryStatistic.tableByDateAndObs(
+						svc.getAllObsByUsersAndDate(entryObject.getFromDate(), entryObject.getToDate(), locationId));
+
+				entryObject.setTable(table);
+
+			}
+
+		}
 		return showForm(request, response, errors);
 	}
 

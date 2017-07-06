@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.openmrs.module.dataentrystatistics.DataTable;
 
-public class StatisticsCommand {
+public class EntryObject {
 
 	private Date fromDate;
 
@@ -40,7 +40,7 @@ public class StatisticsCommand {
 		this.month = month;
 	}
 
-	public StatisticsCommand() {
+	public EntryObject() {
 	}
 
 	public Date getFromDate() {
