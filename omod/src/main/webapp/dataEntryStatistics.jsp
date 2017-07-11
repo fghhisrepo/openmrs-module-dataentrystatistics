@@ -58,9 +58,7 @@
                 }
             }
             $("#export").click(function (event) {
-                var outputFile = window.prompt("WHAT DO YOU WANT TO NAME YOUR OUTPUT") || 'export';
-                var  outputFile = outputFile.replace('.csv','') + '.csv'
-                exportTableToCSV.apply(this, [$('#dvData>table'), outputFile]);
+                exportTableToCSV.apply(this, [$('#dvData>table'), 'DATA_ENTRY_STATISTIC']);
                 
             });
         });
