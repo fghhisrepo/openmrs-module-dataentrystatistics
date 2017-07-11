@@ -55,7 +55,6 @@ public class DataEntryStatistic {
 
 				Long total = getTotalObsPerUserAndDate(date, user, calculateUserDateForObsCollectedByUsers);
 				tableRow.put(user, total);
-
 			}
 
 			table.addRow(tableRow);
@@ -67,7 +66,7 @@ public class DataEntryStatistic {
 	private static Long getTotalObsPerUserAndDate(Date date, String user,
 			List<CalculateUserDateForObsCollectedByUser> calculateUserDateForObsCollectedByUsers) {
 
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 
 		String formatedDate = format.format(date);
 
@@ -84,4 +83,78 @@ public class DataEntryStatistic {
 
 	}
 
+	public static DataTable tableByFormAndEncounters(
+			List<CalculateUserDateTotalObsByForm> calculateUserDateTotalObsByForms) {
+
+		List<String> users = new ArrayList<String>();
+
+		Set<String> forms = new HashSet<String>();
+
+		DataTable table = new DataTable();
+
+		for (CalculateUserDateTotalObsByForm calculateUserDateTotalObsByForm : calculateUserDateTotalObsByForms) {
+
+			users.add(calculateUserDateTotalObsByForm.getUser());
+			forms.add(calculateUserDateTotalObsByForm.getForm());
+
+		}
+		table.addColumn("Formularios");
+		table.addColumns(users);
+
+		for (String form : forms) {
+
+			TableRow tableRow = new TableRow();
+			TableRow tr1 = new TableRow();
+
+			tableRow.put("Formularios", form);
+			tr1.put("Formularios", form);
+
+			for (String user : users) {
+
+				Long total = getTotalEncounterPerUserAndForm(form, user, calculateUserDateTotalObsByForms);
+
+				Long totalObs = getTotal(form, user, calculateUserDateTotalObsByForms);
+
+				tableRow.put(user, total);
+
+				tr1.put(user, totalObs);
+
+			}
+			table.addRow(tableRow);
+			table.addRow(tr1);
+
+		}
+		return table;
+	}
+
+	private static Long getTotalEncounterPerUserAndForm(String form, String user,
+			List<CalculateUserDateTotalObsByForm> calculateUserDateTotalObsByForms) {
+
+		for (CalculateUserDateTotalObsByForm calculateUserDateTotalObsByForm : calculateUserDateTotalObsByForms) {
+
+			if (form.equals(calculateUserDateTotalObsByForm.getForm())
+					&& user.equals(calculateUserDateTotalObsByForm.getUser())) {
+				return calculateUserDateTotalObsByForm.getTotalEncounters();
+			}
+		}
+
+		return 0L;
+
+	}
+
+	private static Long getTotal(String form, String user,
+			List<CalculateUserDateTotalObsByForm> calculateUserDateTotalObsByForms) {
+
+		for (CalculateUserDateTotalObsByForm calculateUserDateTotalObsByForm : calculateUserDateTotalObsByForms) {
+
+			if (form.equals(calculateUserDateTotalObsByForm.getForm())
+					&& user.equals(calculateUserDateTotalObsByForm.getUser())) {
+
+				return calculateUserDateTotalObsByForm.getTotalObs();
+			}
+		}
+
+		return 0L;
+
+	}
 }

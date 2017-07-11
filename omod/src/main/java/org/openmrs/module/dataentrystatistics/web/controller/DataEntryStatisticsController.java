@@ -43,6 +43,9 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 	protected final Log log = LogFactory.getLog(getClass());
 	private ModelMap modelMap = new ModelMap();
+	private DataTable table;
+	private EntryObject entryObject;
+	private DataEntryStatisticService dataEntryStatisticService;
 
 	protected void initBinder(HttpServletRequest request, ServletRequestDataBinder binder) throws Exception {
 		super.initBinder(request, binder);
@@ -78,18 +81,28 @@ public class DataEntryStatisticsController extends SimpleFormController {
 	protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object commandObj,
 			BindException errors) throws Exception {
 
-		DataEntryStatisticService svc = (DataEntryStatisticService) Context.getService(DataEntryStatisticService.class);
+		DataEntryStatisticService dataEntryStatisticService = (DataEntryStatisticService) Context
+				.getService(DataEntryStatisticService.class);
 
-		EntryObject entryObject = (EntryObject) commandObj;
+		entryObject = (EntryObject) commandObj;
 
 		if (entryObject.getFromDate() != null && entryObject.getToDate() != null) {
 
 			if (entryObject.getLocation() != null) {
-				
+
 				Integer locationId = Integer.parseInt(entryObject.getLocation());
 
-				DataTable table = DataEntryStatistic.tableByDateAndObs(
-						svc.getAllObsByUsersAndDate(entryObject.getFromDate(), entryObject.getToDate(), locationId));
+				if (entryObject.getReportType().equals(ReportType.DAILY_OBS.name())) {
+
+					table = DataEntryStatistic.tableByDateAndObs(dataEntryStatisticService
+							.getAllObsByUsersAndDate(entryObject.getFromDate(), entryObject.getToDate(), locationId));
+				}
+
+				if (entryObject.getReportType().equals(ReportType.FORM_TYPES.name())) {
+
+					table = DataEntryStatistic.tableByFormAndEncounters(dataEntryStatisticService
+							.getAllObsByUsersAndForm(entryObject.getFromDate(), entryObject.getToDate(), locationId));
+				}
 
 				entryObject.setTable(table);
 
@@ -99,4 +112,11 @@ public class DataEntryStatisticsController extends SimpleFormController {
 		return showForm(request, response, errors);
 	}
 
+	public DataEntryStatisticService getDataEntryStatisticService() {
+		return dataEntryStatisticService;
+	}
+
+	public void setDataEntryStatisticService(DataEntryStatisticService dataEntryStatisticService) {
+		this.dataEntryStatisticService = dataEntryStatisticService;
+	}
 }

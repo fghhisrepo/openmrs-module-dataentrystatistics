@@ -20,6 +20,7 @@ import org.openmrs.Role;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
 import org.openmrs.module.dataentrystatistics.CalculateUserDateForObsCollectedByUser;
+import org.openmrs.module.dataentrystatistics.CalculateUserDateTotalObsByForm;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,13 +48,20 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	}
 
 	@Override
-	public List<CalculateUserDateForObsCollectedByUser> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
+	public List<CalculateUserDateForObsCollectedByUser> getAllObsByUsersAndDate(Date fromDate, Date toDate,
+			Integer location) {
 		return dao.getAllObsByUsersAndDate(fromDate, toDate, location);
 	}
 
 	@Override
 	public List<Role> getAllRoles() {
 		return dao.getAllRoles();
+	}
+
+	@Override
+	public List<CalculateUserDateTotalObsByForm> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location) {
+
+		return dao.getAllObsByUsersAndForm(fromDate, toDate, location);
 	}
 
 }

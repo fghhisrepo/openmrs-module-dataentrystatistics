@@ -24,16 +24,16 @@ import java.util.Map;
 import org.openmrs.util.OpenmrsUtil;
 
 public class DataTable {
-	
+
 	private List<String> columnOrder;
-	
+
 	private ArrayList<TableRow> rows;
-	
+
 	public DataTable() {
 		columnOrder = new ArrayList<String>();
 		rows = new ArrayList<TableRow>();
 	}
-	
+
 	public DataTable(List<TableRow> rows) {
 		if (rows instanceof ArrayList) {
 			this.rows = (ArrayList<TableRow>) rows;
@@ -42,36 +42,36 @@ public class DataTable {
 			this.rows.addAll(rows);
 		}
 	}
-	
+
 	public void addColumn(String colName) {
 		if (!columnOrder.contains(colName))
 			columnOrder.add(colName);
 	}
-	
+
 	public void addColumns(Collection<String> colNames) {
 		for (String colName : colNames)
 			addColumn(colName);
 	}
-	
+
 	public int getRowCount() {
 		return rows.size();
 	}
-	
+
 	public void addRow(TableRow row) {
 		rows.add(row);
 	}
-	
+
 	public void addRows(Collection<TableRow> rows) {
 		this.rows.addAll(rows);
 	}
-	
+
 	public ArrayList<TableRow> getRows() {
 		return rows;
 	}
-	
+
 	public void sortByColumn(final String colName) {
 		Collections.sort(rows, new Comparator<TableRow>() {
-			
+
 			@SuppressWarnings("unchecked")
 			public int compare(TableRow left, TableRow right) {
 				Comparable l = (Comparable) left.get(colName);
@@ -80,7 +80,7 @@ public class DataTable {
 			}
 		});
 	}
-	
+
 	public Map<String, DataTable> split(TableRowClassifier trc) {
 		Map<String, DataTable> ret = new HashMap<String, DataTable>();
 		for (TableRow row : rows) {
@@ -94,7 +94,7 @@ public class DataTable {
 		}
 		return ret;
 	}
-	
+
 	public String toString() {
 		if (rows.size() == 0)
 			return "DataTable with no rows";
@@ -117,7 +117,7 @@ public class DataTable {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getHtmlTable() {
 		if (rows.size() == 0)
 			return "DataTable with no rows";
@@ -129,7 +129,9 @@ public class DataTable {
 			Collections.sort(columns);
 		}
 		StringBuilder sb = new StringBuilder();
-		sb.append("<table id=\"example\" class=\"display nowrap\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">");
+		sb.append("<div id=\"dvData\">");
+		sb.append(
+				"<table id=\"result\" class=\"display nowrap\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">");
 		sb.append("<thead><tr>");
 		for (String colName : columns) {
 			sb.append("<th>").append(colName).append("</th>");
@@ -143,8 +145,10 @@ public class DataTable {
 			sb.append("</tr>");
 		}
 		sb.append("</tbody></table>");
+		sb.append("</div>");
+
 		return sb.toString();
-		
+
 	}
-	
+
 }

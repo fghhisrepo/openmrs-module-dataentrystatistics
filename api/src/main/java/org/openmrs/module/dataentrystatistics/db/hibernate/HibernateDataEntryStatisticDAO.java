@@ -24,6 +24,7 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.openmrs.Role;
 import org.openmrs.module.dataentrystatistics.CalculateUserDateForObsCollectedByUser;
+import org.openmrs.module.dataentrystatistics.CalculateUserDateTotalObsByForm;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 
 /**
@@ -58,9 +59,10 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<CalculateUserDateForObsCollectedByUser> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
+	public List<CalculateUserDateForObsCollectedByUser> getAllObsByUsersAndDate(Date fromDate, Date toDate,
+			Integer location) {
 
-		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), u.username FROM  Obs o INNER JOIN o.creator u INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY DATE(o.dateCreated),  u.username ORDER BY DATE(o.dateCreated) ASC ";
+		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), c.username FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY DATE(o.dateCreated),  c.username ORDER BY DATE(o.dateCreated) ASC ";
 
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
@@ -91,5 +93,33 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		Query query = getCurrentSession().createQuery(hql);
 		return query.list();
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CalculateUserDateTotalObsByForm> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location) {
+
+		String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId) FROM  Obs o  INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l WHERE e.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY f.name, c.username";
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("fromDate", fromDate);
+		query.setParameter("toDate", toDate);	
+		query.setParameter("location", location);
+
+		List<Object[]> list = query.list();
+
+		List<CalculateUserDateTotalObsByForm> calculateUserDateTotalObsByForms = new ArrayList<CalculateUserDateTotalObsByForm>();
+		for (Object[] object : list) {
+
+			CalculateUserDateTotalObsByForm calculateUserDateTotalObsByForm = new CalculateUserDateTotalObsByForm();
+
+			calculateUserDateTotalObsByForm.setUser((String) object[1]);
+			calculateUserDateTotalObsByForm.setForm(((String) object[0]));
+			calculateUserDateTotalObsByForm.setTotalEncounters((Long) object[2]);
+			calculateUserDateTotalObsByForm.setTotalObs((Long) object[3]);
+
+			calculateUserDateTotalObsByForms.add(calculateUserDateTotalObsByForm);
+		}
+
+		return calculateUserDateTotalObsByForms;
 	}
 }

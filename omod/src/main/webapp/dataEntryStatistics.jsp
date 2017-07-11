@@ -8,13 +8,68 @@
 <%@ include file="/WEB-INF/view/admin/maintenance/localHeader.jsp" %>
 
 <openmrs:htmlInclude file="/scripts/calendar/calendar.js" />
-<openmrs:htmlInclude file="/scripts/validation.js" />
 
+<script type='text/javascript' src='https://code.jquery.com/jquery-1.11.0.min.js'></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.min.css" />
+ <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<script   src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"   integrity="sha256-xI/qyl9vpwWFOXz7+x/9WkG5j/SVnSw21viy8fWwbeE="   crossorigin="anonymous"></script>
+
+<openmrs:htmlInclude file="/scripts/validation.js" />
+         <script type='text/javascript'>
+        </script>
+        <script type='text/javascript'>
+        $(document).ready(function () {
+            function exportTableToCSV($table, filename) {
+                var $headers = $table.find('tr:has(th)')
+                    ,$rows = $table.find('tr:has(td)')
+                    ,tmpColDelim = String.fromCharCode(11) // vertical tab character
+                    ,tmpRowDelim = String.fromCharCode(0) // null character
+                    ,colDelim = '","'
+                    ,rowDelim = '"\r\n"';
+                    var csv = '"';
+                    csv += formatRows($headers.map(grabRow));
+                    csv += rowDelim;
+                    csv += formatRows($rows.map(grabRow)) + '"';
+                    var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+                $(this)
+                    .attr({
+                    'download': filename
+                        ,'href': csvData
+                });
+                function formatRows(rows){
+                    return rows.get().join(tmpRowDelim)
+                        .split(tmpRowDelim).join(rowDelim)
+                        .split(tmpColDelim).join(colDelim);
+                }
+                function grabRow(i,row){
+                     
+                    var $row = $(row);
+                    var $cols = $row.find('td'); 
+                    if(!$cols.length) $cols = $row.find('th');  
+                    return $cols.map(grabCol)
+                                .get().join(tmpColDelim);
+                }
+                function grabCol(j,col){
+                    var $col = $(col),
+                        $text = $col.text();
+                    return $text.replace('"', '""'); 
+                }
+            }
+            $("#export").click(function (event) {
+                var outputFile = window.prompt("WHAT DO YOU WANT TO NAME YOUR OUTPUT") || 'export';
+                var  outputFile = outputFile.replace('.csv','') + '.csv'
+                exportTableToCSV.apply(this, [$('#dvData>table'), outputFile]);
+                
+            });
+        });
+    </script>
 <h2><spring:message code="dataentrystatistics.title"/></h2>
 
 <form method="post">
 
-	<p align="right"><a href="/downloadCSV">Download CSV</a></p>
+ 	<p align="right"><a href="#" id ="export" role='button'>Export Table Data Into a CSV File</a></p>
 
 <fieldset>
 	<table  style="width: 30%;">
