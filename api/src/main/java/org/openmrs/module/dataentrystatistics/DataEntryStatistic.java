@@ -28,22 +28,21 @@ public class DataEntryStatistic {
 
 	protected final Log log = LogFactory.getLog(getClass());
 
-	public static DataTable tableByDateAndObs(
-			List<CalculateUserDateForObsCollectedByUser> calculateUserDateForObsCollectedByUsers) {
+	public static DataTable tableByDateAndObs(List<UserObsByDate> obsByDates) {
 
 		List<String> users = new ArrayList<String>();
 
 		Set<Date> dates = new HashSet<Date>();
 
-		List<CalculateUserDateForObsCollectedByUser> groups = new ArrayList<CalculateUserDateForObsCollectedByUser>();
+		List<UserObsByDate> groups = new ArrayList<UserObsByDate>();
 
 		DataTable table = new DataTable();
 
-		for (CalculateUserDateForObsCollectedByUser calculateUserDateForObsCollectedByUser : calculateUserDateForObsCollectedByUsers) {
+		for (UserObsByDate userObsByDate : obsByDates) {
 
-			dates.add(calculateUserDateForObsCollectedByUser.getDate());
-			users.add(calculateUserDateForObsCollectedByUser.getUser());
-			groups.add(calculateUserDateForObsCollectedByUser);
+			dates.add(userObsByDate.getDate());
+			users.add(userObsByDate.getUser());
+			groups.add(userObsByDate);
 		}
 
 		table.addColumn("Data");
@@ -57,7 +56,7 @@ public class DataEntryStatistic {
 
 			for (int j = 0; j < users.size(); j++) {
 
-				Long total = getTotalObsPerUserAndDate(date, users.get(j), calculateUserDateForObsCollectedByUsers);
+				Long total = getTotalObsPerUserAndDate(date, users.get(j), obsByDates);
 				tableRow.put(users.get(j), total);
 			}
 			table.addRow(tableRow);
@@ -74,19 +73,18 @@ public class DataEntryStatistic {
 
 	}
 
-	private static Long getTotalObsPerUserAndDate(Date date, String user,
-			List<CalculateUserDateForObsCollectedByUser> calculateUserDateForObsCollectedByUsers) {
+	private static Long getTotalObsPerUserAndDate(Date date, String user, List<UserObsByDate> userObsByDates) {
 
 		SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 
 		String formatedDate = format.format(date);
 
-		for (CalculateUserDateForObsCollectedByUser calculateUserDateForObsCollectedByUser : calculateUserDateForObsCollectedByUsers) {
+		for (UserObsByDate userObsByDate : userObsByDates) {
 
-			String dataUser = format.format(calculateUserDateForObsCollectedByUser.getDate());
+			String dataUser = format.format(userObsByDate.getDate());
 
-			if (formatedDate.equals(dataUser) && user.equals(calculateUserDateForObsCollectedByUser.getUser())) {
-				return calculateUserDateForObsCollectedByUser.getTotalObs();
+			if (formatedDate.equals(dataUser) && user.equals(userObsByDate.getUser())) {
+				return userObsByDate.getTotalObs();
 			}
 		}
 
@@ -107,8 +105,7 @@ public class DataEntryStatistic {
 
 	}
 
-	public static DataTable tableByFormAndEncounters(
-			List<CalculateUserDateTotalObsByForm> calculateUserDateTotalObsByForms) {
+	public static DataTable tableByFormAndEncounters(List<UserObsByFormType> userObsByFormTypes) {
 
 		List<String> users = new ArrayList<String>();
 
@@ -116,10 +113,10 @@ public class DataEntryStatistic {
 
 		DataTable table = new DataTable();
 
-		for (CalculateUserDateTotalObsByForm calculateUserDateTotalObsByForm : calculateUserDateTotalObsByForms) {
+		for (UserObsByFormType userObsByFormType : userObsByFormTypes) {
 
-			users.add(calculateUserDateTotalObsByForm.getUser());
-			forms.add(calculateUserDateTotalObsByForm.getForm());
+			users.add(userObsByFormType.getUser());
+			forms.add(userObsByFormType.getForm());
 
 		}
 		table.addColumn("Formularios");
@@ -135,9 +132,9 @@ public class DataEntryStatistic {
 
 			for (String user : users) {
 
-				Long total = getTotalEncounterPerUserAndForm(form, user, calculateUserDateTotalObsByForms);
+				Long total = getTotalEncounterPerUserAndForm(form, user, userObsByFormTypes);
 
-				Long totalObs = getTotal(form, user, calculateUserDateTotalObsByForms);
+				Long totalObs = getTotal(form, user, userObsByFormTypes);
 
 				tableRow.put(user, total);
 
@@ -189,13 +186,12 @@ public class DataEntryStatistic {
 	}
 
 	private static Long getTotalEncounterPerUserAndForm(String form, String user,
-			List<CalculateUserDateTotalObsByForm> calculateUserDateTotalObsByForms) {
+			List<UserObsByFormType> userObsByFormTypes) {
 
-		for (CalculateUserDateTotalObsByForm calculateUserDateTotalObsByForm : calculateUserDateTotalObsByForms) {
+		for (UserObsByFormType userObsByFormType : userObsByFormTypes) {
 
-			if (form.equals(calculateUserDateTotalObsByForm.getForm())
-					&& user.equals(calculateUserDateTotalObsByForm.getUser())) {
-				return calculateUserDateTotalObsByForm.getTotalEncounters();
+			if (form.equals(userObsByFormType.getForm()) && user.equals(userObsByFormType.getUser())) {
+				return userObsByFormType.getTotalEncounters();
 			}
 		}
 
@@ -203,15 +199,13 @@ public class DataEntryStatistic {
 
 	}
 
-	private static Long getTotal(String form, String user,
-			List<CalculateUserDateTotalObsByForm> calculateUserDateTotalObsByForms) {
+	private static Long getTotal(String form, String user, List<UserObsByFormType> userObsByFormTypes) {
 
-		for (CalculateUserDateTotalObsByForm calculateUserDateTotalObsByForm : calculateUserDateTotalObsByForms) {
+		for (UserObsByFormType userObsByFormType : userObsByFormTypes) {
 
-			if (form.equals(calculateUserDateTotalObsByForm.getForm())
-					&& user.equals(calculateUserDateTotalObsByForm.getUser())) {
+			if (form.equals(userObsByFormType.getForm()) && user.equals(userObsByFormType.getUser())) {
 
-				return calculateUserDateTotalObsByForm.getTotalObs();
+				return userObsByFormType.getTotalObs();
 			}
 		}
 

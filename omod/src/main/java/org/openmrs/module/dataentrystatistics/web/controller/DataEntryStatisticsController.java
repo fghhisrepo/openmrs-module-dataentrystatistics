@@ -86,35 +86,31 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		entryObject = (EntryObject) commandObj;
 
-		if (entryObject.getFromDate() != null && entryObject.getToDate() != null) {
+		if (entryObject.getFromDate() != null && entryObject.getToDate() != null && !entryObject.getLocation().isEmpty()) {
 
-			if (entryObject.getLocation() != null) {
+			Integer locationId = Integer.parseInt(entryObject.getLocation());
 
-				Integer locationId = Integer.parseInt(entryObject.getLocation());
+			if (entryObject.getReportType().equals(ReportType.DAILY_OBS.name())) {
 
-				if (entryObject.getReportType().equals(ReportType.DAILY_OBS.name())) {
+				table = DataEntryStatistic.tableByDateAndObs(dataEntryStatisticService
+						.getAllObsByUsersAndDate(entryObject.getFromDate(), entryObject.getToDate(), locationId));
+			}
 
-					table = DataEntryStatistic.tableByDateAndObs(dataEntryStatisticService
-							.getAllObsByUsersAndDate(entryObject.getFromDate(), entryObject.getToDate(), locationId));
-				}
+			if (entryObject.getReportType().equals(ReportType.FORM_TYPES.name())) {
 
-				if (entryObject.getReportType().equals(ReportType.FORM_TYPES.name())) {
+				table = DataEntryStatistic.tableByFormAndEncounters(dataEntryStatisticService
+						.getAllObsByUsersAndForm(entryObject.getFromDate(), entryObject.getToDate(), locationId));
+			}
 
-					table = DataEntryStatistic.tableByFormAndEncounters(dataEntryStatisticService
-							.getAllObsByUsersAndForm(entryObject.getFromDate(), entryObject.getToDate(), locationId));
-				}
+			if (entryObject.getReportType().equals(ReportType.MONTH_OBS.name())) {
 
-				if (entryObject.getReportType().equals(ReportType.MONTH_OBS.name())) {
-
-					table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService
-							.getAllMonthObs(entryObject.getFromDate(), entryObject.getToDate(), locationId));
-				}
-
-				entryObject.setTable(table);
-
+				table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService
+						.getAllMonthObs(entryObject.getFromDate(), entryObject.getToDate(), locationId));
 			}
 
 		}
+		entryObject.setTable(table);
+
 		return showForm(request, response, errors);
 	}
 

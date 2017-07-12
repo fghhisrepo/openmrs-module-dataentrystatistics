@@ -2,19 +2,19 @@ package org.openmrs.module.dataentrystatistics;
 
 import java.util.Date;
 
-public class CalculateUserDateForObsCollectedByUser {
+public class UserObsByDate {
 
 	private String user;
 	private Date date;
 	private Long totalObs;
 
-	public CalculateUserDateForObsCollectedByUser(String user, Date date, Long totalObs) {
+	public UserObsByDate(String user, Date date, Long totalObs) {
 		this.user = user;
 		this.date = date;
 		this.totalObs = totalObs;
 	}
 
-	public CalculateUserDateForObsCollectedByUser() {
+	public UserObsByDate() {
 
 	}
 

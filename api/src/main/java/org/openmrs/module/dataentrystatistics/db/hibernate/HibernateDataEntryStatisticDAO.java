@@ -23,8 +23,8 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.openmrs.Role;
-import org.openmrs.module.dataentrystatistics.CalculateUserDateForObsCollectedByUser;
-import org.openmrs.module.dataentrystatistics.CalculateUserDateTotalObsByForm;
+import org.openmrs.module.dataentrystatistics.UserObsByDate;
+import org.openmrs.module.dataentrystatistics.UserObsByFormType;
 import org.openmrs.module.dataentrystatistics.MonthObs;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 
@@ -60,7 +60,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<CalculateUserDateForObsCollectedByUser> getAllObsByUsersAndDate(Date fromDate, Date toDate,
+	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate,
 			Integer location) {
 
 		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), c.username FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY DATE(o.dateCreated),  c.username ORDER BY DATE(o.dateCreated) ASC ";
@@ -72,10 +72,10 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		List<Object[]> list = query.list();
 
-		List<CalculateUserDateForObsCollectedByUser> userDates = new ArrayList<CalculateUserDateForObsCollectedByUser>();
+		List<UserObsByDate> userDates = new ArrayList<UserObsByDate>();
 
 		for (Object[] object : list) {
-			CalculateUserDateForObsCollectedByUser userDate = new CalculateUserDateForObsCollectedByUser();
+			UserObsByDate userDate = new UserObsByDate();
 
 			userDate.setUser((String) object[2]);
 			userDate.setDate((Date) object[0]);
@@ -98,7 +98,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<CalculateUserDateTotalObsByForm> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location) {
+	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location) {
 
 		String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId) FROM  Obs o  INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l WHERE e.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY f.name, c.username";
 		Query query = getCurrentSession().createQuery(hql);
@@ -108,10 +108,10 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		List<Object[]> list = query.list();
 
-		List<CalculateUserDateTotalObsByForm> calculateUserDateTotalObsByForms = new ArrayList<CalculateUserDateTotalObsByForm>();
+		List<UserObsByFormType> calculateUserDateTotalObsByForms = new ArrayList<UserObsByFormType>();
 		for (Object[] object : list) {
 
-			CalculateUserDateTotalObsByForm calculateUserDateTotalObsByForm = new CalculateUserDateTotalObsByForm();
+			UserObsByFormType calculateUserDateTotalObsByForm = new UserObsByFormType();
 
 			calculateUserDateTotalObsByForm.setUser((String) object[1]);
 			calculateUserDateTotalObsByForm.setForm(((String) object[0]));

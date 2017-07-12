@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.openmrs.Role;
-import org.openmrs.module.dataentrystatistics.CalculateUserDateForObsCollectedByUser;
-import org.openmrs.module.dataentrystatistics.CalculateUserDateTotalObsByForm;
+import org.openmrs.module.dataentrystatistics.UserObsByDate;
+import org.openmrs.module.dataentrystatistics.UserObsByFormType;
 import org.openmrs.module.dataentrystatistics.MonthObs;
 
 /**
@@ -26,10 +26,10 @@ import org.openmrs.module.dataentrystatistics.MonthObs;
  */
 public interface DataEntryStatisticDAO {
 
-	public List<CalculateUserDateForObsCollectedByUser> getAllObsByUsersAndDate(Date fromDate, Date toDate,
+	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate,
 			Integer location);
 
-	public List<CalculateUserDateTotalObsByForm> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
+	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
 
 	public List<MonthObs> getAllMonthObs(Date fromDate, Date toDate, Integer location);
 

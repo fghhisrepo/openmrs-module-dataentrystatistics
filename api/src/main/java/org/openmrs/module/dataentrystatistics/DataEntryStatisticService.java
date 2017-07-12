@@ -26,10 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface DataEntryStatisticService extends OpenmrsService {
 
-	public List<CalculateUserDateForObsCollectedByUser> getAllObsByUsersAndDate(Date fromDate, Date toDate,
+	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate,
 			Integer location);
 
-	public List<CalculateUserDateTotalObsByForm> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
+	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
 
 	public List<MonthObs> getAllMonthObs(Date fromDate, Date toDate, Integer location);
 

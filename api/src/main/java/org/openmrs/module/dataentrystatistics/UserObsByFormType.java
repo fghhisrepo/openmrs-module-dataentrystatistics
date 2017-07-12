@@ -1,6 +1,6 @@
 package org.openmrs.module.dataentrystatistics;
 
-public class CalculateUserDateTotalObsByForm {
+public class UserObsByFormType {
 
 	private String form;
 	private Long totalEncounters;
