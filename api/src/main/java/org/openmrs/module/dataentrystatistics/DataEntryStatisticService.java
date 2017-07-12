@@ -31,6 +31,8 @@ public interface DataEntryStatisticService extends OpenmrsService {
 
 	public List<CalculateUserDateTotalObsByForm> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
 
+	public List<MonthObs> getAllMonthObs(Date fromDate, Date toDate, Integer location);
+
 	public List<Role> getAllRoles();
 
 }

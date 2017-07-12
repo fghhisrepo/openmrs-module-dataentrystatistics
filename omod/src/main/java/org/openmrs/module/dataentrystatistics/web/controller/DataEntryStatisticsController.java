@@ -104,6 +104,12 @@ public class DataEntryStatisticsController extends SimpleFormController {
 							.getAllObsByUsersAndForm(entryObject.getFromDate(), entryObject.getToDate(), locationId));
 				}
 
+				if (entryObject.getReportType().equals(ReportType.MONTH_OBS.name())) {
+
+					table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService
+							.getAllMonthObs(entryObject.getFromDate(), entryObject.getToDate(), locationId));
+				}
+
 				entryObject.setTable(table);
 
 			}

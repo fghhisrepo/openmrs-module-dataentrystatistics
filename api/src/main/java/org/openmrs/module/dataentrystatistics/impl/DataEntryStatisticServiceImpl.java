@@ -19,6 +19,7 @@ import java.util.List;
 import org.openmrs.Role;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
+import org.openmrs.module.dataentrystatistics.MonthObs;
 import org.openmrs.module.dataentrystatistics.CalculateUserDateForObsCollectedByUser;
 import org.openmrs.module.dataentrystatistics.CalculateUserDateTotalObsByForm;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
@@ -62,6 +63,11 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	public List<CalculateUserDateTotalObsByForm> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location) {
 
 		return dao.getAllObsByUsersAndForm(fromDate, toDate, location);
+	}
+
+	@Override
+	public List<MonthObs> getAllMonthObs(Date fromDate, Date toDate, Integer location) {
+		return dao.getAllMonthObs(fromDate, toDate, location);
 	}
 
 }

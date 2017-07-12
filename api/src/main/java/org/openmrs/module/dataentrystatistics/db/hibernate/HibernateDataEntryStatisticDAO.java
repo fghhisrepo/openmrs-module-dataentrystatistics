@@ -25,6 +25,7 @@ import org.hibernate.SessionFactory;
 import org.openmrs.Role;
 import org.openmrs.module.dataentrystatistics.CalculateUserDateForObsCollectedByUser;
 import org.openmrs.module.dataentrystatistics.CalculateUserDateTotalObsByForm;
+import org.openmrs.module.dataentrystatistics.MonthObs;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 
 /**
@@ -102,7 +103,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId) FROM  Obs o  INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l WHERE e.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY f.name, c.username";
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
-		query.setParameter("toDate", toDate);	
+		query.setParameter("toDate", toDate);
 		query.setParameter("location", location);
 
 		List<Object[]> list = query.list();
@@ -121,5 +122,34 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		}
 
 		return calculateUserDateTotalObsByForms;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MonthObs> getAllMonthObs(Date fromDate, Date toDate, Integer location) {
+
+		String hql = "SELECT  MONTH(o.dateCreated), count(o.obsId), c.username FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY MONTH(o.dateCreated), c.username";
+
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("fromDate", fromDate);
+		query.setParameter("toDate", toDate);
+		query.setParameter("location", location);
+
+		List<Object[]> list = query.list();
+
+		List<MonthObs> monthObss = new ArrayList<MonthObs>();
+
+		for (Object[] object : list) {
+
+			MonthObs monthObs = new MonthObs();
+
+			monthObs.setUser((String) object[2]);
+			monthObs.setDate((Integer) object[0]);
+			monthObs.setTotalObs((Long) object[1]);
+
+			monthObss.add(monthObs);
+		}
+
+		return monthObss;
 	}
 }

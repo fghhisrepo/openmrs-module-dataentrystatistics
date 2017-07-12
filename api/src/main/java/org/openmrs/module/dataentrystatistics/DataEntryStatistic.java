@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.module.dataentrystatistics.util.Month;
 
 public class DataEntryStatistic {
 
@@ -34,13 +35,15 @@ public class DataEntryStatistic {
 
 		Set<Date> dates = new HashSet<Date>();
 
+		List<CalculateUserDateForObsCollectedByUser> groups = new ArrayList<CalculateUserDateForObsCollectedByUser>();
+
 		DataTable table = new DataTable();
 
 		for (CalculateUserDateForObsCollectedByUser calculateUserDateForObsCollectedByUser : calculateUserDateForObsCollectedByUsers) {
 
 			dates.add(calculateUserDateForObsCollectedByUser.getDate());
 			users.add(calculateUserDateForObsCollectedByUser.getUser());
-
+			groups.add(calculateUserDateForObsCollectedByUser);
 		}
 
 		table.addColumn("Data");
@@ -49,18 +52,26 @@ public class DataEntryStatistic {
 		for (Date date : dates) {
 
 			TableRow tableRow = new TableRow();
+
 			tableRow.put("Data", date);
 
-			for (String user : users) {
+			for (int j = 0; j < users.size(); j++) {
 
-				Long total = getTotalObsPerUserAndDate(date, user, calculateUserDateForObsCollectedByUsers);
-				tableRow.put(user, total);
+				Long total = getTotalObsPerUserAndDate(date, users.get(j), calculateUserDateForObsCollectedByUsers);
+				tableRow.put(users.get(j), total);
 			}
-
 			table.addRow(tableRow);
+
 		}
 
+		TableRow lastRow = new TableRow();
+
+		lastRow.put("Data", "Total OBS");
+
+		table.addRow(lastRow);
+
 		return table;
+
 	}
 
 	private static Long getTotalObsPerUserAndDate(Date date, String user,
@@ -76,6 +87,19 @@ public class DataEntryStatistic {
 
 			if (formatedDate.equals(dataUser) && user.equals(calculateUserDateForObsCollectedByUser.getUser())) {
 				return calculateUserDateForObsCollectedByUser.getTotalObs();
+			}
+		}
+
+		return 0L;
+
+	}
+
+	private static Long getTotalObsPerUserAndDate(Integer date, String user, List<MonthObs> monthObs) {
+
+		for (MonthObs month : monthObs) {
+
+			if (date.equals(month.getDate()) && user.equals(month.getUser())) {
+				return month.getTotalObs();
 			}
 		}
 
@@ -124,6 +148,43 @@ public class DataEntryStatistic {
 			table.addRow(tr1);
 
 		}
+		return table;
+	}
+
+	public static DataTable tableByMonthsByObs(List<MonthObs> monthObs) {
+
+		Set<Integer> dates = new HashSet<Integer>();
+
+		List<String> users = new ArrayList<String>();
+
+		DataTable table = new DataTable();
+
+		for (MonthObs m : monthObs) {
+
+			users.add(m.getUser());
+			dates.add(m.getDate());
+
+		}
+
+		table.addColumn("Mes");
+		table.addColumns(users);
+
+		for (Integer month : dates) {
+
+			TableRow tableRow = new TableRow();
+
+			tableRow.put("Mes", Month.getMonthName(month));
+
+			for (int j = 0; j < users.size(); j++) {
+
+				Long total = getTotalObsPerUserAndDate(month, users.get(j), monthObs);
+				tableRow.put(users.get(j), total);
+			}
+
+			table.addRow(tableRow);
+
+		}
+
 		return table;
 	}
 
