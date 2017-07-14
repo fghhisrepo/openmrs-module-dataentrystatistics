@@ -2,8 +2,8 @@ package org.openmrs.module.dataentrystatistics.util;
 
 public enum Month {
 
-	JANUARY(1), FEBRUARY(2), MARCH(3), APRIL(4), MAY(5), JUNE(6), JULY(7), AUGUST(8), SEPTEMBER(9), OCTOBER(
-			10), NOVEMBER(11), DECEMBER(12);
+	JANEIRO(1), FEVEREIRO(2), MARCO(3), ABRIL(4), MAIO(5), JUNHO(6), JULHO(7), AGOSTO(8), SETEMBRO(9), OUTUBRO(
+			10), NOVEMBRO(11), DEZEMBRO(12);
 
 	private int value;
 

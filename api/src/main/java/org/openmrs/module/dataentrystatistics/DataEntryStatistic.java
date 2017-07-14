@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.dataentrystatistics.util.Month;
 
-public class DataEntryStatistic {
+public class DataEntryStatistic<K> {
 
 	protected final Log log = LogFactory.getLog(getClass());
 
@@ -34,43 +34,62 @@ public class DataEntryStatistic {
 
 		Set<Date> dates = new HashSet<Date>();
 
-		List<UserObsByDate> groups = new ArrayList<UserObsByDate>();
-
 		DataTable table = new DataTable();
 
 		for (UserObsByDate userObsByDate : obsByDates) {
 
 			dates.add(userObsByDate.getDate());
-			users.add(userObsByDate.getUser());
-			groups.add(userObsByDate);
+			users.add(userObsByDate.getUser().toUpperCase());
 		}
 
-		table.addColumn("Data");
+		table.addColumn("DATA");
 		table.addColumns(users);
 
 		for (Date date : dates) {
 
 			TableRow tableRow = new TableRow();
 
-			tableRow.put("Data", date);
+			tableRow.put("DATA", date);
 
 			for (int j = 0; j < users.size(); j++) {
 
-				Long total = getTotalObsPerUserAndDate(date, users.get(j), obsByDates);
-				tableRow.put(users.get(j), total);
+				Long total = getTotalObsPerUserAndDate(date, users.get(j).toUpperCase(), obsByDates);
+				tableRow.put(users.get(j).toUpperCase(), total);
 			}
 			table.addRow(tableRow);
 
 		}
 
-		TableRow lastRow = new TableRow();
+		TableRow lastRowTotal = new TableRow();
+		TableRow lastRowAverege = new TableRow();
 
-		lastRow.put("Data", "Total OBS");
+		lastRowTotal.put("DATA", "TOTAL OBS");
+		lastRowAverege.put("DATA", "MEDIA OBS");
 
-		table.addRow(lastRow);
+		for (String u : users) {
+			Long totalObs = getTotal(u, obsByDates);
+
+			lastRowTotal.put(u, totalObs);
+			lastRowAverege.put(u, totalObs / table.getRowCount());
+		}
+
+		table.addRow(lastRowTotal);
+		table.addRow(lastRowAverege);
 
 		return table;
+	}
 
+	private static Long getTotal(String user, List<UserObsByDate> obsByDates) {
+
+		Long sum = 0L;
+
+		for (UserObsByDate userObsByDate : obsByDates) {
+
+			if (user.equalsIgnoreCase(userObsByDate.getUser())) {
+				sum = sum + userObsByDate.getTotalObs();
+			}
+		}
+		return sum;
 	}
 
 	private static Long getTotalObsPerUserAndDate(Date date, String user, List<UserObsByDate> userObsByDates) {
@@ -83,7 +102,7 @@ public class DataEntryStatistic {
 
 			String dataUser = format.format(userObsByDate.getDate());
 
-			if (formatedDate.equals(dataUser) && user.equals(userObsByDate.getUser())) {
+			if (formatedDate.equals(dataUser) && user.equals(userObsByDate.getUser().toUpperCase())) {
 				return userObsByDate.getTotalObs();
 			}
 		}
@@ -96,7 +115,7 @@ public class DataEntryStatistic {
 
 		for (MonthObs month : monthObs) {
 
-			if (date.equals(month.getDate()) && user.equals(month.getUser())) {
+			if (date.equals(month.getDate()) && user.equals(month.getUser().toUpperCase())) {
 				return month.getTotalObs();
 			}
 		}
@@ -115,37 +134,67 @@ public class DataEntryStatistic {
 
 		for (UserObsByFormType userObsByFormType : userObsByFormTypes) {
 
-			users.add(userObsByFormType.getUser());
+			users.add(userObsByFormType.getUser().toUpperCase());
 			forms.add(userObsByFormType.getForm());
 
 		}
-		table.addColumn("Formularios");
+		table.addColumn("FORMULARIOS");
 		table.addColumns(users);
 
 		for (String form : forms) {
 
-			TableRow tableRow = new TableRow();
-			TableRow tr1 = new TableRow();
+			TableRow tableRowForm = new TableRow();
+			TableRow tableRowObs = new TableRow();
 
-			tableRow.put("Formularios", form);
-			tr1.put("Formularios", form);
+			tableRowForm.put("FORMULARIOS", form.concat("TOTAL-ENC"));
+			tableRowObs.put("FORMULARIOS", form.concat("TOTAL-OBS"));
 
 			for (String user : users) {
 
-				Long total = getTotalEncounterPerUserAndForm(form, user, userObsByFormTypes);
+				Long totalForms = getTotalEncounterPerUserAndForm(form, user.toUpperCase(), userObsByFormTypes);
 
-				Long totalObs = getTotal(form, user, userObsByFormTypes);
+				Long totalObs = getTotal(form, user.toUpperCase(), userObsByFormTypes);
 
-				tableRow.put(user, total);
+				tableRowForm.put(user.toUpperCase(), totalForms);
 
-				tr1.put(user, totalObs);
+				tableRowObs.put(user.toUpperCase(), totalObs);
 
 			}
-			table.addRow(tableRow);
-			table.addRow(tr1);
+
+			table.addRow(tableRowForm);
+			table.addRow(tableRowObs);
 
 		}
+
+		TableRow lastRowTotal = new TableRow();
+		TableRow lastRowAverege = new TableRow();
+
+		lastRowTotal.put("FORMULARIOS", "TOTAL FORMULARIOS");
+		lastRowAverege.put("FORMULARIOS", "MEDIA FORMULARIOS");
+
+		for (String u : users) {
+			Long total = getTotalPerFormType(u, userObsByFormTypes);
+
+			lastRowTotal.put(u, total);
+			lastRowAverege.put(u, total / (table.getRowCount()) / 2);
+		}
+
+		table.addRow(lastRowTotal);
+		table.addRow(lastRowAverege);
+
 		return table;
+	}
+
+	private static Long getTotalPerFormType(String user, List<UserObsByFormType> userObsByFormTypes) {
+		Long sum = 0L;
+
+		for (UserObsByFormType obsByFormType : userObsByFormTypes) {
+
+			if (user.equalsIgnoreCase(obsByFormType.getUser())) {
+				sum = sum + obsByFormType.getTotalObs();
+			}
+		}
+		return sum;
 	}
 
 	public static DataTable tableByMonthsByObs(List<MonthObs> monthObs) {
@@ -158,24 +207,24 @@ public class DataEntryStatistic {
 
 		for (MonthObs m : monthObs) {
 
-			users.add(m.getUser());
+			users.add(m.getUser().toUpperCase());
 			dates.add(m.getDate());
 
 		}
 
-		table.addColumn("Mes");
+		table.addColumn("MES");
 		table.addColumns(users);
 
 		for (Integer month : dates) {
 
 			TableRow tableRow = new TableRow();
 
-			tableRow.put("Mes", Month.getMonthName(month));
+			tableRow.put("MES", Month.getMonthName(month));
 
 			for (int j = 0; j < users.size(); j++) {
 
-				Long total = getTotalObsPerUserAndDate(month, users.get(j), monthObs);
-				tableRow.put(users.get(j), total);
+				Long total = getTotalObsPerUserAndDate(month, users.get(j).toUpperCase(), monthObs);
+				tableRow.put(users.get(j).toUpperCase(), total);
 			}
 
 			table.addRow(tableRow);
@@ -190,7 +239,7 @@ public class DataEntryStatistic {
 
 		for (UserObsByFormType userObsByFormType : userObsByFormTypes) {
 
-			if (form.equals(userObsByFormType.getForm()) && user.equals(userObsByFormType.getUser())) {
+			if (form.equals(userObsByFormType.getForm()) && user.equals(userObsByFormType.getUser().toUpperCase())) {
 				return userObsByFormType.getTotalEncounters();
 			}
 		}
@@ -203,7 +252,7 @@ public class DataEntryStatistic {
 
 		for (UserObsByFormType userObsByFormType : userObsByFormTypes) {
 
-			if (form.equals(userObsByFormType.getForm()) && user.equals(userObsByFormType.getUser())) {
+			if (form.equals(userObsByFormType.getForm()) && user.equals(userObsByFormType.getUser().toUpperCase())) {
 
 				return userObsByFormType.getTotalObs();
 			}

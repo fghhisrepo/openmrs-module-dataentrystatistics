@@ -23,9 +23,9 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.openmrs.Role;
+import org.openmrs.module.dataentrystatistics.MonthObs;
 import org.openmrs.module.dataentrystatistics.UserObsByDate;
 import org.openmrs.module.dataentrystatistics.UserObsByFormType;
-import org.openmrs.module.dataentrystatistics.MonthObs;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 
 /**
@@ -60,8 +60,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate,
-			Integer location) {
+	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
 
 		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), c.username FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY DATE(o.dateCreated),  c.username ORDER BY DATE(o.dateCreated) ASC ";
 
@@ -151,5 +150,32 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		}
 
 		return monthObss;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location) {
+
+		String hql = "SELECT count(o.obsId), c.username FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY c.username";
+
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("fromDate", fromDate);
+		query.setParameter("toDate", toDate);
+		query.setParameter("location", location);
+
+		List<Object[]> list = query.list();
+
+		List<UserObsByDate> userObsByDates = new ArrayList<UserObsByDate>();
+
+		for (Object[] object : list) {
+			UserObsByDate userObsByDate = new UserObsByDate();
+
+			userObsByDate.setUser((String) object[1]);
+			userObsByDate.setTotalObs((Long) object[0]);
+
+			userObsByDates.add(userObsByDate);
+		}
+
+		return userObsByDates;
 	}
 }

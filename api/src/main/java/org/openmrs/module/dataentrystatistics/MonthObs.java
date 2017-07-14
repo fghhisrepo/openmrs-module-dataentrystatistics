@@ -3,6 +3,7 @@ package org.openmrs.module.dataentrystatistics;
 public class MonthObs {
 	private String user;
 	private Integer date;
+	private Integer year;
 	private Long totalObs;
 
 	public String getUser() {
@@ -27,5 +28,13 @@ public class MonthObs {
 
 	public void setDate(Integer date) {
 		this.date = date;
+	}
+
+	public Integer getYear() {
+		return year;
+	}
+
+	public void setYear(Integer year) {
+		this.year = year;
 	}
 }

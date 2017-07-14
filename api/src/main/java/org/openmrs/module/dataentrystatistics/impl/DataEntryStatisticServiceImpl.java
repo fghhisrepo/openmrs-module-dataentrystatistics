@@ -49,8 +49,7 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	}
 
 	@Override
-	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate,
-			Integer location) {
+	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
 		return dao.getAllObsByUsersAndDate(fromDate, toDate, location);
 	}
 
@@ -68,6 +67,11 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	@Override
 	public List<MonthObs> getAllMonthObs(Date fromDate, Date toDate, Integer location) {
 		return dao.getAllMonthObs(fromDate, toDate, location);
+	}
+
+	@Override
+	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location) {
+		return dao.countTotalObsPerUserAndDate(fromDate, toDate, location);
 	}
 
 }

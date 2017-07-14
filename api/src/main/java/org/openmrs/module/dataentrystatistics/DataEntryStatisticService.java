@@ -28,6 +28,9 @@ public interface DataEntryStatisticService extends OpenmrsService {
 
 	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate,
 			Integer location);
+	
+	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location);
+
 
 	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
 

@@ -26,8 +26,9 @@ import org.openmrs.module.dataentrystatistics.MonthObs;
  */
 public interface DataEntryStatisticDAO {
 
-	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate,
-			Integer location);
+	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location);
+
+	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location);
 
 	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
 
