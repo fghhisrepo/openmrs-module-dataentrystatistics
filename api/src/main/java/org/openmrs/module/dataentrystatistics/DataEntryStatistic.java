@@ -244,7 +244,9 @@ public class DataEntryStatistic<K> {
 
 	public static DataTable tableByMonthsByObs(List<MonthObs> monthObs) {
 
-		Set<Integer> dates = new HashSet<Integer>();
+		Set<Integer> months = new HashSet<Integer>();
+
+		Set<Integer> years = new HashSet<Integer>();
 
 		List<String> users = new ArrayList<String>();
 
@@ -253,30 +255,60 @@ public class DataEntryStatistic<K> {
 		for (MonthObs m : monthObs) {
 
 			users.add(m.getUser().toUpperCase());
-			dates.add(m.getDate());
+			months.add(m.getDate());
+			years.add(m.getYear());
 
 		}
 
 		table.addColumn("MES");
 		table.addColumns(users);
 
-		for (Integer month : dates) {
+		for (Integer month : months) {
+			for (Integer year : years) {
 
-			TableRow tableRow = new TableRow();
+				TableRow tableRow = new TableRow();
 
-			tableRow.put("MES", Month.getMonthName(month));
+				tableRow.put("MES", Month.getMonthName(month).concat("(" + year + ")"));
 
-			for (int j = 0; j < users.size(); j++) {
+				for (int j = 0; j < users.size(); j++) {
+					Long total = getTotalObsPerUserAndDate(month, users.get(j).toUpperCase(), monthObs);
+					tableRow.put(users.get(j).toUpperCase(), total);
+				}
 
-				Long total = getTotalObsPerUserAndDate(month, users.get(j).toUpperCase(), monthObs);
-				tableRow.put(users.get(j).toUpperCase(), total);
+				table.addRow(tableRow);
 			}
+		}
 
-			table.addRow(tableRow);
+		TableRow lastRowAverege = new TableRow();
+
+		lastRowAverege.put("MES", "MEDIA OBS");
+
+		for (String user : users) {
+
+			Long totalObs = getTotalMonthReport(user, monthObs);
+
+			Long avarege = totalObs / table.getRowCount();
+
+			lastRowAverege.put(user, avarege);
 
 		}
 
+		table.addRow(lastRowAverege);
+
 		return table;
+	}
+
+	private static Long getTotalMonthReport(String user, List<MonthObs> monthObs) {
+
+		Long sum = 0L;
+
+		for (MonthObs montObs : monthObs) {
+
+			if (user.equalsIgnoreCase(montObs.getUser())) {
+				sum = sum + montObs.getTotalObs();
+			}
+		}
+		return sum;
 	}
 
 	private static Long getTotalEncounterPerUserAndForm(String form, String user,

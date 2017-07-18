@@ -127,7 +127,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 	@Override
 	public List<MonthObs> getAllMonthObs(Date fromDate, Date toDate, Integer location) {
 
-		String hql = "SELECT  MONTH(o.dateCreated), count(o.obsId), c.username FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY MONTH(o.dateCreated), c.username";
+		String hql = "SELECT  MONTH(o.dateCreated), count(o.obsId), c.username, YEAR(o.dateCreated) FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY MONTH(o.dateCreated), c.username";
 
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
@@ -145,6 +145,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 			monthObs.setUser((String) object[2]);
 			monthObs.setDate((Integer) object[0]);
 			monthObs.setTotalObs((Long) object[1]);
+			monthObs.setYear((Integer) object[3]);
 
 			monthObss.add(monthObs);
 		}

@@ -64,7 +64,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		DataEntryStatisticService svc = (DataEntryStatisticService) Context.getService(DataEntryStatisticService.class);
 
-		List<String> reportTypes = new ArrayList<>();
+		List<String> reportTypes = new ArrayList<String>();
 
 		List<Role> roles = svc.getAllRoles();
 
