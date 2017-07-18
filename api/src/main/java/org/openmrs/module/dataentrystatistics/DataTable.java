@@ -53,6 +53,11 @@ public class DataTable {
 			addColumn(colName);
 	}
 
+	public void addColumnsValues(Collection<Long> colValues) {
+		for (Long c : colValues)
+			addColumn(c.toString());
+	}
+
 	public int getRowCount() {
 		return rows.size();
 	}
@@ -130,8 +135,7 @@ public class DataTable {
 		}
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div id=\"dvData\">");
-		sb.append(
-				"<table id=\"result\" class=\"display nowrap\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">");
+		sb.append("<table id=\"result\" class=\"display nowrap\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">");
 		sb.append("<thead><tr>");
 		for (String colName : columns) {
 			sb.append("<th>").append(colName).append("</th>");

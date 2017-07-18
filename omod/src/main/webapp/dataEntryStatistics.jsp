@@ -54,7 +54,7 @@
                 }
             }
             $("#export").click(function (event) {
-                exportTableToCSV.apply(this, [$('#dvData>table'), 'DATA_ENTRY_STATISTIC']);
+                exportTableToCSV.apply(this, [$('#dvData>table'), 'DATA_ENTRY_STATISTIC.csv']);
                 
             });
         });
