@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.dataentrystatistics;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,15 +66,18 @@ public class DataEntryStatistic<K> {
 		TableRow lastRowTotal = new TableRow();
 		TableRow lastRowAverege = new TableRow();
 
+		DecimalFormat format = new DecimalFormat("#.##");
+
 		lastRowTotal.put("DATA", "TOTAL OBS");
 		lastRowAverege.put("DATA", "MEDIA OBS");
 
 		for (String u : users) {
 
 			Long totalObs = getTotal(u, obsByDates);
-			Long avarege = totalObs / table.getRowCount();
+			Double avarege = totalObs.doubleValue() / table.getRowCount();
+
 			lastRowTotal.put(u, totalObs);
-			lastRowAverege.put(u, avarege);
+			lastRowAverege.put(u, format.format(avarege));
 
 			lastRowTotal.put("TOTAL", getTotal(obsByDates));
 			lastRowAverege.put("TOTAL", getTotal(table.getRowCount(), obsByDates));
@@ -188,9 +192,11 @@ public class DataEntryStatistic<K> {
 
 		TableRow lastRowTotalForm = new TableRow();
 		TableRow lastRowTotalObs = new TableRow();
+		TableRow tableAveregeObsPerEncounter = new TableRow();
 
 		lastRowTotalForm.put("FORMULARIOS", "TOTAL FORMULARIOS-ENC");
 		lastRowTotalObs.put("FORMULARIOS", "TOTAL FORMULARIOS-OBS");
+		tableAveregeObsPerEncounter.put("FORMULARIOS", "MEDIA DE OBS POR ENC(OBS/ENC)");
 
 		for (String form : forms) {
 
@@ -221,22 +227,28 @@ public class DataEntryStatistic<K> {
 
 		for (String user : users) {
 
+			DecimalFormat df = new DecimalFormat("#.##");
+
 			Long totalEnc = getTotalPerFormType(user, userObsByFormTypes, "ENC");
-			lastRowTotalForm.put(user, totalEnc);
+			lastRowTotalForm.put(user, df.format(totalEnc));
 			lastRowTotalForm.put("TOTAL", getTotalFormsEncounters(userObsByFormTypes));
 
-		}
-
-		for (String user : users) {
-
 			Long totalObs = getTotalPerOBS(user, userObsByFormTypes, "OBS");
-			lastRowTotalObs.put(user, totalObs);
+			lastRowTotalObs.put(user, df.format(totalObs));
 			lastRowTotalObs.put("TOTAL", getTotalFormsOBS(userObsByFormTypes));
+
+			Double avarege = totalObs.doubleValue() / totalEnc.doubleValue();
+
+			String value = df.format(avarege);
+
+			tableAveregeObsPerEncounter.put(user, value);
+			tableAveregeObsPerEncounter.put("TOTAL", value);
 
 		}
 
 		table.addRow(lastRowTotalForm);
 		table.addRow(lastRowTotalObs);
+		table.addRow(tableAveregeObsPerEncounter);
 
 		return table;
 	}
