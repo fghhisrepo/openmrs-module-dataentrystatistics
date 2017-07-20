@@ -250,19 +250,6 @@ public class DataEntryStatistic<K> {
 			Long totalEncd = getTotalPerFormType(user, userObsByFormTypes, "ENC");
 
 			lastRowTotalForm.put(user, totalEncd);
-			DecimalFormat df = new DecimalFormat("#.##");
-
-			Long totalEnc = getTotalPerFormType(user, userObsByFormTypes, "ENC");
-			lastRowTotalForm.put(user, df.format(totalEnc));
-			lastRowTotalForm.put("TOTAL", getTotalFormsEncounters(userObsByFormTypes));
-
-			Long totalObs = getTotalPerOBS(user, userObsByFormTypes, "OBS");
-			lastRowTotalObs.put(user, df.format(totalObs));
-			lastRowTotalObs.put("TOTAL", getTotalFormsOBS(userObsByFormTypes));
-
-			Double avarege = totalObs.doubleValue() / totalEnc.doubleValue();
-
-			String value = df.format(avarege);
 
 			tableAveregeObsPerEncounter.put(user, value);
 			tableAveregeObsPerEncounter.put("TOTAL", value);
