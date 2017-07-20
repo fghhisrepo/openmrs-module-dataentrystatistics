@@ -200,6 +200,7 @@ public class DataEntryStatistic<K> {
 
 		lastRowTotalForm.put("FORMULARIOS", "TOTAL FORMULARIOS-ENC");
 		lastRowTotalObs.put("FORMULARIOS", "TOTAL FORMULARIOS-OBS");
+		tableAveregeObsPerEncounter.put("FORMULARIOS", "MEDIA DE OBS POR ENC(OBS/ENC)");
 
 		for (String form : forms) {
 
@@ -249,15 +250,22 @@ public class DataEntryStatistic<K> {
 			Long totalEncd = getTotalPerFormType(user, userObsByFormTypes, "ENC");
 
 			lastRowTotalForm.put(user, totalEncd);
+			DecimalFormat df = new DecimalFormat("#.##");
+
+			Long totalEnc = getTotalPerFormType(user, userObsByFormTypes, "ENC");
+			lastRowTotalForm.put(user, df.format(totalEnc));
 			lastRowTotalForm.put("TOTAL", getTotalFormsEncounters(userObsByFormTypes));
 
-		}
-
-		for (String user : users) {
-
 			Long totalObs = getTotalPerOBS(user, userObsByFormTypes, "OBS");
-			lastRowTotalObs.put(user, totalObs);
+			lastRowTotalObs.put(user, df.format(totalObs));
 			lastRowTotalObs.put("TOTAL", getTotalFormsOBS(userObsByFormTypes));
+
+			Double avarege = totalObs.doubleValue() / totalEnc.doubleValue();
+
+			String value = df.format(avarege);
+
+			tableAveregeObsPerEncounter.put(user, value);
+			tableAveregeObsPerEncounter.put("TOTAL", value);
 
 		}
 
