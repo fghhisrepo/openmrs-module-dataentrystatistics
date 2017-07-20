@@ -198,6 +198,9 @@ public class DataEntryStatistic<K> {
 		lastRowTotalObs.put("FORMULARIOS", "TOTAL FORMULARIOS-OBS");
 		tableAveregeObsPerEncounter.put("FORMULARIOS", "MEDIA DE OBS POR ENC(OBS/ENC)");
 
+		lastRowTotalForm.put("FORMULARIOS", "TOTAL FORMULARIOS-ENC");
+		lastRowTotalObs.put("FORMULARIOS", "TOTAL FORMULARIOS-OBS");
+
 		for (String form : forms) {
 
 			TableRow tableRowForm = new TableRow();
@@ -243,6 +246,18 @@ public class DataEntryStatistic<K> {
 
 			tableAveregeObsPerEncounter.put(user, value);
 			tableAveregeObsPerEncounter.put("TOTAL", value);
+			Long totalEncd = getTotalPerFormType(user, userObsByFormTypes, "ENC");
+			
+			lastRowTotalForm.put(user, totalEncd);
+			lastRowTotalForm.put("TOTAL", getTotalFormsEncounters(userObsByFormTypes));
+
+		}
+
+		for (String user : users) {
+
+			Long totalObs = getTotalPerOBS(user, userObsByFormTypes, "OBS");
+			lastRowTotalObs.put(user, totalObs);
+			lastRowTotalObs.put("TOTAL", getTotalFormsOBS(userObsByFormTypes));
 
 		}
 
