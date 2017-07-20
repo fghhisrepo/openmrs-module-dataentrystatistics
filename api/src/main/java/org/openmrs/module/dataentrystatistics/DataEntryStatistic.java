@@ -52,10 +52,10 @@ public class DataEntryStatistic<K> {
 
 			tableRow.put("DATA", date);
 
-			for (int j = 0; j < users.size(); j++) {
+			for (String user : users) {
 
-				Long total = getTotalObsPerUserAndDate(date, users.get(j).toUpperCase(), obsByDates);
-				tableRow.put(users.get(j).toUpperCase(), total);
+				Long total = getTotalObsPerUserAndDate(date, user.toUpperCase(), obsByDates);
+				tableRow.put(user.toUpperCase(), total);
 				tableRow.put("TOTAL", getTotal(date, obsByDates));
 
 			}
@@ -227,19 +227,19 @@ public class DataEntryStatistic<K> {
 
 		for (String user : users) {
 
-			DecimalFormat df = new DecimalFormat("#.##");
+			DecimalFormat format = new DecimalFormat("#.##");
 
 			Long totalEnc = getTotalPerFormType(user, userObsByFormTypes, "ENC");
-			lastRowTotalForm.put(user, df.format(totalEnc));
+			lastRowTotalForm.put(user, format.format(totalEnc));
 			lastRowTotalForm.put("TOTAL", getTotalFormsEncounters(userObsByFormTypes));
 
 			Long totalObs = getTotalPerOBS(user, userObsByFormTypes, "OBS");
-			lastRowTotalObs.put(user, df.format(totalObs));
+			lastRowTotalObs.put(user, format.format(totalObs));
 			lastRowTotalObs.put("TOTAL", getTotalFormsOBS(userObsByFormTypes));
 
 			Double avarege = totalObs.doubleValue() / totalEnc.doubleValue();
 
-			String value = df.format(avarege);
+			String value = format.format(avarege);
 
 			tableAveregeObsPerEncounter.put(user, value);
 			tableAveregeObsPerEncounter.put("TOTAL", value);
@@ -336,14 +336,18 @@ public class DataEntryStatistic<K> {
 		Set<Integer> years = new HashSet<Integer>();
 
 		List<String> users = new ArrayList<String>();
+		List<String> usersAvarege = new ArrayList<String>();
 
 		DataTable table = new DataTable();
+
+		DecimalFormat format = new DecimalFormat("#.##");
 
 		for (MonthObs m : monthObs) {
 
 			users.add(m.getUser().toUpperCase());
 			months.add(m.getDate());
 			years.add(m.getYear());
+			usersAvarege.add(m.getUser());
 
 		}
 
@@ -357,13 +361,14 @@ public class DataEntryStatistic<K> {
 
 				tableRow.put("MES", Month.getMonthName(month).concat("(" + year + ")"));
 
-				for (int j = 0; j < users.size(); j++) {
-					Long total = getTotalObsPerUserAndDate(month, users.get(j).toUpperCase(), monthObs);
-					tableRow.put(users.get(j).toUpperCase(), total);
+				for (String user : users) {
+					Long total = getTotalObsPerUserAndDate(month, user.toUpperCase(), monthObs);
+					tableRow.put(user.toUpperCase(), total);
 				}
 
 				table.addRow(tableRow);
 			}
+
 		}
 
 		TableRow lastRowAverege = new TableRow();
@@ -374,9 +379,9 @@ public class DataEntryStatistic<K> {
 
 			Long totalObs = getTotalMonthReport(user, monthObs);
 
-			Long avarege = totalObs / table.getRowCount();
+			Double avarege = totalObs.doubleValue() / table.getRowCount();
 
-			lastRowAverege.put(user, avarege);
+			lastRowAverege.put(user, format.format(avarege));
 
 		}
 
