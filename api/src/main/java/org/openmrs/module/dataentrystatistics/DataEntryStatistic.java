@@ -186,13 +186,19 @@ public class DataEntryStatistic<K> {
 		table.addColumns(users);
 		table.addColumn("TOTAL");
 
+		TableRow lastRowTotalForm = new TableRow();
+		TableRow lastRowTotalObs = new TableRow();
+
+		lastRowTotalForm.put("FORMULARIOS", "TOTAL FORMULARIOS-ENC");
+		lastRowTotalObs.put("FORMULARIOS", "TOTAL FORMULARIOS-OBS");
+
 		for (String form : forms) {
 
 			TableRow tableRowForm = new TableRow();
 			TableRow tableRowObs = new TableRow();
 
-			tableRowForm.put("FORMULARIOS", form);
-			tableRowObs.put("FORMULARIOS", form);
+			tableRowForm.put("FORMULARIOS", "ENC".concat(" - ").concat(form));
+			tableRowObs.put("FORMULARIOS", "OBS".concat(" - ").concat(form));
 
 			for (String user : users) {
 
@@ -203,9 +209,9 @@ public class DataEntryStatistic<K> {
 				tableRowForm.put(user.toUpperCase(), totalForms);
 
 				tableRowObs.put(user.toUpperCase(), totalObs);
+
 				tableRowForm.put("TOTAL", getTotalFormsEncounters(form, userObsByFormTypes));
 				tableRowObs.put("TOTAL", getTotalFormsObs(form, userObsByFormTypes));
-
 			}
 
 			table.addRow(tableRowForm);
@@ -213,7 +219,56 @@ public class DataEntryStatistic<K> {
 
 		}
 
+		for (String user : users) {
+
+			Long totalEnc = getTotalPerFormType(user, userObsByFormTypes, "ENC");
+			lastRowTotalForm.put(user, totalEnc);
+			lastRowTotalForm.put("TOTAL", getTotalFormsEncounters(userObsByFormTypes));
+
+		}
+
+		for (String user : users) {
+
+			Long totalObs = getTotalPerOBS(user, userObsByFormTypes, "OBS");
+			lastRowTotalObs.put(user, totalObs);
+			lastRowTotalObs.put("TOTAL", getTotalFormsOBS(userObsByFormTypes));
+
+		}
+
+		table.addRow(lastRowTotalForm);
+		table.addRow(lastRowTotalObs);
+
 		return table;
+	}
+
+	private static Long getTotalPerFormType(String user, List<UserObsByFormType> userObsByFormTypes, String type) {
+
+		Long sum = 0L;
+
+		for (UserObsByFormType obsByFormType : userObsByFormTypes) {
+
+			if (user.equalsIgnoreCase(obsByFormType.getUser())) {
+
+				if (type.substring(0, 3).equals("ENC"))
+					sum = sum + obsByFormType.getTotalEncounters();
+			}
+		}
+		return sum;
+	}
+
+	private static Long getTotalPerOBS(String user, List<UserObsByFormType> userObsByFormTypes, String type) {
+
+		Long sum = 0L;
+
+		for (UserObsByFormType obsByFormType : userObsByFormTypes) {
+			if (user.equalsIgnoreCase(obsByFormType.getUser())) {
+
+				if (type.substring(0, 3).equals("OBS")) {
+					sum = sum + obsByFormType.getTotalObs();
+				}
+			}
+		}
+		return sum;
 	}
 
 	private static Long getTotalFormsEncounters(String form, List<UserObsByFormType> obsByFormTypes) {
@@ -225,6 +280,26 @@ public class DataEntryStatistic<K> {
 			if (form.equals(obsByFormType.getForm())) {
 				sum = sum + obsByFormType.getTotalEncounters();
 			}
+		}
+		return sum;
+	}
+
+	private static Long getTotalFormsEncounters(List<UserObsByFormType> obsByFormTypes) {
+
+		Long sum = 0L;
+
+		for (UserObsByFormType obsByFormType : obsByFormTypes) {
+			sum = sum + obsByFormType.getTotalEncounters();
+		}
+		return sum;
+	}
+
+	private static Long getTotalFormsOBS(List<UserObsByFormType> obsByFormTypes) {
+
+		Long sum = 0L;
+
+		for (UserObsByFormType obsByFormType : obsByFormTypes) {
+			sum = sum + obsByFormType.getTotalObs();
 		}
 		return sum;
 	}
