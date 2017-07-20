@@ -80,7 +80,7 @@ public class DataEntryStatistic<K> {
 			lastRowAverege.put(u, format.format(avarege));
 
 			lastRowTotal.put("TOTAL", getTotal(obsByDates));
-			lastRowAverege.put("TOTAL", getTotal(table.getRowCount(), obsByDates));
+			lastRowAverege.put("TOTAL", format.format(getTotal(table.getRowCount(), obsByDates)));
 
 		}
 
@@ -128,13 +128,13 @@ public class DataEntryStatistic<K> {
 		return sum;
 	}
 
-	private static Long getTotal(Integer value, List<UserObsByDate> obsByDates) {
+	private static Double getTotal(Integer value, List<UserObsByDate> obsByDates) {
 
-		Long sum = 0L;
+		Double sum = (double) 0;
 
 		for (UserObsByDate userObsByDate : obsByDates) {
 
-			sum = sum + userObsByDate.getTotalObs();
+			sum = sum + userObsByDate.getTotalObs().doubleValue();
 
 		}
 		return sum / value;
