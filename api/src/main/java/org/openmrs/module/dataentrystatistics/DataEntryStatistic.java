@@ -378,7 +378,6 @@ public class DataEntryStatistic<K> {
 
 				table.addRow(tableRow);
 			}
-
 		}
 
 		TableRow lastRowAverege = new TableRow();
