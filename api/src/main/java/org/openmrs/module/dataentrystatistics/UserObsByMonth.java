@@ -1,6 +1,6 @@
 package org.openmrs.module.dataentrystatistics;
 
-public class MonthObs {
+public class UserObsByMonth {
 	private String user;
 	private Integer date;
 	private Integer year;

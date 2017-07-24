@@ -19,7 +19,7 @@ import java.util.List;
 import org.openmrs.Role;
 import org.openmrs.module.dataentrystatistics.UserObsByDate;
 import org.openmrs.module.dataentrystatistics.UserObsByFormType;
-import org.openmrs.module.dataentrystatistics.MonthObs;
+import org.openmrs.module.dataentrystatistics.UserObsByMonth;
 
 /**
  * Database methods for the DataEntryStatisticService
@@ -32,7 +32,7 @@ public interface DataEntryStatisticDAO {
 
 	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
 
-	public List<MonthObs> getAllMonthObs(Date fromDate, Date toDate, Integer location);
+	public List<UserObsByMonth> getAllMonthObs(Date fromDate, Date toDate, Integer location);
 
 	public List<Role> getAllRoles();
 

@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.openmrs.Role;
-import org.openmrs.module.dataentrystatistics.MonthObs;
+import org.openmrs.module.dataentrystatistics.UserObsByMonth;
 import org.openmrs.module.dataentrystatistics.UserObsByDate;
 import org.openmrs.module.dataentrystatistics.UserObsByFormType;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
@@ -127,7 +127,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MonthObs> getAllMonthObs(Date fromDate, Date toDate, Integer location) {
+	public List<UserObsByMonth> getAllMonthObs(Date fromDate, Date toDate, Integer location) {
 
 		String hql = "SELECT  MONTH(o.dateCreated), count(o.obsId), c.username, YEAR(o.dateCreated) FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND  o.voided = :voided  GROUP BY MONTH(o.dateCreated), c.username, YEAR(o.dateCreated)";
 
@@ -139,11 +139,11 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		List<Object[]> list = query.list();
 
-		List<MonthObs> monthObss = new ArrayList<MonthObs>();
+		List<UserObsByMonth> monthObss = new ArrayList<UserObsByMonth>();
 
 		for (Object[] object : list) {
 
-			MonthObs monthObs = new MonthObs();
+			UserObsByMonth monthObs = new UserObsByMonth();
 
 			monthObs.setUser((String) object[2]);
 			monthObs.setDate((Integer) object[0]);

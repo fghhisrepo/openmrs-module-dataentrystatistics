@@ -69,7 +69,7 @@ public class DataEntryStatistic<K> {
 		DecimalFormat format = new DecimalFormat("#.##");
 
 		lastRowTotal.put("DATA", "TOTAL OBS");
-		lastRowAverege.put("DATA", "MEDIA OBS");
+		lastRowAverege.put("DATA", "MEDIA OBS (OBS/DAY)");
 
 		for (String u : users) {
 
@@ -159,9 +159,9 @@ public class DataEntryStatistic<K> {
 
 	}
 
-	private static Long getTotalObsPerUserAndDate(Integer date, String user, List<MonthObs> monthObs) {
+	private static Long getTotalObsPerUserAndDate(Integer date, String user, List<UserObsByMonth> monthObs) {
 
-		for (MonthObs month : monthObs) {
+		for (UserObsByMonth month : monthObs) {
 
 			if (date.equals(month.getDate()) && user.equals(month.getUser().toUpperCase())) {
 				return month.getTotalObs();
@@ -247,7 +247,7 @@ public class DataEntryStatistic<K> {
 			tableAveregeObsPerEncounter.put(user, value);
 			tableAveregeObsPerEncounter.put("TOTAL", value);
 			Long totalEncd = getTotalPerFormType(user, userObsByFormTypes, "ENC");
-			
+
 			lastRowTotalForm.put(user, totalEncd);
 			lastRowTotalForm.put("TOTAL", getTotalFormsEncounters(userObsByFormTypes));
 
@@ -344,7 +344,7 @@ public class DataEntryStatistic<K> {
 		return sum;
 	}
 
-	public static DataTable tableByMonthsByObs(List<MonthObs> monthObs) {
+	public static DataTable tableByMonthsByObs(List<UserObsByMonth> monthObs) {
 
 		Set<Integer> months = new HashSet<Integer>();
 
@@ -357,7 +357,7 @@ public class DataEntryStatistic<K> {
 
 		DecimalFormat format = new DecimalFormat("#.##");
 
-		for (MonthObs m : monthObs) {
+		for (UserObsByMonth m : monthObs) {
 
 			users.add(m.getUser().toUpperCase());
 			months.add(m.getDate());
@@ -405,11 +405,11 @@ public class DataEntryStatistic<K> {
 		return table;
 	}
 
-	private static Long getTotalMonthReport(String user, List<MonthObs> monthObs) {
+	private static Long getTotalMonthReport(String user, List<UserObsByMonth> monthObs) {
 
 		Long sum = 0L;
 
-		for (MonthObs montObs : monthObs) {
+		for (UserObsByMonth montObs : monthObs) {
 
 			if (user.equalsIgnoreCase(montObs.getUser())) {
 				sum = sum + montObs.getTotalObs();
