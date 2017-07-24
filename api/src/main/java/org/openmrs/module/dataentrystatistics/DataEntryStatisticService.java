@@ -16,8 +16,8 @@ package org.openmrs.module.dataentrystatistics;
 import java.util.Date;
 import java.util.List;
 
+import org.openmrs.Role;
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -25,26 +25,17 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public interface DataEntryStatisticService extends OpenmrsService {
+
+	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate,
+			Integer location);
 	
-	/**
-	 * Creates a list of data entry stats from <code>fromDate</code> to <code>toDate</code>
-	 * EncounterUserColumn is a column in the encounter table like <code>creator</code>,
-	 * <code>provider</code>, etc (defaults to creator) EncounterUserColumn is a column in the
-	 * encounter table like <code>creator</code>, <code>orderer</code>, etc (defaults to orderer)
-	 * 
-	 * @param fromDate
-	 * @param toDate
-	 * @param encounterUserColumn
-	 * @param orderUserColumn
-	 * @param groupBy (optional)
-	 * @return the list of DataEntryStatistics
-	 */
-	// Authorization?
-	public List<DataEntryStatistic> getDataEntryStatistics(Date fromDate, Date toDate, String encounterUserColumn,
-	                                                       String orderUserColumn, String groupBy);
-	
-	/**
-	 * @return the dao
-	 */
-	public DataEntryStatisticDAO getDao();
+	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location);
+
+
+	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
+
+	public List<UserObsByMonth> getAllMonthObs(Date fromDate, Date toDate, Integer location);
+
+	public List<Role> getAllRoles();
+
 }

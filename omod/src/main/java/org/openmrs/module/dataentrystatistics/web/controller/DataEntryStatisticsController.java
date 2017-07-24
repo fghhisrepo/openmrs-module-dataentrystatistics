@@ -13,9 +13,9 @@
  */
 package org.openmrs.module.dataentrystatistics.web.controller;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,140 +23,102 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Role;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
 import org.openmrs.module.dataentrystatistics.DataTable;
+import org.openmrs.module.dataentrystatistics.web.model.EntryObject;
+import org.openmrs.module.dataentrystatistics.web.util.ReportType;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
+@SuppressWarnings({ "rawtypes", "deprecation" })
 public class DataEntryStatisticsController extends SimpleFormController {
-	
+
 	protected final Log log = LogFactory.getLog(getClass());
-	
-	public class StatisticsCommand {
-		
-		private Date fromDate;
-		
-		private Date toDate;
-		
-		private DataTable table;
-		
-		private String encUserColumn;
-		
-		private String orderUserColumn;
-		
-		private String groupBy;
-		
-		private Boolean hideAverageObs = false;
-		
-		public StatisticsCommand() {
-		}
-		
-		public Date getFromDate() {
-			return fromDate;
-		}
-		
-		public void setFromDate(Date fromDate) {
-			this.fromDate = fromDate;
-		}
-		
-		public DataTable getTable() {
-			return table;
-		}
-		
-		public void setTable(DataTable table) {
-			this.table = table;
-		}
-		
-		public Date getToDate() {
-			return toDate;
-		}
-		
-		public void setToDate(Date toDate) {
-			this.toDate = toDate;
-		}
-		
-		public String getEncUserColumn() {
-			return encUserColumn;
-		}
-		
-		public void setEncUserColumn(String encUserColumn) {
-			this.encUserColumn = encUserColumn;
-		}
-		
-		public String getOrderUserColumn() {
-			return orderUserColumn;
-		}
-		
-		public void setOrderUserColumn(String orderUserColumn) {
-			this.orderUserColumn = orderUserColumn;
-		}
-		
-		public String getGroupBy() {
-			return groupBy;
-		}
-		
-		public void setGroupBy(String groupBy) {
-			this.groupBy = groupBy;
-		}
-		
-		public Boolean getHideAverageObs() {
-			return hideAverageObs;
-		}
-		
-		public void setHideAverageObs(Boolean hideAverageObs) {
-			this.hideAverageObs = hideAverageObs;
-		}
-	}
-	
+	private ModelMap modelMap = new ModelMap();
+	private DataTable table;
+	private EntryObject entryObject;
+	private DataEntryStatisticService dataEntryStatisticService;
+
 	protected void initBinder(HttpServletRequest request, ServletRequestDataBinder binder) throws Exception {
 		super.initBinder(request, binder);
-		
-		binder.registerCustomEditor(java.util.Date.class, new CustomDateEditor(OpenmrsUtil.getDateFormat(Context.getLocale()), true, 10));
+
+		binder.registerCustomEditor(java.util.Date.class,
+				new CustomDateEditor(OpenmrsUtil.getDateFormat(Context.getLocale()), true, 10));
 	}
-	
+
 	protected Object formBackingObject(HttpServletRequest request) throws ServletException {
-		
-		DataEntryStatisticService svc = (DataEntryStatisticService) Context.getService(DataEntryStatisticService.class);
-		
-		StatisticsCommand ret = new StatisticsCommand();
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.HOUR_OF_DAY, 0);
-		c.set(Calendar.MINUTE, 0);
-		c.set(Calendar.SECOND, 0);
-		ret.setFromDate(c.getTime());
-		ret.setToDate(null);
-		
-		Date toDateToUse = ret.getToDate() != null ? OpenmrsUtil.getLastMomentOfDay(ret.getToDate()) : null;
-		String encUserColumn = ret.getEncUserColumn();
-		String orderUserColumn = ret.getOrderUserColumn();
-		List<DataEntryStatistic> stats = svc.getDataEntryStatistics(ret.getFromDate(),
-		    toDateToUse, encUserColumn, orderUserColumn, ret.getGroupBy());
-		DataTable table = DataEntryStatistic.tableByUserAndType(stats, ret.getHideAverageObs());
-		ret.setTable(table);
-		
-		return ret;
+
+		return new EntryObject();
+
 	}
-	
-	protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object commandObj,
-	                                BindException errors) throws Exception {
-		
+
+	protected Map referenceData(HttpServletRequest request) throws Exception {
+
 		DataEntryStatisticService svc = (DataEntryStatisticService) Context.getService(DataEntryStatisticService.class);
-		
-		StatisticsCommand command = (StatisticsCommand) commandObj;
-		Date toDateToUse = command.getToDate() != null ? OpenmrsUtil.getLastMomentOfDay(command.getToDate()) : null;
-		String encUserColumn = command.getEncUserColumn();
-		String orderUserColumn = command.getOrderUserColumn();
-		List<DataEntryStatistic> stats = svc.getDataEntryStatistics(command.getFromDate(),
-		    toDateToUse, encUserColumn, orderUserColumn, command.getGroupBy());
-		DataTable table = DataEntryStatistic.tableByUserAndType(stats, command.getHideAverageObs());
-		command.setTable(table);
+
+		List<String> reportTypes = new ArrayList<String>();
+
+		List<Role> roles = svc.getAllRoles();
+
+		for (ReportType type : ReportType.values()) {
+			reportTypes.add(type.name());
+		}
+
+		request.setAttribute("reportTypes", reportTypes);
+		request.setAttribute("roles", roles);
+
+		return modelMap;
+	}
+
+	protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object commandObj,
+			BindException errors) throws Exception {
+
+		DataEntryStatisticService dataEntryStatisticService = (DataEntryStatisticService) Context
+				.getService(DataEntryStatisticService.class);
+
+		entryObject = (EntryObject) commandObj;
+
+		if (entryObject.getFromDate() != null && entryObject.getToDate() != null && !entryObject.getLocation().isEmpty()) {
+
+			Integer locationId = Integer.parseInt(entryObject.getLocation());
+
+			if (entryObject.getReportType().equals(ReportType.DAILY_OBS.name())) {
+
+				table = DataEntryStatistic.tableByDateAndObs(dataEntryStatisticService
+						.getAllObsByUsersAndDate(entryObject.getFromDate(), entryObject.getToDate(), locationId));
+			}
+
+			if (entryObject.getReportType().equals(ReportType.FORM_TYPES.name())) {
+
+				table = DataEntryStatistic.tableByFormAndEncounters(dataEntryStatisticService
+						.getAllObsByUsersAndForm(entryObject.getFromDate(), entryObject.getToDate(), locationId));
+			}
+
+			if (entryObject.getReportType().equals(ReportType.MONTH_OBS.name())) {
+
+				table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService
+						.getAllMonthObs(entryObject.getFromDate(), entryObject.getToDate(), locationId));
+			}
+
+		}
+		entryObject.setTable(table);
+
 		return showForm(request, response, errors);
 	}
-	
+
+	public DataEntryStatisticService getDataEntryStatisticService() {
+		return dataEntryStatisticService;
+	}
+
+	public void setDataEntryStatisticService(DataEntryStatisticService dataEntryStatisticService) {
+		this.dataEntryStatisticService = dataEntryStatisticService;
+	}
 }

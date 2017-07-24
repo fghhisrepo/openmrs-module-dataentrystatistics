@@ -1,3 +1,4 @@
+
 <%@ include file="/WEB-INF/template/include.jsp" %>
 
 <openmrs:require privilege="View Data Entry Statistics" otherwise="/login.htm" redirect="/module/@MODULE_ID@/dataEntryStatistics.list" />
@@ -7,51 +8,93 @@
 <%@ include file="/WEB-INF/view/admin/maintenance/localHeader.jsp" %>
 
 <openmrs:htmlInclude file="/scripts/calendar/calendar.js" />
+
+<script type='text/javascript' src='https://code.jquery.com/jquery-1.11.0.min.js'></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+
 <openmrs:htmlInclude file="/scripts/validation.js" />
+
+<script type='text/javascript'>
+        $(document).ready(function () {
+            function exportTableToCSV($table, filename) {
+                var $headers = $table.find('tr:has(th)')
+                    ,$rows = $table.find('tr:has(td)')
+                    ,tmpColDelim = String.fromCharCode(11) // vertical tab character
+                    ,tmpRowDelim = String.fromCharCode(0) // null character
+                    ,colDelim = '","'
+                    ,rowDelim = '"\r\n"';
+                    var csv = '"';
+                    csv += formatRows($headers.map(grabRow));
+                    csv += rowDelim;
+                    csv += formatRows($rows.map(grabRow)) + '"';
+                    var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+                $(this)
+                    .attr({
+                    'download': filename
+                        ,'href': csvData
+                });
+                function formatRows(rows){
+                    return rows.get().join(tmpRowDelim)
+                        .split(tmpRowDelim).join(rowDelim)
+                        .split(tmpColDelim).join(colDelim);
+                }
+                function grabRow(i,row){
+                     
+                    var $row = $(row);
+                    var $cols = $row.find('td'); 
+                    if(!$cols.length) $cols = $row.find('th');  
+                    return $cols.map(grabCol)
+                                .get().join(tmpColDelim);
+                }
+                function grabCol(j,col){
+                    var $col = $(col),
+                        $text = $col.text();
+                    return $text.replace('"', '""'); 
+                }
+            }
+            $("#export").click(function (event) {
+                exportTableToCSV.apply(this, [$('#dvData>table'), 'DATA_ENTRY_STATISTIC.csv']);
+                
+            });
+        });
+</script>
 
 <h2><spring:message code="dataentrystatistics.title"/></h2>
 
 <form method="post">
 
-<table>
+ 	<p align="right"><a href="#" id ="export" role='button'>Export Table Data Into a CSV File</a></p>
+
+<fieldset>
+	<table  style="width: 30%;">
 	<tr>
-		<td><spring:message code="dataentrystatistics.encounterUser"/>:</td>
+		<td><spring:message code="dataentrystatistics.obsCreator"/>:</td>
 		<td>
-			<spring:bind path="command.encUserColumn">			
-				<select name="${status.expression}" width="10">
-					<option value="creator" <c:if test="${command.encUserColumn=='creator'}">selected</c:if>><spring:message code="dataentrystatistics.encounterCreator"/></option>
-					<option value="provider" <c:if test="${command.encUserColumn=='provider'}">selected</c:if>><spring:message code="dataentrystatistics.encounterProvider"/></option>
+			<spring:bind path="command.obsCreator">			
+				<select name="${status.expression}">
+					<c:forEach items="${roles}" var="role">
+		                <option>${role}</option>
+		            </c:forEach>
 				</select>
-				<c:if test="${status.errorMessage != ''}"><span class="error">${status.errorMessage}</span></c:if> 
 			</spring:bind>
 		</td>
 	</tr>
-	<tr>
-		<td><spring:message code="dataentrystatistics.orderUser"/>:</td>
-		<td>
-			<spring:bind path="command.orderUserColumn">			
-				<select name="${status.expression}" width="10">
-					<option value="creator" <c:if test="${command.orderUserColumn=='creator'}">selected</c:if>><spring:message code="dataentrystatistics.orderCreator"/></option>
-					<option value="orderer" <c:if test="${command.orderUserColumn=='orderer'}">selected</c:if>><spring:message code="dataentrystatistics.orderOrderer"/></option>
-				</select>
-				<c:if test="${status.errorMessage != ''}"><span class="error">${status.errorMessage}</span></c:if> 
-			</spring:bind>
-		</td>
-	</tr>
-	<tr>
-		<td><spring:message code="dataentrystatistics.groupBy"/>:</td>
-		<td>
-			<spring:bind path="command.groupBy">
-				<select name="${status.expression}" width="10">
-					<option value="" <c:if test="${command.groupBy==''}">selected</c:if>></option>
-					<option value="location" <c:if test="${command.groupBy=='location'}">selected</c:if>><spring:message code="Encounter.location"/></option>
-				</select>
-				<c:if test="${status.errorMessage != ''}"><span class="error">${status.errorMessage}</span></c:if> 
-			</spring:bind>
-		</td>
-	</tr>
-	<tr>
-		<td><spring:message code="general.fromDate"/>:</td>
+		<tr>
+			<td><spring:message code="dataentrystatistics.location" /></td>
+				<td><spring:bind path="command.location">
+						<openmrs_tag:locationField formFieldName="location"
+							initialValue="${status.value}" />
+						
+						<c:if test="${status.errorMessage != ''}">
+							<span class="error">${status.errorMessage}</span>
+						</c:if>
+					</spring:bind></td>
+			</tr>
+		<tr>
+		
+		<tr>
+			<td><spring:message code="dataentrystatistics.startDate"/>:</td>
 		<td>
 			<spring:bind path="command.fromDate">
 				<input type="text" name="${status.expression}" size="10" 
@@ -61,7 +104,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td><spring:message code="general.toDate"/>:</td>
+		<td><spring:message code="dataentrystatistics.endDate"/>:</td>
 		<td>
 			<spring:bind path="command.toDate">
 				<input type="text" name="${status.expression}" size="10" 
@@ -70,22 +113,26 @@
 			</spring:bind>
 		</td>
 	</tr>
+		
 	<tr>
-		<td><spring:message code="dataentrystatistics.hideAverageObs"/>:</td>
+		<td><spring:message code="dataentrystatistics.type"/>:</td>
 		<td>
-			<spring:bind path="command.hideAverageObs">
-				<input type="hidden" name="_${status.expression}" />
-				<input type="checkbox" name="${status.expression}" <c:if test="${status.value}">checked</c:if> />
-				<c:if test="${status.errorMessage != ''}"><span class="error">${status.errorMessage}</span></c:if> 
+			<spring:bind path="command.reportType">			
+				<select name="${status.expression}" width="60%">
+				<c:forEach items="${reportTypes}" var="reportType">
+	                <option>${reportType}</option>
+	            </c:forEach>
+				</select>
 			</spring:bind>
 		</td>
 	</tr>
+	
 	<tr>
 		<td></td>
 		<td><input type="submit" value="<spring:message code="general.view"/>" /></td>
 	</tr>
-</table>
-
+	</table>
+	</fieldset>
 </form>
 
 <p/>

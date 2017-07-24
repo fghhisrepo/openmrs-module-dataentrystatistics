@@ -16,18 +16,24 @@ package org.openmrs.module.dataentrystatistics.db;
 import java.util.Date;
 import java.util.List;
 
-import org.openmrs.api.db.DAOException;
-import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
+import org.openmrs.Role;
+import org.openmrs.module.dataentrystatistics.UserObsByDate;
+import org.openmrs.module.dataentrystatistics.UserObsByFormType;
+import org.openmrs.module.dataentrystatistics.UserObsByMonth;
 
 /**
  * Database methods for the DataEntryStatisticService
  */
 public interface DataEntryStatisticDAO {
 
-	/**
-	 * @see DataEntryStatisticService#getDataEntryStatistics(.Date,Date, String, String, String)
-	 */
-	public List<DataEntryStatistic> getDataEntryStatistics(Date fromDate, Date toDate, String encounterUserColumn,
-	                                                       String orderUserColumn, String groupBy) throws DAOException;
-	
+	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location);
+
+	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location);
+
+	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
+
+	public List<UserObsByMonth> getAllMonthObs(Date fromDate, Date toDate, Integer location);
+
+	public List<Role> getAllRoles();
+
 }

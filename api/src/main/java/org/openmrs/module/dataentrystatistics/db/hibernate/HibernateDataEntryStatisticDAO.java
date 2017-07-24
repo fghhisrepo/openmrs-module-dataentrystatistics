@@ -22,197 +22,164 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
-import org.openmrs.EncounterType;
-import org.openmrs.Form;
-import org.openmrs.Person;
-import org.openmrs.User;
-import org.openmrs.api.db.DAOException;
-import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
+import org.openmrs.Role;
+import org.openmrs.module.dataentrystatistics.UserObsByMonth;
+import org.openmrs.module.dataentrystatistics.UserObsByDate;
+import org.openmrs.module.dataentrystatistics.UserObsByFormType;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 
 /**
  * Database methods for the DataEntryStatisticService
  */
 public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
-	
+
 	protected Log log = LogFactory.getLog(getClass());
-	
-	/**
-	 * Hibernate session factory
-	 */
-	private SessionFactory sessionFactory;
 
-	/**
-	 * @see DataEntryStatisiticDAO#getDataEntryStatistics(Date, Date, String, String, String)
-	 */
-	@SuppressWarnings("unchecked")
-	public List<DataEntryStatistic> getDataEntryStatistics(Date fromDate, Date toDate, String encounterColumn,
-	                                                       String orderColumn, String groupBy) throws DAOException {
-		
-		// for all encounters, find user, form name, and number of entries
-		
-		// default userColumn to creator
-		if (encounterColumn == null)
-			encounterColumn = "creator";
-		encounterColumn = encounterColumn.toLowerCase();
-		
-		List<DataEntryStatistic> ret = new ArrayList<DataEntryStatistic>();
+	SessionFactory sessionFactory;
 
-		// data entry stats with extended info
-		// check if there's anything else to group by
-		if (groupBy == null)
-			groupBy = "";
-		if (groupBy.length() != 0)
-			groupBy = "e." + groupBy + ", ";
-		log.debug("GROUP BY IS " + groupBy);
-		
-		String hql = "select " + groupBy + "e." + encounterColumn + ", e.encounterType"
-		        + ", e.form, count(distinct e.encounterId), count(o.obsId) " + "from Obs o right join o.encounter as e ";
-		if (fromDate != null || toDate != null) {
-			String s = "where ";
-			if (fromDate != null)
-				s += "e.dateCreated >= :fromDate ";
-			if (toDate != null) {
-				if (fromDate != null)
-					s += "and ";
-				s += "e.dateCreated <= :toDate ";
-			}
-			hql += s;
-		}
-		
-		//remove voided obs and encounters.
-		if (fromDate != null || toDate != null) {
-			hql += " and ";
-		}
-		else {
-			hql += " where ";
-		}
-		hql += " e.voided = :voided and o.voided = :voided ";
-		
-		
-		hql += "group by ";
-		if (groupBy.length() > 0)
-			hql += groupBy + " ";
-		hql += "e." + encounterColumn + ", e.encounterType, e.form ";
-		Query q = getCurrentSession().createQuery(hql);
-		if (fromDate != null)
-			q.setParameter("fromDate", fromDate);
-		if (toDate != null)
-			q.setParameter("toDate", toDate);
-		
-		q.setParameter("voided", false);
-		
-		List<Object[]> l = q.list();
-		for (Object[] holder : l) {
-			DataEntryStatistic s = new DataEntryStatistic();
-			int offset = 0;
-			if (groupBy.length() > 0) {
-				s.setGroupBy(holder[0]);
-				offset = 1;
-			}
-
-			Object temp = holder[0 + offset];
-			if (temp instanceof User)
-				s.setUser(((User) temp).getPerson());
-			else
-				s.setUser((Person) holder[0 + offset]);
-			EncounterType encType = ((EncounterType) holder[1 + offset]);
-			Form form = ((Form) holder[2 + offset]);
-			s.setEntryType(form != null ? form.getName() : (encType != null ? encType.getName() : "null"));
-			int numEncounters = ((Number) holder[3 + offset]).intValue();
-			int numObs = ((Number) holder[4 + offset]).intValue();
-			s.setNumberOfEntries(numEncounters); // not sure why this comes out as a Long instead of an Integer
-			log.debug("NEW Num encounters is " + numEncounters);
-			s.setNumberOfObs(numObs);
-			log.debug("NEW Num obs is " + numObs);
-			ret.add(s);
-		}
-		
-		// default userColumn to creator
-		if (orderColumn == null)
-			orderColumn = "creator";
-		orderColumn = orderColumn.toLowerCase();
-		
-		// for orders, count how many were created. (should eventually count something with voided/changed)
-		hql = "select o." + orderColumn + ", o.orderType.name, count(*) " + "from Order o ";
-		if (fromDate != null || toDate != null) {
-			String s = "where ";
-			if (fromDate != null)
-				s += "o.dateCreated >= :fromDate ";
-			if (toDate != null) {
-				if (fromDate != null)
-					s += "and ";
-				s += "o.dateCreated <= :toDate ";
-			}
-			hql += s;
-		}
-		
-		//remove voided orders.
-		if (fromDate != null || toDate != null) {
-			hql += " and ";
-		}
-		else {
-			hql += " where ";
-		}
-		hql += " o.voided = :voided ";
-		
-		hql += "group by o." + orderColumn + ", o.orderType.name ";
-		q = getCurrentSession().createQuery(hql);
-		if (fromDate != null)
-			q.setParameter("fromDate", fromDate);
-		if (toDate != null)
-			q.setParameter("toDate", toDate);
-		
-		q.setParameter("voided", false);
-		
-		l = q.list();
-		for (Object[] holder : l) {
-			DataEntryStatistic s = new DataEntryStatistic();
-			Object temp = holder[0];
-			if (temp instanceof User)
-				s.setUser(((User) temp).getPerson());
-			else
-				s.setUser((Person) temp);
-			s.setEntryType((String) holder[1]);
-			s.setNumberOfEntries(((Number) holder[2]).intValue()); // not sure why this comes out as a Long instead of an Integer
-			s.setNumberOfObs(0);
-			ret.add(s);
-		}
-		
-		return ret;
-	}
-
-	/**
-	 * @return the sessionFactory
-	 */
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
 	}
 
-	/**
-	 * @param sessionFactory the sessionFactory to set
-	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
-	
-	/**
-	 * Gets the current hibernate session while taking care of the hibernate 3 and 4 differences.
-	 * 
-	 * @return the current hibernate session.
-	 */
+
 	private org.hibernate.Session getCurrentSession() {
 		try {
 			return sessionFactory.getCurrentSession();
-		}
-		catch (NoSuchMethodError ex) {
+		} catch (NoSuchMethodError ex) {
 			try {
 				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
-				return (org.hibernate.Session)method.invoke(sessionFactory, null);
-			}
-			catch (Exception e) {
+				return (org.hibernate.Session) method.invoke(sessionFactory, null);
+			} catch (Exception e) {
 				throw new RuntimeException("Failed to get the current hibernate session", e);
 			}
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
+
+		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), c.username FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND o.voided = :voided  GROUP BY DATE(o.dateCreated),  c.username ORDER BY DATE(o.dateCreated) ASC ";
+
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("fromDate", fromDate);
+		query.setParameter("toDate", toDate);
+		query.setParameter("location", location);
+		query.setParameter("voided", false);
+
+		List<Object[]> list = query.list();
+
+		List<UserObsByDate> userDates = new ArrayList<UserObsByDate>();
+
+		for (Object[] object : list) {
+			UserObsByDate userDate = new UserObsByDate();
+
+			userDate.setUser((String) object[2]);
+			userDate.setDate((Date) object[0]);
+			userDate.setTotalObs((Long) object[1]);
+
+			userDates.add(userDate);
+		}
+
+		return userDates;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Role> getAllRoles() {
+		String hql = "SELECT  r FROM Role r ";
+		Query query = getCurrentSession().createQuery(hql);
+		return query.list();
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location) {
+
+		String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId) FROM  Obs o  INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l WHERE e.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND o.voided = :voided GROUP BY f.name, c.username";
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("fromDate", fromDate);
+		query.setParameter("toDate", toDate);
+		query.setParameter("location", location);
+		query.setParameter("voided", false);
+
+		List<Object[]> list = query.list();
+
+		List<UserObsByFormType> userObsByFormTypes = new ArrayList<UserObsByFormType>();
+		for (Object[] object : list) {
+
+			UserObsByFormType userObsByFormType = new UserObsByFormType();
+
+			userObsByFormType.setUser((String) object[1]);
+			userObsByFormType.setForm(((String) object[0]));
+			userObsByFormType.setTotalEncounters((Long) object[2]);
+			userObsByFormType.setTotalObs((Long) object[3]);
+
+			userObsByFormTypes.add(userObsByFormType);
+		}
+
+		return userObsByFormTypes;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<UserObsByMonth> getAllMonthObs(Date fromDate, Date toDate, Integer location) {
+
+		String hql = "SELECT  MONTH(o.dateCreated), count(o.obsId), c.username, YEAR(o.dateCreated) FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND  o.voided = :voided  GROUP BY MONTH(o.dateCreated), c.username, YEAR(o.dateCreated)";
+
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("fromDate", fromDate);
+		query.setParameter("toDate", toDate);
+		query.setParameter("location", location);
+		query.setParameter("voided", false);
+
+		List<Object[]> list = query.list();
+
+		List<UserObsByMonth> monthObss = new ArrayList<UserObsByMonth>();
+
+		for (Object[] object : list) {
+
+			UserObsByMonth monthObs = new UserObsByMonth();
+
+			monthObs.setUser((String) object[2]);
+			monthObs.setDate((Integer) object[0]);
+			monthObs.setTotalObs((Long) object[1]);
+			monthObs.setYear((Integer) object[3]);
+
+			monthObss.add(monthObs);
+		}
+
+		return monthObss;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location) {
+
+		String hql = "SELECT count(o.obsId), c.username FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY c.username";
+
+		Query query = getCurrentSession().createQuery(hql);
+		query.setParameter("fromDate", fromDate);
+		query.setParameter("toDate", toDate);
+		query.setParameter("location", location);
+
+		List<Object[]> list = query.list();
+
+		List<UserObsByDate> userObsByDates = new ArrayList<UserObsByDate>();
+
+		for (Object[] object : list) {
+			UserObsByDate userObsByDate = new UserObsByDate();
+
+			userObsByDate.setUser((String) object[1]);
+			userObsByDate.setTotalObs((Long) object[0]);
+
+			userObsByDates.add(userObsByDate);
+		}
+
+		return userObsByDates;
 	}
 }
