@@ -109,20 +109,20 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		List<Object[]> list = query.list();
 
-		List<UserObsByFormType> calculateUserDateTotalObsByForms = new ArrayList<UserObsByFormType>();
+		List<UserObsByFormType> userObsByFormTypes = new ArrayList<UserObsByFormType>();
 		for (Object[] object : list) {
 
-			UserObsByFormType calculateUserDateTotalObsByForm = new UserObsByFormType();
+			UserObsByFormType userObsByFormType = new UserObsByFormType();
 
-			calculateUserDateTotalObsByForm.setUser((String) object[1]);
-			calculateUserDateTotalObsByForm.setForm(((String) object[0]));
-			calculateUserDateTotalObsByForm.setTotalEncounters((Long) object[2]);
-			calculateUserDateTotalObsByForm.setTotalObs((Long) object[3]);
+			userObsByFormType.setUser((String) object[1]);
+			userObsByFormType.setForm(((String) object[0]));
+			userObsByFormType.setTotalEncounters((Long) object[2]);
+			userObsByFormType.setTotalObs((Long) object[3]);
 
-			calculateUserDateTotalObsByForms.add(calculateUserDateTotalObsByForm);
+			userObsByFormTypes.add(userObsByFormType);
 		}
 
-		return calculateUserDateTotalObsByForms;
+		return userObsByFormTypes;
 	}
 
 	@SuppressWarnings("unchecked")
