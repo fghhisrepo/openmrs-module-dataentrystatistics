@@ -7,6 +7,8 @@ public class UserObsByFormType {
 	private Long totalObs;
 	private String user;
 	private String type;
+	private String location;
+
 
 	public String getForm() {
 		return form;
@@ -46,6 +48,14 @@ public class UserObsByFormType {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 }

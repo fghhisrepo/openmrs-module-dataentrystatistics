@@ -29,6 +29,8 @@ public class DataTable {
 
 	private ArrayList<TableRow> rows;
 
+	private String location;
+
 	public DataTable() {
 		columnOrder = new ArrayList<String>();
 		rows = new ArrayList<TableRow>();
@@ -136,7 +138,9 @@ public class DataTable {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div id=\"dvData\">");
 		sb.append("<table id=\"result\" class=\"display nowrap\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">");
-		sb.append("<thead><tr>");
+		sb.append("<thead>");
+		sb.append("<th border=\"1\">").append(location.toUpperCase()).append("</th>");
+		sb.append("<tr>");
 		for (String colName : columns) {
 			sb.append("<th>").append(colName).append("</th>");
 		}
@@ -153,6 +157,14 @@ public class DataTable {
 
 		return sb.toString();
 
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 }

@@ -86,7 +86,8 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		entryObject = (EntryObject) commandObj;
 
-		if (entryObject.getFromDate() != null && entryObject.getToDate() != null && !entryObject.getLocation().isEmpty()) {
+		if (entryObject.getFromDate() != null && entryObject.getToDate() != null
+				&& !entryObject.getLocation().isEmpty()) {
 
 			Integer locationId = Integer.parseInt(entryObject.getLocation());
 
@@ -105,6 +106,12 @@ public class DataEntryStatisticsController extends SimpleFormController {
 			if (entryObject.getReportType().equals(ReportType.MONTH_OBS.name())) {
 
 				table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService
+						.getAllMonthObs(entryObject.getFromDate(), entryObject.getToDate(), locationId));
+			}
+
+			if (entryObject.getReportType().equals(ReportType.AVAREGE_OBS.name())) {
+
+				table = DataEntryStatistic.tableByMonthsByObsAvarege(dataEntryStatisticService
 						.getAllMonthObs(entryObject.getFromDate(), entryObject.getToDate(), locationId));
 			}
 
