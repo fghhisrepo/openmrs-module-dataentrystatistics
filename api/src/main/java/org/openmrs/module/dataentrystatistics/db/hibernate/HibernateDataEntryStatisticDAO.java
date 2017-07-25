@@ -62,7 +62,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 	@Override
 	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
 
-		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), c.username FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND o.voided = :voided  GROUP BY DATE(o.dateCreated),  c.username ORDER BY DATE(o.dateCreated) ASC ";
+		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), c.username, l.name FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND o.voided = :voided  GROUP BY DATE(o.dateCreated),  c.username ORDER BY DATE(o.dateCreated) ASC ";
 
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
@@ -80,6 +80,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 			userDate.setUser((String) object[2]);
 			userDate.setDate((Date) object[0]);
 			userDate.setTotalObs((Long) object[1]);
+			userDate.setLocation((String) object[3]);
 
 			userDates.add(userDate);
 		}
@@ -100,7 +101,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 	@Override
 	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location) {
 
-		String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId) FROM  Obs o  INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l WHERE e.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND o.voided = :voided GROUP BY f.name, c.username";
+		String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId),  l.name  FROM  Obs o  INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l WHERE e.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND o.voided = :voided GROUP BY f.name, c.username";
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
 		query.setParameter("toDate", toDate);
@@ -118,6 +119,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 			userObsByFormType.setForm(((String) object[0]));
 			userObsByFormType.setTotalEncounters((Long) object[2]);
 			userObsByFormType.setTotalObs((Long) object[3]);
+			userObsByFormType.setLocation((String) object[4]);
 
 			userObsByFormTypes.add(userObsByFormType);
 		}
@@ -129,7 +131,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 	@Override
 	public List<UserObsByMonth> getAllMonthObs(Date fromDate, Date toDate, Integer location) {
 
-		String hql = "SELECT  MONTH(o.dateCreated), count(o.obsId), c.username, YEAR(o.dateCreated) FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND  o.voided = :voided  GROUP BY MONTH(o.dateCreated), c.username, YEAR(o.dateCreated)";
+		String hql = "SELECT  MONTH(o.dateCreated), count(o.obsId), c.username, YEAR(o.dateCreated), DAY(o.dateCreated), l.name FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND  o.voided = :voided  GROUP BY MONTH(o.dateCreated), c.username, YEAR(o.dateCreated)";
 
 		Query query = getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
@@ -149,6 +151,8 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 			monthObs.setDate((Integer) object[0]);
 			monthObs.setTotalObs((Long) object[1]);
 			monthObs.setYear((Integer) object[3]);
+			monthObs.setDay((Integer) object[4]);
+			monthObs.setLocation((String) object[5]);
 
 			monthObss.add(monthObs);
 		}

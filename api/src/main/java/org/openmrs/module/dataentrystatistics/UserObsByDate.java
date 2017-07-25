@@ -7,6 +7,7 @@ public class UserObsByDate {
 	private String user;
 	private Date date;
 	private Long totalObs;
+	private String location;
 
 	public UserObsByDate(String user, Date date, Long totalObs) {
 		this.user = user;
@@ -40,6 +41,14 @@ public class UserObsByDate {
 
 	public void setUser(String user) {
 		this.user = user;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 }

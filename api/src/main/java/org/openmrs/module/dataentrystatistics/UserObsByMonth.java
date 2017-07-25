@@ -4,7 +4,10 @@ public class UserObsByMonth {
 	private String user;
 	private Integer date;
 	private Integer year;
+	private Integer day;
 	private Long totalObs;
+	private String location;
+
 
 	public String getUser() {
 		return user;
@@ -36,5 +39,21 @@ public class UserObsByMonth {
 
 	public void setYear(Integer year) {
 		this.year = year;
+	}
+
+	public Integer getDay() {
+		return day;
+	}
+
+	public void setDay(Integer day) {
+		this.day = day;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 }
