@@ -430,9 +430,11 @@ public class DataEntryStatistic<K> {
 			Double avarege = totalObs.doubleValue() / table.getRowCount();
 
 			lastRowAverege.put(user, format.format(avarege));
-			lastRowAverege.put("TOTAL", format.format(getTotalPerMonth(monthObs)));
 
 		}
+		DecimalFormat f = new DecimalFormat("#.###");
+
+		lastRowAverege.put("TOTAL", f.format(getTotalPerMonth(monthObs).doubleValue() / table.getRowCount()));
 
 		table.addRow(lastRowAverege);
 
