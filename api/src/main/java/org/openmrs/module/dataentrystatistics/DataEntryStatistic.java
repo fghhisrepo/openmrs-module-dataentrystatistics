@@ -69,23 +69,23 @@ public class DataEntryStatistic<K> {
 		TableRow lastRowTotal = new TableRow();
 		TableRow lastRowAverege = new TableRow();
 
-		DecimalFormat format = new DecimalFormat("#.##");
+		DecimalFormat format = new DecimalFormat("#.####");
 
 		lastRowTotal.put("DATA", "TOTAL OBS");
 		lastRowAverege.put("DATA", "MEDIA OBS (OBS/DAY)");
 
 		for (String u : users) {
+			DecimalFormat f = new DecimalFormat("#.###");
 
 			Long totalObs = getTotal(u, obsByDates);
 			Double avarege = totalObs.doubleValue() / table.getRowCount();
 
 			lastRowTotal.put(u, totalObs);
-			lastRowAverege.put(u, format.format(avarege));
+			lastRowAverege.put(u, f.format(avarege));
 
 			lastRowTotal.put("TOTAL", getTotal(obsByDates));
-			lastRowAverege.put("TOTAL", format.format(getTotal(table.getRowCount(), obsByDates)));
-
 		}
+		lastRowAverege.put("TOTAL", format.format(getTotal(table.getRowCount(), obsByDates)));
 
 		table.addRow(lastRowTotal);
 		table.addRow(lastRowAverege);
@@ -198,12 +198,8 @@ public class DataEntryStatistic<K> {
 		TableRow lastRowTotalObs = new TableRow();
 		TableRow tableAveregeObsPerEncounter = new TableRow();
 
-		lastRowTotalForm.put("FORMULARIOS", "TOTAL FORMULARIOS-ENC");
-		lastRowTotalObs.put("FORMULARIOS", "TOTAL FORMULARIOS-OBS");
-		tableAveregeObsPerEncounter.put("FORMULARIOS", "MEDIA DE OBS POR ENC(OBS/ENC)");
-
-		lastRowTotalForm.put("FORMULARIOS", "TOTAL FORMULARIOS-ENC");
-		lastRowTotalObs.put("FORMULARIOS", "TOTAL FORMULARIOS-OBS");
+		lastRowTotalForm.put("FORMULARIOS", "ENC-TOTAL FORMULARIOS");
+		lastRowTotalObs.put("FORMULARIOS", "OBS-TOTAL FORMULARIOS");
 		tableAveregeObsPerEncounter.put("FORMULARIOS", "MEDIA DE OBS POR ENC(OBS/ENC)");
 
 		for (String form : forms) {
@@ -232,20 +228,23 @@ public class DataEntryStatistic<K> {
 			table.addRow(tableRowObs);
 
 		}
+		DecimalFormat format = new DecimalFormat("#.##");
+
+		Double avarege = (double) 0;
 
 		for (String user : users) {
 
-			DecimalFormat format = new DecimalFormat("#.##");
-
 			Long totalEnc = getTotalPerFormType(user, userObsByFormTypes, "ENC");
+
 			lastRowTotalForm.put(user, format.format(totalEnc));
 			lastRowTotalForm.put("TOTAL", getTotalFormsEncounters(userObsByFormTypes));
 
 			Long totalObs = getTotalPerOBS(user, userObsByFormTypes, "OBS");
+
 			lastRowTotalObs.put(user, format.format(totalObs));
 			lastRowTotalObs.put("TOTAL", getTotalFormsOBS(userObsByFormTypes));
 
-			Double avarege = totalObs.doubleValue() / totalEnc.doubleValue();
+			avarege = totalObs.doubleValue() / totalEnc.doubleValue();
 
 			String value = format.format(avarege);
 
@@ -256,9 +255,13 @@ public class DataEntryStatistic<K> {
 			lastRowTotalForm.put(user, totalEncd);
 
 			tableAveregeObsPerEncounter.put(user, value);
-			tableAveregeObsPerEncounter.put("TOTAL", value);
 
 		}
+		Long totalEnc = getTotalPerFormType(userObsByFormTypes, "ENC");
+		Long totalObs = getTotalPerOBS(userObsByFormTypes, "OBS");
+		DecimalFormat f = new DecimalFormat("#.####");
+
+		tableAveregeObsPerEncounter.put("TOTAL", f.format(totalObs.doubleValue() / totalEnc.doubleValue()));
 
 		table.addRow(lastRowTotalForm);
 		table.addRow(lastRowTotalObs);
@@ -282,6 +285,18 @@ public class DataEntryStatistic<K> {
 		return sum;
 	}
 
+	private static Long getTotalPerFormType(List<UserObsByFormType> userObsByFormTypes, String type) {
+
+		Long sum = 0L;
+
+		for (UserObsByFormType obsByFormType : userObsByFormTypes) {
+
+			if (type.substring(0, 3).equals("ENC"))
+				sum = sum + obsByFormType.getTotalEncounters();
+		}
+		return sum;
+	}
+
 	private static Long getTotalPerOBS(String user, List<UserObsByFormType> userObsByFormTypes, String type) {
 
 		Long sum = 0L;
@@ -292,6 +307,19 @@ public class DataEntryStatistic<K> {
 				if (type.substring(0, 3).equals("OBS")) {
 					sum = sum + obsByFormType.getTotalObs();
 				}
+			}
+		}
+		return sum;
+	}
+
+	private static Long getTotalPerOBS(List<UserObsByFormType> userObsByFormTypes, String type) {
+
+		Long sum = 0L;
+
+		for (UserObsByFormType obsByFormType : userObsByFormTypes) {
+
+			if (type.substring(0, 3).equals("OBS")) {
+				sum = sum + obsByFormType.getTotalObs();
 			}
 		}
 		return sum;
@@ -457,6 +485,7 @@ public class DataEntryStatistic<K> {
 			years.add(m.getYear());
 			usersAvarege.add(m.getUser());
 			days.add(m.getDay());
+			table.setLocation(m.getLocation());
 
 		}
 
