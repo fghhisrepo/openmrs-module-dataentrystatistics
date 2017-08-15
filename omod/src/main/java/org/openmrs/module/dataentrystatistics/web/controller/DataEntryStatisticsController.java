@@ -28,8 +28,9 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
 import org.openmrs.module.dataentrystatistics.DataTable;
+import org.openmrs.module.dataentrystatistics.model.ReportType;
+import org.openmrs.module.dataentrystatistics.util.DateUtil;
 import org.openmrs.module.dataentrystatistics.web.model.EntryObject;
-import org.openmrs.module.dataentrystatistics.web.util.ReportType;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.ui.ModelMap;
@@ -41,91 +42,95 @@ import org.springframework.web.servlet.mvc.SimpleFormController;
 @SuppressWarnings({ "rawtypes", "deprecation" })
 public class DataEntryStatisticsController extends SimpleFormController {
 
-	protected final Log log = LogFactory.getLog(getClass());
-	private ModelMap modelMap = new ModelMap();
+	protected final Log log = LogFactory.getLog(this.getClass());
+	private final ModelMap modelMap = new ModelMap();
 	private DataTable table;
 	private EntryObject entryObject;
 	private DataEntryStatisticService dataEntryStatisticService;
 
-	protected void initBinder(HttpServletRequest request, ServletRequestDataBinder binder) throws Exception {
+	@Override
+	protected void initBinder(final HttpServletRequest request, final ServletRequestDataBinder binder)
+			throws Exception {
 		super.initBinder(request, binder);
 
 		binder.registerCustomEditor(java.util.Date.class,
 				new CustomDateEditor(OpenmrsUtil.getDateFormat(Context.getLocale()), true, 10));
 	}
 
-	protected Object formBackingObject(HttpServletRequest request) throws ServletException {
+	@Override
+	protected Object formBackingObject(final HttpServletRequest request) throws ServletException {
 
 		return new EntryObject();
 
 	}
 
-	protected Map referenceData(HttpServletRequest request) throws Exception {
+	@Override
+	protected Map referenceData(final HttpServletRequest request) throws Exception {
 
-		DataEntryStatisticService svc = (DataEntryStatisticService) Context.getService(DataEntryStatisticService.class);
+		final DataEntryStatisticService svc = Context.getService(DataEntryStatisticService.class);
 
-		List<String> reportTypes = new ArrayList<String>();
+		final List<String> reportTypes = new ArrayList<String>();
 
-		List<Role> roles = svc.getAllRoles();
+		final List<Role> roles = svc.getAllRoles();
 
-		for (ReportType type : ReportType.values()) {
+		for (final ReportType type : ReportType.values()) {
 			reportTypes.add(type.name());
 		}
 
 		request.setAttribute("reportTypes", reportTypes);
 		request.setAttribute("roles", roles);
 
-		return modelMap;
+		return this.modelMap;
 	}
 
-	protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object commandObj,
-			BindException errors) throws Exception {
+	@Override
+	protected ModelAndView onSubmit(final HttpServletRequest request, final HttpServletResponse response,
+			final Object commandObj, final BindException errors) throws Exception {
 
-		DataEntryStatisticService dataEntryStatisticService = (DataEntryStatisticService) Context
-				.getService(DataEntryStatisticService.class);
+		final DataEntryStatisticService dataEntryStatisticService = Context.getService(DataEntryStatisticService.class);
 
-		entryObject = (EntryObject) commandObj;
+		this.entryObject = (EntryObject) commandObj;
 
-		if (entryObject.getFromDate() != null && entryObject.getToDate() != null
-				&& !entryObject.getLocation().isEmpty()) {
-
-			Integer locationId = Integer.parseInt(entryObject.getLocation());
-
-			if (entryObject.getReportType().equals(ReportType.DAILY_OBS.name())) {
-
-				table = DataEntryStatistic.tableByDateAndObs(dataEntryStatisticService
-						.getAllObsByUsersAndDate(entryObject.getFromDate(), entryObject.getToDate(), locationId));
-			}
-
-			if (entryObject.getReportType().equals(ReportType.FORM_TYPES.name())) {
-
-				table = DataEntryStatistic.tableByFormAndEncounters(dataEntryStatisticService
-						.getAllObsByUsersAndForm(entryObject.getFromDate(), entryObject.getToDate(), locationId));
-			}
-
-			if (entryObject.getReportType().equals(ReportType.MONTH_OBS.name())) {
-
-				table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService
-						.getAllMonthObs(entryObject.getFromDate(), entryObject.getToDate(), locationId));
-			}
-
-			if (entryObject.getReportType().equals(ReportType.AVAREGE_OBS.name())) {
-
-				table = DataEntryStatistic.tableByMonthsByObsAvarege(dataEntryStatisticService
-						.getAllMonthObs(entryObject.getFromDate(), entryObject.getToDate(), locationId));
-			}
-
+		if ((this.entryObject.getFromDate() == null) && (this.entryObject.getToDate() == null)
+				&& this.entryObject.getLocation().isEmpty()) {
+			return this.showForm(request, response, errors);
 		}
-		entryObject.setTable(table);
 
-		return showForm(request, response, errors);
+		if ((this.entryObject.getFromMonth() == null) && (this.entryObject.getToMonth() == null)
+				&& this.entryObject.getLocation().isEmpty()) {
+			return this.showForm(request, response, errors);
+		}
+
+		final Integer locationId = Integer.parseInt(this.entryObject.getLocation());
+
+		if (this.entryObject.getReportType().equals(ReportType.DAILY_OBS.name())) {
+
+			this.table = DataEntryStatistic.tableByDateAndObs(dataEntryStatisticService
+					.getAllObsByUsersAndDate(this.entryObject.getFromDate(), this.entryObject.getToDate(), locationId));
+		}
+
+		if (this.entryObject.getReportType().equals(ReportType.FORM_TYPES.name())) {
+
+			this.table = DataEntryStatistic.tableByFormAndEncounters(dataEntryStatisticService
+					.getAllObsByUsersAndForm(this.entryObject.getFromDate(), this.entryObject.getToDate(), locationId));
+		}
+
+		if (this.entryObject.getReportType().equals(ReportType.MONTHLY_OBS.name())) {
+
+			this.table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService.getAllMonthObs(
+					this.entryObject.getFromMonth(), DateUtil.getLastDay(this.entryObject.getToMonth()), locationId));
+		}
+
+		this.entryObject.setTable(this.table);
+
+		return this.showForm(request, response, errors);
 	}
 
 	public DataEntryStatisticService getDataEntryStatisticService() {
-		return dataEntryStatisticService;
+		return this.dataEntryStatisticService;
 	}
 
-	public void setDataEntryStatisticService(DataEntryStatisticService dataEntryStatisticService) {
+	public void setDataEntryStatisticService(final DataEntryStatisticService dataEntryStatisticService) {
 		this.dataEntryStatisticService = dataEntryStatisticService;
 	}
 }

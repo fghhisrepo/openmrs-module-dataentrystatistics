@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.openmrs.Role;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.dataentrystatistics.model.ReportData;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -26,15 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface DataEntryStatisticService extends OpenmrsService {
 
-	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate,
-			Integer location);
-	
-	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location);
+	public ReportData<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location);
 
+	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location);
 
 	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
 
-	public List<UserObsByMonth> getAllMonthObs(Date fromDate, Date toDate, Integer location);
+	public List<UserObs> getAllMonthObs(Date fromDate, Date toDate, Integer location);
 
 	public List<Role> getAllRoles();
 
