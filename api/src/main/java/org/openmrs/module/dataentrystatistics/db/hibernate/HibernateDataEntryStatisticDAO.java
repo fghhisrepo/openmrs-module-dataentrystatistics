@@ -66,7 +66,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		final String hql = "SELECT DATE(o.dateCreated), COUNT(o.obsId), c.username, l.name FROM Obs o "
 				+ "INNER JOIN o.creator c INNER JOIN o.location l "
-				+ "WHERE DATE(o.dateCreated) BETWEEN :fromDate AND :toDate AND l.locationId =:location "
+				+ "WHERE DATE(o.dateCreated) BETWEEN :fromDate AND :toDate AND l.locationId =:location AND c.username IS NOT null "
 				+ "AND o.voided = :voided GROUP BY DATE(o.dateCreated), c.username ORDER BY DATE(o.dateCreated) ASC";
 
 		final Query query = this.getCurrentSession().createQuery(hql);
@@ -140,7 +140,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		final String hql = "SELECT c.username, l.name, MONTH(o.dateCreated), COUNT(o.obsId) FROM Obs o "
 				+ "INNER JOIN o.creator c INNER JOIN o.location l "
-				+ "WHERE DATE(o.dateCreated) BETWEEN :fromDate AND :toDate AND l.locationId =:location "
+				+ "WHERE DATE(o.dateCreated) BETWEEN :fromDate AND :toDate AND l.locationId =:location AND c.username IS NOT NULL "
 				+ "AND o.voided = :voided GROUP BY MONTH(o.dateCreated), c.username "
 				+ "ORDER BY MONTH(o.dateCreated), c.username ASC";
 
