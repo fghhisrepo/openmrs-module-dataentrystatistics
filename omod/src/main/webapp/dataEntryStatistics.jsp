@@ -16,53 +16,8 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+
 <openmrs:htmlInclude file="/scripts/validation.js" />
-
-<script type='text/javascript'>
-	$(document).ready(
-			function() {
-				function exportTableToCSV($table, filename) {
-					var $headers = $table.find('tr:has(th)'), $rows = $table
-							.find('tr:has(td)'), tmpColDelim = String
-							.fromCharCode(11) // vertical tab character
-					, tmpRowDelim = String.fromCharCode(0) // null character
-					, colDelim = '","', rowDelim = '"\r\n"';
-					var csv = '"';
-					csv += formatRows($headers.map(grabRow));
-					csv += rowDelim;
-					csv += formatRows($rows.map(grabRow)) + '"';
-					var csvData = 'data:application/csv;charset=utf-8,'
-							+ encodeURIComponent(csv);
-					$(this).attr({
-						'download' : filename,
-						'href' : csvData
-					});
-					function formatRows(rows) {
-						return rows.get().join(tmpRowDelim).split(tmpRowDelim)
-								.join(rowDelim).split(tmpColDelim).join(
-										colDelim);
-					}
-					function grabRow(i, row) {
-
-						var $row = $(row);
-						var $cols = $row.find('td');
-						if (!$cols.length)
-							$cols = $row.find('th');
-						return $cols.map(grabCol).get().join(tmpColDelim);
-					}
-					function grabCol(j, col) {
-						var $col = $(col), $text = $col.text();
-						return $text.replace('"', '""');
-					}
-				}
-				$("#export").click(
-						function(event) {
-							exportTableToCSV.apply(this, [ $('#dvData>table'),
-									'DATA_ENTRY_STATISTIC.csv' ]);
-
-						});
-			});
-</script>
 
 <h2>
 	<spring:message code="dataentrystatistics.title" />
@@ -165,6 +120,10 @@
 </form>
 
 <p />
+
+<c:out value="${command.table.htmlHeader}" escapeXml="false" />
+
+<div style="clear: both"></div>
 
 <c:out value="${command.table.htmlTable}" escapeXml="false" />
 
