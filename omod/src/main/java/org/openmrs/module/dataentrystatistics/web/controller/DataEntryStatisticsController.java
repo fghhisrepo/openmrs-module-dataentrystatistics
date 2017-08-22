@@ -107,19 +107,30 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 			this.table = DataEntryStatistic.tableByDateAndObs(dataEntryStatisticService
 					.getAllObsByUsersAndDate(this.entryObject.getFromDate(), this.entryObject.getToDate(), locationId));
+
+			this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
+			this.table.setToDate(DateUtil.format(this.entryObject.getToDate()));
 		}
 
 		if (this.entryObject.getReportType().equals(ReportType.FORM_TYPES.name())) {
 
 			this.table = DataEntryStatistic.tableByFormAndEncounters(dataEntryStatisticService
 					.getAllObsByUsersAndForm(this.entryObject.getFromDate(), this.entryObject.getToDate(), locationId));
+
+			this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
+			this.table.setToDate(DateUtil.format(this.entryObject.getToDate()));
 		}
 
 		if (this.entryObject.getReportType().equals(ReportType.MONTHLY_OBS.name())) {
 
 			this.table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService.getAllMonthObs(
 					this.entryObject.getFromMonth(), DateUtil.getLastDay(this.entryObject.getToMonth()), locationId));
+
+			this.table.setFromDate(DateUtil.format(this.entryObject.getFromMonth()));
+			this.table.setToDate(DateUtil.format(this.entryObject.getToMonth()));
 		}
+
+		this.table.setReportType(this.entryObject.getReportType());
 
 		this.entryObject.setTable(this.table);
 
