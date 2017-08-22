@@ -19,10 +19,11 @@ import java.util.List;
 import org.openmrs.Role;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
-import org.openmrs.module.dataentrystatistics.UserObsByMonth;
+import org.openmrs.module.dataentrystatistics.UserObs;
 import org.openmrs.module.dataentrystatistics.UserObsByDate;
 import org.openmrs.module.dataentrystatistics.UserObsByFormType;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
+import org.openmrs.module.dataentrystatistics.model.ReportData;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -37,41 +38,41 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	 * @return the dao
 	 */
 	public DataEntryStatisticDAO getDao() {
-		return dao;
+		return this.dao;
 	}
 
 	/**
 	 * @param dao
 	 *            the dao to set
 	 */
-	public void setDao(DataEntryStatisticDAO dao) {
+	public void setDao(final DataEntryStatisticDAO dao) {
 		this.dao = dao;
 	}
 
 	@Override
-	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
-		return dao.getAllObsByUsersAndDate(fromDate, toDate, location);
+	public ReportData<UserObsByDate> getAllObsByUsersAndDate(final Date fromDate, final Date toDate, final Integer location) {
+		return this.dao.findObservationsByPeriodAndLocation(fromDate, toDate, location);
 	}
 
 	@Override
 	public List<Role> getAllRoles() {
-		return dao.getAllRoles();
+		return this.dao.getAllRoles();
 	}
 
 	@Override
-	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location) {
+	public List<UserObsByFormType> getAllObsByUsersAndForm(final Date fromDate, final Date toDate, final Integer location) {
 
-		return dao.getAllObsByUsersAndForm(fromDate, toDate, location);
+		return this.dao.getAllObsByUsersAndForm(fromDate, toDate, location);
 	}
 
 	@Override
-	public List<UserObsByMonth> getAllMonthObs(Date fromDate, Date toDate, Integer location) {
-		return dao.getAllMonthObs(fromDate, toDate, location);
+	public List<UserObs> getAllMonthObs(final Date fromDate, final Date toDate, final Integer location) {
+		return this.dao.getAllMonthObs(fromDate, toDate, location);
 	}
 
 	@Override
-	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location) {
-		return dao.countTotalObsPerUserAndDate(fromDate, toDate, location);
+	public List<UserObsByDate> countTotalObsPerUserAndDate(final Date fromDate, final Date toDate, final Integer location) {
+		return this.dao.countTotalObsPerUserAndDate(fromDate, toDate, location);
 	}
 
 }

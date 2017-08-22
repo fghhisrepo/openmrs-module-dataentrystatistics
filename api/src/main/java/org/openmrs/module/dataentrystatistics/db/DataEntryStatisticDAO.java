@@ -17,22 +17,23 @@ import java.util.Date;
 import java.util.List;
 
 import org.openmrs.Role;
+import org.openmrs.module.dataentrystatistics.UserObs;
 import org.openmrs.module.dataentrystatistics.UserObsByDate;
 import org.openmrs.module.dataentrystatistics.UserObsByFormType;
-import org.openmrs.module.dataentrystatistics.UserObsByMonth;
+import org.openmrs.module.dataentrystatistics.model.ReportData;
 
 /**
  * Database methods for the DataEntryStatisticService
  */
 public interface DataEntryStatisticDAO {
 
-	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location);
+	public ReportData<UserObsByDate> findObservationsByPeriodAndLocation(Date fromDate, Date toDate, Integer location);
 
 	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location);
 
 	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
 
-	public List<UserObsByMonth> getAllMonthObs(Date fromDate, Date toDate, Integer location);
+	public List<UserObs> getAllMonthObs(Date fromDate, Date toDate, Integer location);
 
 	public List<Role> getAllRoles();
 

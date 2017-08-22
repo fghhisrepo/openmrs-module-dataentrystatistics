@@ -5,50 +5,71 @@ import java.util.Date;
 public class UserObsByDate {
 
 	private String user;
+
 	private Date date;
+
 	private Long totalObs;
+
 	private String location;
 
-	public UserObsByDate(String user, Date date, Long totalObs) {
+	private Date startDate;
+
+	private Date endDate;
+
+	public UserObsByDate(final String user, final Date date, final Long totalObs) {
 		this.user = user;
 		this.date = date;
 		this.totalObs = totalObs;
 	}
 
 	public UserObsByDate() {
-
 	}
 
 	public Date getDate() {
-		return date;
+		return this.date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(final Date date) {
 		this.date = date;
 	}
 
 	public Long getTotalObs() {
-		return totalObs;
+		return this.totalObs;
 	}
 
-	public void setTotalObs(Long totalObs) {
+	public void setTotalObs(final Long totalObs) {
 		this.totalObs = totalObs;
 	}
 
 	public String getUser() {
-		return user;
+		return this.user;
 	}
 
-	public void setUser(String user) {
+	public void setUser(final String user) {
 		this.user = user;
 	}
 
 	public String getLocation() {
-		return location;
+		return this.location;
 	}
 
-	public void setLocation(String location) {
+	public void setLocation(final String location) {
 		this.location = location;
 	}
 
+	public void setStartDate(final Date startDate) {
+		this.startDate = startDate;
+	}
+
+	public Date getStartDate() {
+		return this.startDate;
+	}
+
+	public void setEndDate(final Date endDate) {
+		this.endDate = endDate;
+	}
+
+	public Date getEndDate() {
+		return this.endDate;
+	}
 }

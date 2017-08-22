@@ -23,36 +23,37 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.openmrs.Role;
-import org.openmrs.module.dataentrystatistics.UserObsByMonth;
+import org.openmrs.module.dataentrystatistics.UserObs;
 import org.openmrs.module.dataentrystatistics.UserObsByDate;
 import org.openmrs.module.dataentrystatistics.UserObsByFormType;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
+import org.openmrs.module.dataentrystatistics.model.ReportData;
 
 /**
  * Database methods for the DataEntryStatisticService
  */
 public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
-	protected Log log = LogFactory.getLog(getClass());
+	protected Log log = LogFactory.getLog(this.getClass());
 
 	SessionFactory sessionFactory;
 
 	public SessionFactory getSessionFactory() {
-		return sessionFactory;
+		return this.sessionFactory;
 	}
 
-	public void setSessionFactory(SessionFactory sessionFactory) {
+	public void setSessionFactory(final SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 
 	private org.hibernate.Session getCurrentSession() {
 		try {
-			return sessionFactory.getCurrentSession();
-		} catch (NoSuchMethodError ex) {
+			return this.sessionFactory.getCurrentSession();
+		} catch (final NoSuchMethodError ex) {
 			try {
-				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
-				return (org.hibernate.Session) method.invoke(sessionFactory, null);
-			} catch (Exception e) {
+				final Method method = this.sessionFactory.getClass().getMethod("getCurrentSession", null);
+				return (org.hibernate.Session) method.invoke(this.sessionFactory, null);
+			} catch (final Exception e) {
 				throw new RuntimeException("Failed to get the current hibernate session", e);
 			}
 		}
@@ -60,60 +61,66 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location) {
+	public ReportData<UserObsByDate> findObservationsByPeriodAndLocation(final Date fromDate, final Date toDate,
+			final Integer location) {
 
-		String hql = "SELECT  DATE(o.dateCreated), count(o.obsId), c.username, l.name FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND o.voided = :voided  GROUP BY DATE(o.dateCreated),  c.username ORDER BY DATE(o.dateCreated) ASC ";
+		final String hql = "SELECT DATE(o.dateCreated), COUNT(o.obsId), c.username, l.name FROM Obs o "
+				+ "INNER JOIN o.creator c INNER JOIN o.location l "
+				+ "WHERE DATE(o.dateCreated) BETWEEN :fromDate AND :toDate AND l.locationId =:location AND c.username IS NOT null "
+				+ "AND o.voided = :voided GROUP BY DATE(o.dateCreated), c.username ORDER BY DATE(o.dateCreated) ASC";
 
-		Query query = getCurrentSession().createQuery(hql);
+		final Query query = this.getCurrentSession().createQuery(hql);
+
 		query.setParameter("fromDate", fromDate);
 		query.setParameter("toDate", toDate);
 		query.setParameter("location", location);
 		query.setParameter("voided", false);
 
-		List<Object[]> list = query.list();
+		final List<Object[]> list = query.list();
 
-		List<UserObsByDate> userDates = new ArrayList<UserObsByDate>();
+		final ReportData<UserObsByDate> reportData = new ReportData<UserObsByDate>(null, null, null, fromDate, toDate);
 
-		for (Object[] object : list) {
-			UserObsByDate userDate = new UserObsByDate();
+		for (final Object[] object : list) {
+			final UserObsByDate userDate = new UserObsByDate();
 
 			userDate.setUser((String) object[2]);
 			userDate.setDate((Date) object[0]);
 			userDate.setTotalObs((Long) object[1]);
 			userDate.setLocation((String) object[3]);
 
-			userDates.add(userDate);
+			reportData.addData(userDate);
 		}
 
-		return userDates;
+		return reportData;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Role> getAllRoles() {
-		String hql = "SELECT  r FROM Role r ";
-		Query query = getCurrentSession().createQuery(hql);
+		final String hql = "SELECT  r FROM Role r ";
+		final Query query = this.getCurrentSession().createQuery(hql);
 		return query.list();
 
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location) {
+	public List<UserObsByFormType> getAllObsByUsersAndForm(final Date fromDate, final Date toDate,
+			final Integer location) {
 
-		String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId),  l.name  FROM  Obs o  INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l WHERE e.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND o.voided = :voided GROUP BY f.name, c.username";
-		Query query = getCurrentSession().createQuery(hql);
+		final String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId),  l.name  FROM  Obs o  INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l WHERE e.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND o.voided = :voided GROUP BY f.name, c.username";
+		final Query query = this.getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
 		query.setParameter("toDate", toDate);
 		query.setParameter("location", location);
 		query.setParameter("voided", false);
 
-		List<Object[]> list = query.list();
+		final List<Object[]> list = query.list();
 
-		List<UserObsByFormType> userObsByFormTypes = new ArrayList<UserObsByFormType>();
-		for (Object[] object : list) {
+		final List<UserObsByFormType> userObsByFormTypes = new ArrayList<UserObsByFormType>();
+		for (final Object[] object : list) {
 
-			UserObsByFormType userObsByFormType = new UserObsByFormType();
+			final UserObsByFormType userObsByFormType = new UserObsByFormType();
 
 			userObsByFormType.setUser((String) object[1]);
 			userObsByFormType.setForm(((String) object[0]));
@@ -129,32 +136,34 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<UserObsByMonth> getAllMonthObs(Date fromDate, Date toDate, Integer location) {
+	public List<UserObs> getAllMonthObs(final Date fromDate, final Date toDate, final Integer location) {
 
-		String hql = "SELECT  MONTH(o.dateCreated), count(o.obsId), c.username, YEAR(o.dateCreated), DAY(o.dateCreated), l.name FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location AND  o.voided = :voided  GROUP BY MONTH(o.dateCreated), c.username, YEAR(o.dateCreated)";
+		final String hql = "SELECT c.username, l.name, MONTH(o.dateCreated), COUNT(o.obsId) FROM Obs o "
+				+ "INNER JOIN o.creator c INNER JOIN o.location l "
+				+ "WHERE DATE(o.dateCreated) BETWEEN :fromDate AND :toDate AND l.locationId =:location AND c.username IS NOT NULL "
+				+ "AND o.voided = :voided GROUP BY MONTH(o.dateCreated), c.username "
+				+ "ORDER BY MONTH(o.dateCreated), c.username ASC";
 
-		Query query = getCurrentSession().createQuery(hql);
+		final Query query = this.getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
 		query.setParameter("toDate", toDate);
 		query.setParameter("location", location);
 		query.setParameter("voided", false);
 
-		List<Object[]> list = query.list();
+		final List<Object[]> list = query.list();
 
-		List<UserObsByMonth> monthObss = new ArrayList<UserObsByMonth>();
+		final List<UserObs> monthObss = new ArrayList<UserObs>();
 
-		for (Object[] object : list) {
+		for (final Object[] object : list) {
 
-			UserObsByMonth monthObs = new UserObsByMonth();
+			final UserObs userObs = new UserObs();
 
-			monthObs.setUser((String) object[2]);
-			monthObs.setDate((Integer) object[0]);
-			monthObs.setTotalObs((Long) object[1]);
-			monthObs.setYear((Integer) object[3]);
-			monthObs.setDay((Integer) object[4]);
-			monthObs.setLocation((String) object[5]);
+			userObs.setUser((String) object[0]);
+			userObs.setLocation((String) object[1]);
+			userObs.setDate((Integer) object[2]);
+			userObs.setTotalObs((Long) object[3]);
 
-			monthObss.add(monthObs);
+			monthObss.add(userObs);
 		}
 
 		return monthObss;
@@ -162,21 +171,22 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location) {
+	public List<UserObsByDate> countTotalObsPerUserAndDate(final Date fromDate, final Date toDate,
+			final Integer location) {
 
-		String hql = "SELECT count(o.obsId), c.username FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY c.username";
+		final String hql = "SELECT count(o.obsId), c.username FROM  Obs o INNER JOIN o.creator c INNER JOIN o.location l  where o.dateCreated BETWEEN :fromDate AND :toDate AND l.locationId =:location  GROUP BY c.username";
 
-		Query query = getCurrentSession().createQuery(hql);
+		final Query query = this.getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
 		query.setParameter("toDate", toDate);
 		query.setParameter("location", location);
 
-		List<Object[]> list = query.list();
+		final List<Object[]> list = query.list();
 
-		List<UserObsByDate> userObsByDates = new ArrayList<UserObsByDate>();
+		final List<UserObsByDate> userObsByDates = new ArrayList<UserObsByDate>();
 
-		for (Object[] object : list) {
-			UserObsByDate userObsByDate = new UserObsByDate();
+		for (final Object[] object : list) {
+			final UserObsByDate userObsByDate = new UserObsByDate();
 
 			userObsByDate.setUser((String) object[1]);
 			userObsByDate.setTotalObs((Long) object[0]);
