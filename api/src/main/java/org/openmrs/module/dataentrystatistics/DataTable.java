@@ -183,7 +183,12 @@ public class DataTable {
 		final StringBuilder sb = new StringBuilder();
 		sb.append("<div id=\"dvData\">");
 		sb.append("<table id=\"result\" class=\"display nowrap\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">");
-		sb.append("<thead><tr>");
+		sb.append("<thead>");
+
+		sb.append(getHtmlHeader(columns.size()));
+		sb.append("<tr><td colspan=" + columns.size() + "/></tr>");
+
+		sb.append("<tr>");
 		for (final String colName : columns) {
 			sb.append("<th>").append(colName).append("</th>");
 		}
@@ -199,17 +204,19 @@ public class DataTable {
 		sb.append("</div>");
 
 		return sb.toString();
-
 	}
 
-	public String getHtmlHeader() {
+	private String getHtmlHeader(final int comlumnsSize) {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("<div id=\"header\">");
-		builder.append("<p><strong>LOCATION:</strong> ").append(this.getLocation()).append("</p>");
-		builder.append("<p><strong>REPORT TYPE:</strong> ").append(this.getReportType()).append("</p>");
-		builder.append("<p><strong>FROM DATE:</strong> ").append(this.getFromDate()).append("</p>");
-		builder.append("<p><strong>TO DATE:</strong> ").append(this.getToDate()).append("</p>");
-		builder.append("</div>");
+		builder.append("<tr><th><strong>LOCATION:</strong></th>").append("<th colspan=" + comlumnsSize + ">")
+				.append(this.getLocation()).append("</th></tr>");
+		builder.append("<tr><th><strong>REPORT TYPE:</strong> ")
+				.append("<th colspan=" + comlumnsSize + " id=\"reportSelected\">").append(this.getReportType())
+				.append("</th></tr>");
+		builder.append("<tr><th><strong>FROM DATE:</strong> ").append("<th colspan=" + comlumnsSize + ">")
+				.append(this.getFromDate()).append("</th></tr>");
+		builder.append("<tr><th><strong>TO DATE:</strong> ").append("<th colspan=" + comlumnsSize + ">")
+				.append(this.getToDate()).append("</th></tr>");
 
 		return builder.toString();
 	}
