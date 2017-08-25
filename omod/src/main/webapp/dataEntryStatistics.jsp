@@ -121,10 +121,6 @@
 
 <p />
 
-<c:out value="${command.table.htmlHeader}" escapeXml="false" />
-
-<div style="clear: both"></div>
-
 <c:out value="${command.table.htmlTable}" escapeXml="false" />
 
 <openmrs:htmlInclude

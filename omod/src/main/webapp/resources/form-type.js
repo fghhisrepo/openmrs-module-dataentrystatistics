@@ -101,7 +101,7 @@ $("#export").click(
 					+ (today.getMonth() + 1) + '' + today.getDate();
 			var fileName = $('#location').find(":selected").text().trim()
 					.toUpperCase();
-			var report = $('#reportType').val();
+			var report = $('#reportSelected').text();
 
 			fileName = 'DES_' + report + '_' + fileName + '_' + formatedDate;
 
