@@ -31,6 +31,8 @@ public class DataTable {
 
 	private String location;
 
+	private String parentLocation;
+
 	private String reportType;
 
 	private String fromDate;
@@ -185,7 +187,7 @@ public class DataTable {
 		sb.append("<table id=\"result\" class=\"display nowrap\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">");
 		sb.append("<thead>");
 
-		sb.append(getHtmlHeader(columns.size()));
+		sb.append(this.getHtmlHeader(columns.size()));
 		sb.append("<tr><td colspan=" + columns.size() + "/></tr>");
 
 		sb.append("<tr>");
@@ -208,8 +210,10 @@ public class DataTable {
 
 	private String getHtmlHeader(final int comlumnsSize) {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("<tr><th><strong>LOCATION:</strong></th>").append("<th colspan=" + comlumnsSize + ">")
-				.append(this.getLocation()).append("</th></tr>");
+		if (!this.getLocation().isEmpty()) {
+			builder.append("<tr><th><strong>LOCATION:</strong></th>").append("<th colspan=" + comlumnsSize + ">")
+					.append(this.getLocation()).append("</th></tr>");
+		}
 		builder.append("<tr><th><strong>REPORT TYPE:</strong> ")
 				.append("<th colspan=" + comlumnsSize + " id=\"reportSelected\">").append(this.getReportType())
 				.append("</th></tr>");
@@ -219,5 +223,13 @@ public class DataTable {
 				.append(this.getToDate()).append("</th></tr>");
 
 		return builder.toString();
+	}
+
+	public String getParentLocation() {
+		return this.parentLocation;
+	}
+
+	public void setParentLocation(final String parentLocation) {
+		this.parentLocation = parentLocation;
 	}
 }

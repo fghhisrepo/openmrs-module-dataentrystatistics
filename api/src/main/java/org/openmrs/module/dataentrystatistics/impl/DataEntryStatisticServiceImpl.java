@@ -50,7 +50,8 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	}
 
 	@Override
-	public ReportData<UserObsByDate> getAllObsByUsersAndDate(final Date fromDate, final Date toDate, final Integer location) {
+	public ReportData<UserObsByDate> getAllObsByUsersAndDate(final Date fromDate, final Date toDate,
+			final Integer location) {
 		return this.dao.findObservationsByPeriodAndLocation(fromDate, toDate, location);
 	}
 
@@ -60,7 +61,8 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	}
 
 	@Override
-	public List<UserObsByFormType> getAllObsByUsersAndForm(final Date fromDate, final Date toDate, final Integer location) {
+	public List<UserObsByFormType> getAllObsByUsersAndForm(final Date fromDate, final Date toDate,
+			final Integer location) {
 
 		return this.dao.getAllObsByUsersAndForm(fromDate, toDate, location);
 	}
@@ -71,8 +73,15 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	}
 
 	@Override
-	public List<UserObsByDate> countTotalObsPerUserAndDate(final Date fromDate, final Date toDate, final Integer location) {
+	public List<UserObsByDate> countTotalObsPerUserAndDate(final Date fromDate, final Date toDate,
+			final Integer location) {
 		return this.dao.countTotalObsPerUserAndDate(fromDate, toDate, location);
+	}
+
+	@Override
+	public ReportData<UserObsByDate> findObservationsByPeriod(final Date fromDate, final Date toDate,
+			final Integer location) {
+		return this.dao.findObservationsByPeriod(fromDate, toDate, location );
 	}
 
 }

@@ -42,8 +42,9 @@ public class DataEntryStatistic<K> {
 		final List<String> users = CollectionUtil.mapWithoutDuplication(reportData.getData(), "user", String.class);
 
 		final List<Date> dates = CollectionUtil.daysBetween(reportData.getStartDate(), reportData.getEndDate());
-
-		table.setLocation(reportData.getData().get(0).getLocation());
+		if (!table.getLocation().isEmpty()) {
+			table.setLocation(reportData.getData().get(0).getLocation());
+		}
 		table.addColumn("DATE");
 		table.addColumns(users);
 		table.addColumn("TOTAL");

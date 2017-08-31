@@ -42,8 +42,18 @@
 						</select>
 					</spring:bind></td>
 			</tr>
-
 			<tr>
+				<td><spring:message code="dataentrystatistics.orderBy" />:</td>
+				<td><spring:bind path="command.orderBy">
+						<select name="${status.expression}" width="60%" id="orderBy">
+							<option></option>
+							<c:forEach items="${orderBys}" var="orderBy">
+								<option>${orderBy}</option>
+							</c:forEach>
+						</select>
+					</spring:bind></td>
+			</tr>
+			<tr id="locationTr">
 				<td><spring:message code="dataentrystatistics.location" /></td>
 				<td><spring:bind path="command.location">
 						<openmrs_tag:locationField formFieldName="location"
@@ -58,6 +68,7 @@
 			<tr>
 				<td><spring:message code="dataentrystatistics.type" />:</td>
 				<td><spring:bind path="command.reportType">
+						<option></option>
 						<select name="${status.expression}" width="60%" id="reportType">
 							<c:forEach items="${reportTypes}" var="reportType">
 								<option>${reportType}</option>

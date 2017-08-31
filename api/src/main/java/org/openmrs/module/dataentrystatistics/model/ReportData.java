@@ -5,11 +5,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.openmrs.Location;
+
 public class ReportData<T> {
 
 	private final String creator;
 
 	private final String location;
+
+	private Location parentLocation;
 
 	private final ReportType reportType;
 
@@ -23,6 +27,17 @@ public class ReportData<T> {
 			final Date endDate) {
 		this.creator = creator;
 		this.location = location;
+		this.reportType = reportType;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.data = new ArrayList<T>();
+	}
+
+	public ReportData(final String creator, final String location, final Location parentLocation,
+			final ReportType reportType, final Date startDate, final Date endDate) {
+		this.creator = creator;
+		this.location = location;
+		this.parentLocation = parentLocation;
 		this.reportType = reportType;
 		this.startDate = startDate;
 		this.endDate = endDate;
@@ -56,4 +71,13 @@ public class ReportData<T> {
 	public void addData(final T data) {
 		this.data.add(data);
 	}
+
+	public Location getParentLocation() {
+		return this.parentLocation;
+	}
+
+	public void setParentLocation(final Location parentLocation) {
+		this.parentLocation = parentLocation;
+	}
+
 }

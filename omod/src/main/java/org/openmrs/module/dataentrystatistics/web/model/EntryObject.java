@@ -2,6 +2,7 @@ package org.openmrs.module.dataentrystatistics.web.model;
 
 import java.util.Date;
 
+import org.openmrs.Location;
 import org.openmrs.module.dataentrystatistics.DataTable;
 
 public class EntryObject {
@@ -23,10 +24,14 @@ public class EntryObject {
 	private Integer month;
 
 	private String location;
+	
+	private String orderBy;
 
 	private String period;
 
 	private String reportType;
+	
+	private Location parentLocation;
 
 	public Date getFromMonth() {
 		return this.fromMonth;
@@ -118,5 +123,24 @@ public class EntryObject {
 	public void setReportType(final String reportType) {
 		this.reportType = reportType;
 	}
+
+	public String getOrderBy() {
+		return this.orderBy;
+	}
+
+	public void setOrderBy(final String orderBy) {
+		this.orderBy = orderBy;
+	}
+
+	public Location getParentLocation() {
+		return this.parentLocation;
+	}
+
+	public void setParentLocation(final Location parentLocation) {
+		this.parentLocation = parentLocation;
+	}
+
+
+
 
 }

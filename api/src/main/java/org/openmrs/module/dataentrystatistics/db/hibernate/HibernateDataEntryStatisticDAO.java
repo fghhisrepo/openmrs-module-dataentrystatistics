@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.openmrs.Location;
 import org.openmrs.Role;
 import org.openmrs.module.dataentrystatistics.UserObs;
 import org.openmrs.module.dataentrystatistics.UserObsByDate;
@@ -196,4 +197,38 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		return userObsByDates;
 	}
+
+	@Override
+	public ReportData<UserObsByDate> findObservationsByPeriod(final Date fromDate, final Date toDate,
+			final Integer location) {
+		final String hql = "SELECT DATE(o.dateCreated), COUNT(o.obsId), c.username,  l.parentLocation FROM Obs o "
+				+ "INNER JOIN o.creator c INNER JOIN o.location l "
+				+ "WHERE DATE(o.dateCreated) BETWEEN :fromDate AND :toDate AND o.voided = :voided GROUP BY DATE(o.dateCreated), c.username ORDER BY DATE(o.dateCreated) ASC ";
+
+		final Query query = this.getCurrentSession().createQuery(hql);
+
+		query.setParameter("fromDate", fromDate);
+		query.setParameter("toDate", toDate);
+		query.setParameter("voided", false);
+
+		@SuppressWarnings("unchecked")
+		final List<Object[]> list = query.list();
+
+		final ReportData<UserObsByDate> reportData = new ReportData<UserObsByDate>(null, null, null, null, fromDate,
+				toDate);
+
+		for (final Object[] object : list) {
+			final UserObsByDate userDate = new UserObsByDate();
+
+			userDate.setUser((String) object[2]);
+			userDate.setDate((Date) object[0]);
+			userDate.setTotalObs((Long) object[1]);
+			userDate.setParentLocation((Location) object[3]);
+
+			reportData.addData(userDate);
+		}
+
+		return reportData;
+	}
+
 }

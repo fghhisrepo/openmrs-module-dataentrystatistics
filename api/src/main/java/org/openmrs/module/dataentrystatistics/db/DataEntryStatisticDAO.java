@@ -29,6 +29,9 @@ public interface DataEntryStatisticDAO {
 
 	public ReportData<UserObsByDate> findObservationsByPeriodAndLocation(Date fromDate, Date toDate, Integer location);
 
+	public ReportData<UserObsByDate> findObservationsByPeriod(final Date fromDate, final Date toDate,
+			final Integer location);
+
 	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location);
 
 	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
