@@ -34,9 +34,14 @@ public interface DataEntryStatisticDAO {
 
 	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location);
 
-	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
+	public ReportData<UserObsByFormType>  getAllObsByUsersAndFormAndLocation(Date fromDate, Date toDate, Integer location);
+	
+	public ReportData<UserObsByFormType> getAllObsByUsersAndForm(final Date fromDate, final Date toDate,
+			final Integer location);
 
-	public List<UserObs> getAllMonthObs(Date fromDate, Date toDate, Integer location);
+	public ReportData<UserObs> getAllMonthObsFromLocation(Date fromDate, Date toDate, Integer location);
+	public ReportData<UserObs> getAllMonthObs(Date fromDate, Date toDate, Integer location);
+
 
 	public List<Role> getAllRoles();
 

@@ -101,12 +101,20 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		if (this.entryObject.getReportType().equals(ReportType.DAILY_OBS.name())) {
 
-			if (this.entryObject.getOrderBy().equals(OrderBy.healthy_facilities.name())) {
+			if (this.entryObject.getOrderBy().equals(OrderBy.HEALTHY_FACILITIES.name())) {
 				this.table = DataEntryStatistic.tableByDateAndObs(
-						dataEntryStatisticService.getAllObsByUsersAndDate(this.entryObject.getFromDate(),
+						dataEntryStatisticService.findObservationsByPeriodAndLocation(this.entryObject.getFromDate(),
 								this.entryObject.getToDate(), this.parse(this.entryObject.getLocation())));
+
+				final String location = dataEntryStatisticService
+						.findObservationsByPeriodAndLocation(this.entryObject.getFromDate(),
+								this.entryObject.getToDate(), this.parse(this.entryObject.getLocation()))
+						.getData().get(0).getLocation();
+
+				this.table.setLocation(location);
+
 			}
-			if (this.entryObject.getOrderBy().equals(OrderBy.Distric.name())) {
+			if (this.entryObject.getOrderBy().equals(OrderBy.DISTRIC.name())) {
 
 				this.table = DataEntryStatistic.tableByDateAndObs(dataEntryStatisticService
 						.findObservationsByPeriod(this.entryObject.getFromDate(), this.entryObject.getToDate(), null));
@@ -124,22 +132,68 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		if (this.entryObject.getReportType().equals(ReportType.FORM_TYPES.name())) {
 
-			this.table = DataEntryStatistic.tableByFormAndEncounters(
-					dataEntryStatisticService.getAllObsByUsersAndForm(this.entryObject.getFromDate(),
-							this.entryObject.getToDate(), this.parse(this.entryObject.getLocation())));
+			if (this.entryObject.getOrderBy().equals(OrderBy.HEALTHY_FACILITIES.name())) {
 
-			this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
-			this.table.setToDate(DateUtil.format(this.entryObject.getToDate()));
+				this.table = DataEntryStatistic.tableByFormAndEncounters(
+						dataEntryStatisticService.getAllObsByUsersAndFormAndLocation(this.entryObject.getFromDate(),
+								this.entryObject.getToDate(), this.parse(this.entryObject.getLocation())));
+
+				final String location = dataEntryStatisticService
+						.getAllObsByUsersAndFormAndLocation(this.entryObject.getFromDate(),
+								this.entryObject.getToDate(), this.parse(this.entryObject.getLocation()))
+						.getData().get(0).getLocation();
+
+				this.table.setLocation(location);
+
+				this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
+				this.table.setToDate(DateUtil.format(this.entryObject.getToDate()));
+			}
+
+			if (this.entryObject.getOrderBy().equals(OrderBy.DISTRIC.name())) {
+
+				this.table = DataEntryStatistic.tableByFormAndEncounters(dataEntryStatisticService
+						.getAllObsByUsersAndForm(this.entryObject.getFromDate(), this.entryObject.getToDate(), null));
+
+				final String location = dataEntryStatisticService
+						.findObservationsByPeriod(this.entryObject.getFromDate(), this.entryObject.getToDate(), null)
+						.getData().get(0).getParentLocation().getName();
+
+				this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
+				this.table.setToDate(DateUtil.format(this.entryObject.getToDate()));
+
+				this.table.setLocation(location);
+
+			}
 		}
 
 		if (this.entryObject.getReportType().equals(ReportType.MONTHLY_OBS.name())) {
 
-			this.table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService.getAllMonthObs(
-					this.entryObject.getFromMonth(), DateUtil.getLastDay(this.entryObject.getToMonth()),
-					this.parse(this.entryObject.getLocation())));
+			if (this.entryObject.getOrderBy().equals(OrderBy.HEALTHY_FACILITIES.name())) {
 
-			this.table.setFromDate(DateUtil.format(this.entryObject.getFromMonth()));
-			this.table.setToDate(DateUtil.format(this.entryObject.getToMonth()));
+				this.table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService.getAllMonthObsFromLocation(
+						this.entryObject.getFromMonth(), DateUtil.getLastDay(this.entryObject.getToMonth()),
+						this.parse(this.entryObject.getLocation())));
+
+				this.table.setFromDate(DateUtil.format(this.entryObject.getFromMonth()));
+				this.table.setToDate(DateUtil.format(this.entryObject.getToMonth()));
+			}
+
+			if (this.entryObject.getOrderBy().equals(OrderBy.DISTRIC.name())) {
+
+				this.table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService.getAllMonthObs(
+						this.entryObject.getFromMonth(), DateUtil.getLastDay(this.entryObject.getToMonth()), null));
+
+				final String location = dataEntryStatisticService
+						.getAllMonthObs(this.entryObject.getFromMonth(),
+								DateUtil.getLastDay(this.entryObject.getToMonth()), null)
+						.getData().get(0).getParentLocation().getName();
+
+				this.table.setFromDate(DateUtil.format(this.entryObject.getFromMonth()));
+				this.table.setToDate(DateUtil.format(this.entryObject.getToMonth()));
+				this.table.setLocation(location);
+
+			}
+
 		}
 
 		this.table.setReportType(this.entryObject.getReportType());

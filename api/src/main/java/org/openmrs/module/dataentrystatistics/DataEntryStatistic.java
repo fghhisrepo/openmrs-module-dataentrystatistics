@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.dataentrystatistics.model.ReportData;
 import org.openmrs.module.dataentrystatistics.util.CollectionUtil;
+import org.openmrs.module.dataentrystatistics.util.DateUtil;
 import org.openmrs.module.dataentrystatistics.util.Month;
 
 public class DataEntryStatistic<K> {
@@ -42,12 +43,11 @@ public class DataEntryStatistic<K> {
 		final List<String> users = CollectionUtil.mapWithoutDuplication(reportData.getData(), "user", String.class);
 
 		final List<Date> dates = CollectionUtil.daysBetween(reportData.getStartDate(), reportData.getEndDate());
-		if (!table.getLocation().isEmpty()) {
-			table.setLocation(reportData.getData().get(0).getLocation());
-		}
+
 		table.addColumn("DATE");
 		table.addColumns(users);
 		table.addColumn("TOTAL");
+		table.addColumn("WORKING DAY");
 
 		final TableRow workingDaysRow = new TableRow();
 
@@ -69,6 +69,7 @@ public class DataEntryStatistic<K> {
 			}
 
 			tableRow.put("TOTAL", totalPerDate);
+			tableRow.put("WORKING DAY", DateUtil.isWeekEnd(date) ? "N" : "Y ");
 
 			table.addRow(tableRow);
 		}
@@ -77,8 +78,11 @@ public class DataEntryStatistic<K> {
 		final TableRow averageRow = new TableRow();
 
 		totalObsRow.put("DATE", "TOTAL OBS");
+		totalObsRow.put("WORKING DAY", "N/A");
 		workingDaysRow.put("DATE", "TOTAL WORKING DAYS");
+		workingDaysRow.put("WORKING DAY", "N/A");
 		averageRow.put("DATE", "AVERAGE (OBS/DAY)");
+		averageRow.put("WORKING DAY", "N/A");
 
 		Long totalObservation = 0L;
 		Integer totalWorkingDays = 0;
@@ -163,7 +167,7 @@ public class DataEntryStatistic<K> {
 		return 0L;
 	}
 
-	public static DataTable tableByFormAndEncounters(final List<UserObsByFormType> userObsByFormTypes) {
+	public static DataTable tableByFormAndEncounters(final ReportData<UserObsByFormType> reportData) {
 
 		final List<String> users = new ArrayList<String>();
 
@@ -171,11 +175,10 @@ public class DataEntryStatistic<K> {
 
 		final DataTable table = new DataTable();
 
-		for (final UserObsByFormType userObsByFormType : userObsByFormTypes) {
+		for (final UserObsByFormType userObsByFormType : reportData.getData()) {
 
 			users.add(userObsByFormType.getUser().toUpperCase());
 			forms.add(userObsByFormType.getForm());
-			table.setLocation(userObsByFormType.getLocation());
 
 		}
 		table.addColumn("FORMULARIOS");
@@ -200,16 +203,16 @@ public class DataEntryStatistic<K> {
 
 			for (final String user : users) {
 
-				final Long totalForms = getTotalEncounterPerUserAndForm(form, user.toUpperCase(), userObsByFormTypes);
+				final Long totalForms = getTotalEncounterPerUserAndForm(form, user.toUpperCase(), reportData.getData());
 
-				final Long totalObs = getTotal(form, user.toUpperCase(), userObsByFormTypes);
+				final Long totalObs = getTotal(form, user.toUpperCase(), reportData.getData());
 
 				tableRowForm.put(user.toUpperCase(), totalForms);
 
 				tableRowObs.put(user.toUpperCase(), totalObs);
 
-				tableRowForm.put("TOTAL", getTotalFormsEncounters(form, userObsByFormTypes));
-				tableRowObs.put("TOTAL", getTotalFormsObs(form, userObsByFormTypes));
+				tableRowForm.put("TOTAL", getTotalFormsEncounters(form, reportData.getData()));
+				tableRowObs.put("TOTAL", getTotalFormsObs(form, reportData.getData()));
 			}
 
 			table.addRow(tableRowForm);
@@ -222,15 +225,15 @@ public class DataEntryStatistic<K> {
 
 		for (final String user : users) {
 
-			final Long totalEnc = getTotalPerFormType(user, userObsByFormTypes, "ENC");
+			final Long totalEnc = getTotalPerFormType(user, reportData.getData(), "ENC");
 
 			lastRowTotalForm.put(user, format.format(totalEnc));
-			lastRowTotalForm.put("TOTAL", getTotalFormsEncounters(userObsByFormTypes));
+			lastRowTotalForm.put("TOTAL", getTotalFormsEncounters(reportData.getData()));
 
-			final Long totalObs = getTotalPerOBS(user, userObsByFormTypes, "OBS");
+			final Long totalObs = getTotalPerOBS(user, reportData.getData(), "OBS");
 
 			lastRowTotalObs.put(user, format.format(totalObs));
-			lastRowTotalObs.put("TOTAL", getTotalFormsOBS(userObsByFormTypes));
+			lastRowTotalObs.put("TOTAL", getTotalFormsOBS(reportData.getData()));
 
 			avarege = totalObs.doubleValue() / totalEnc.doubleValue();
 
@@ -238,15 +241,15 @@ public class DataEntryStatistic<K> {
 
 			tableAveregeObsPerEncounter.put(user, value);
 			tableAveregeObsPerEncounter.put("TOTAL", value);
-			final Long totalEncd = getTotalPerFormType(user, userObsByFormTypes, "ENC");
+			final Long totalEncd = getTotalPerFormType(user, reportData.getData(), "ENC");
 
 			lastRowTotalForm.put(user, totalEncd);
 
 			tableAveregeObsPerEncounter.put(user, value);
 
 		}
-		final Long totalEnc = getTotalPerFormType(userObsByFormTypes, "ENC");
-		final Long totalObs = getTotalPerOBS(userObsByFormTypes, "OBS");
+		final Long totalEnc = getTotalPerFormType(reportData.getData(), "ENC");
+		final Long totalObs = getTotalPerOBS(reportData.getData(), "OBS");
 		final DecimalFormat f = new DecimalFormat("#.####");
 
 		tableAveregeObsPerEncounter.put("TOTAL", f.format(totalObs.doubleValue() / totalEnc.doubleValue()));
@@ -363,18 +366,18 @@ public class DataEntryStatistic<K> {
 		return sum;
 	}
 
-	public static DataTable tableByMonthsByObs(final List<UserObs> userObs) {
+	public static DataTable tableByMonthsByObs(final ReportData<UserObs> userObs) {
 
-		final List<String> users = CollectionUtil.mapWithoutDuplication(userObs, "user", String.class);
-		final List<Integer> months = CollectionUtil.mapWithoutDuplication(userObs, "date", Integer.class);
+		final List<String> users = CollectionUtil.mapWithoutDuplication(userObs.getData(), "user", String.class);
+		final List<Integer> months = CollectionUtil.mapWithoutDuplication(userObs.getData(), "date", Integer.class);
 
 		final DataTable table = new DataTable();
 
-		if (userObs.isEmpty()) {
+		if (userObs.getData().isEmpty()) {
 			return table;
 		}
 
-		table.setLocation(userObs.get(0).getLocation());
+		table.setLocation(userObs.getData().get(0).getLocation());
 
 		table.addColumn("MES");
 		table.addColumns(users);
@@ -392,7 +395,7 @@ public class DataEntryStatistic<K> {
 			Long totalPerMonth = 0L;
 
 			for (final String user : users) {
-				final Long totalPerMonthAndUser = getTotalPerMonthAndUser(userObs, month, user);
+				final Long totalPerMonthAndUser = getTotalPerMonthAndUser(userObs.getData(), month, user);
 				updateWorkingTime(workingMonthsRow, user, totalPerMonthAndUser);
 
 				totalPerMonth += totalPerMonthAndUser;
@@ -414,7 +417,7 @@ public class DataEntryStatistic<K> {
 
 		for (final String user : users) {
 
-			final Long totalObsPerUser = getTotalObsPerUser(user, userObs);
+			final Long totalObsPerUser = getTotalObsPerUser(user, userObs.getData());
 			totalObs += totalObsPerUser;
 
 			final Integer totalWorkingMonthPerUser = (Integer) workingMonthsRow.get(user);

@@ -55,7 +55,7 @@ $('#reportType').on('change', function() {
 
 $('#orderBy').on('change', function() {
 	var orderBy = $('#orderBy').val();
-	if (orderBy == 'Distric') {
+	if (orderBy == 'DISTRIC' || orderBy == "") {
 		$('#locationTr').hide();
 		return;
 	}

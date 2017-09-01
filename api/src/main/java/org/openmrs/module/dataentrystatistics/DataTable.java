@@ -210,10 +210,9 @@ public class DataTable {
 
 	private String getHtmlHeader(final int comlumnsSize) {
 		final StringBuilder builder = new StringBuilder();
-		if (!this.getLocation().isEmpty()) {
-			builder.append("<tr><th><strong>LOCATION:</strong></th>").append("<th colspan=" + comlumnsSize + ">")
-					.append(this.getLocation()).append("</th></tr>");
-		}
+		
+		builder.append("<tr><th><strong>LOCATION:</strong></th>").append("<th colspan=" + comlumnsSize + ">")
+				.append(this.getLocation()).append("</th></tr>");
 		builder.append("<tr><th><strong>REPORT TYPE:</strong> ")
 				.append("<th colspan=" + comlumnsSize + " id=\"reportSelected\">").append(this.getReportType())
 				.append("</th></tr>");

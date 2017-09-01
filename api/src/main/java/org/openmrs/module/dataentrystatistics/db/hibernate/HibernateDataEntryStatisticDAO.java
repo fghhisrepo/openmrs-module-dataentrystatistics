@@ -106,7 +106,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<UserObsByFormType> getAllObsByUsersAndForm(final Date fromDate, final Date toDate,
+	public ReportData<UserObsByFormType> getAllObsByUsersAndFormAndLocation(final Date fromDate, final Date toDate,
 			final Integer location) {
 
 		final String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId),  l.name  FROM  Obs o  INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l WHERE DATE(o.dateCreated) >= :fromDate AND DATE(o.dateCreated) <= :toDate AND l.locationId =:location AND o.voided = :voided GROUP BY f.name, c.username";
@@ -118,7 +118,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		final List<Object[]> list = query.list();
 
-		final List<UserObsByFormType> userObsByFormTypes = new ArrayList<UserObsByFormType>();
+		final ReportData<UserObsByFormType> reportData = new ReportData<UserObsByFormType>(null, null, null, fromDate, toDate);
 		for (final Object[] object : list) {
 
 			final UserObsByFormType userObsByFormType = new UserObsByFormType();
@@ -129,15 +129,16 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 			userObsByFormType.setTotalObs((Long) object[3]);
 			userObsByFormType.setLocation((String) object[4]);
 
-			userObsByFormTypes.add(userObsByFormType);
+			reportData.addData(userObsByFormType);
 		}
 
-		return userObsByFormTypes;
+		return reportData;
+
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<UserObs> getAllMonthObs(final Date fromDate, final Date toDate, final Integer location) {
+	public ReportData<UserObs> getAllMonthObsFromLocation(final Date fromDate, final Date toDate, final Integer location) {
 
 		final String hql = "SELECT c.username, l.name, MONTH(o.dateCreated), COUNT(o.obsId) FROM Obs o "
 				+ "INNER JOIN o.creator c INNER JOIN o.location l "
@@ -153,7 +154,8 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		final List<Object[]> list = query.list();
 
-		final List<UserObs> monthObss = new ArrayList<UserObs>();
+		final ReportData<UserObs> reportData = new ReportData<UserObs>(null, null, null, fromDate, toDate);
+
 
 		for (final Object[] object : list) {
 
@@ -164,10 +166,10 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 			userObs.setDate((Integer) object[2]);
 			userObs.setTotalObs((Long) object[3]);
 
-			monthObss.add(userObs);
+			reportData.addData(userObs);
 		}
 
-		return monthObss;
+		return reportData;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -229,6 +231,72 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		}
 
 		return reportData;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ReportData<UserObsByFormType> getAllObsByUsersAndForm(final Date fromDate, final Date toDate,
+			final Integer location) {
+
+		final String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId),  l.parentLocation   FROM  Obs o  INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l WHERE DATE(o.dateCreated) >= :fromDate AND DATE(o.dateCreated) <= :toDate AND o.voided = :voided GROUP BY f.name, c.username";
+		final Query query = this.getCurrentSession().createQuery(hql);
+		query.setParameter("fromDate", fromDate);
+		query.setParameter("toDate", toDate);
+		query.setParameter("voided", false);
+
+		final List<Object[]> list = query.list();
+		final ReportData<UserObsByFormType> reportData = new ReportData<UserObsByFormType>(null, null, null, fromDate, toDate);
+		for (final Object[] object : list) {
+
+			final UserObsByFormType userObsByFormType = new UserObsByFormType();
+
+			userObsByFormType.setUser((String) object[1]);
+			userObsByFormType.setForm(((String) object[0]));
+			userObsByFormType.setTotalEncounters((Long) object[2]);
+			userObsByFormType.setTotalObs((Long) object[3]);
+			userObsByFormType.setParentLocation((Location) object[4]);
+
+			reportData.addData(userObsByFormType);
+		}
+
+		return reportData;
+
+	}
+
+	@Override
+	public ReportData<UserObs> getAllMonthObs(final Date fromDate, final Date toDate, final Integer location) {
+
+		final String hql = "SELECT c.username,  l.parentLocation, MONTH(o.dateCreated), COUNT(o.obsId) FROM Obs o "
+				+ "INNER JOIN o.creator c INNER JOIN o.location l "
+				+ "WHERE DATE(o.dateCreated) >= :fromDate AND DATE(o.dateCreated) <= :toDate  AND c.username IS NOT NULL "
+				+ "AND o.voided = :voided GROUP BY MONTH(o.dateCreated), c.username "
+				+ "ORDER BY MONTH(o.dateCreated), c.username ASC";
+
+		final Query query = this.getCurrentSession().createQuery(hql);
+		query.setParameter("fromDate", fromDate);
+		query.setParameter("toDate", toDate);
+		query.setParameter("voided", false);
+
+		@SuppressWarnings("unchecked")
+		final List<Object[]> list = query.list();
+
+		final ReportData<UserObs> reportData = new ReportData<UserObs>(null, null, null, fromDate, toDate);
+
+
+		for (final Object[] object : list) {
+
+			final UserObs userObs = new UserObs();
+
+			userObs.setUser((String) object[0]);
+			userObs.setParentLocation((Location) object[1]);
+			userObs.setDate((Integer) object[2]);
+			userObs.setTotalObs((Long) object[3]);
+
+			reportData.addData(userObs);
+		}
+
+		return reportData;
+
 	}
 
 }

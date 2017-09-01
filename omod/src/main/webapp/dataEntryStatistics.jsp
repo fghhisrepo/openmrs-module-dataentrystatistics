@@ -65,12 +65,12 @@
 					</spring:bind></td>
 			</tr>
 
-			<tr>
+			<tr id="reportTypeTr">
 				<td><spring:message code="dataentrystatistics.type" />:</td>
 				<td><spring:bind path="command.reportType">
 						<option></option>
 						<select name="${status.expression}" width="60%" id="reportType">
-							<c:forEach items="${reportTypes}" var="reportType">
+							<c:forEach items="${reportTypes}" var="reportType" >
 								<option>${reportType}</option>
 							</c:forEach>
 						</select>
