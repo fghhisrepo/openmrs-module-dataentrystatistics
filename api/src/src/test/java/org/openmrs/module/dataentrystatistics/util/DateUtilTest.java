@@ -44,7 +44,7 @@ public class DateUtilTest {
 	@Test
 	public void shouldVerifyIfTheDateIsAWeekend() {
 		try {
-			final Date date = this.format.parse("31-08-2017");
+			final Date date = this.format.parse("03-08-2017");
 			final boolean value = DateUtil.isWeekEnd(date);
 			assertTrue(value);
 		} catch (final ParseException e) {

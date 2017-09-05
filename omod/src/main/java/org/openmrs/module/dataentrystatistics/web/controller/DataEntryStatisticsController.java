@@ -174,6 +174,12 @@ public class DataEntryStatisticsController extends SimpleFormController {
 						this.entryObject.getFromMonth(), DateUtil.getLastDay(this.entryObject.getToMonth()),
 						this.parse(this.entryObject.getLocation())));
 
+				final String location = dataEntryStatisticService
+						.getAllMonthObsFromLocation(this.entryObject.getFromMonth(),  DateUtil.getLastDay(this.entryObject.getToMonth()),
+								this.parse(this.entryObject.getLocation()))
+						.getData().get(0).getLocation();
+				this.table.setLocation(location);
+
 				this.table.setFromDate(DateUtil.format(this.entryObject.getFromMonth()));
 				this.table.setToDate(DateUtil.format(this.entryObject.getToMonth()));
 			}
@@ -214,4 +220,5 @@ public class DataEntryStatisticsController extends SimpleFormController {
 	public void setDataEntryStatisticService(final DataEntryStatisticService dataEntryStatisticService) {
 		this.dataEntryStatisticService = dataEntryStatisticService;
 	}
+
 }

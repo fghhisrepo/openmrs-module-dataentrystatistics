@@ -109,7 +109,8 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 	public ReportData<UserObsByFormType> getAllObsByUsersAndFormAndLocation(final Date fromDate, final Date toDate,
 			final Integer location) {
 
-		final String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId),  l.name  FROM  Obs o  INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l WHERE DATE(o.dateCreated) >= :fromDate AND DATE(o.dateCreated) <= :toDate AND l.locationId =:location AND o.voided = :voided GROUP BY f.name, c.username";
+		final String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId),  l.name   FROM  Obs o  INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l WHERE DATE(o.dateCreated) >= :fromDate AND DATE(o.dateCreated) <= :toDate AND l.locationId =:location AND o.voided = :voided GROUP BY f.name, c.username";
+
 		final Query query = this.getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
 		query.setParameter("toDate", toDate);
@@ -118,7 +119,8 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		final List<Object[]> list = query.list();
 
-		final ReportData<UserObsByFormType> reportData = new ReportData<UserObsByFormType>(null, null, null, fromDate, toDate);
+		final ReportData<UserObsByFormType> reportData = new ReportData<UserObsByFormType>(null, null, null, fromDate,
+				toDate);
 		for (final Object[] object : list) {
 
 			final UserObsByFormType userObsByFormType = new UserObsByFormType();
@@ -138,7 +140,8 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ReportData<UserObs> getAllMonthObsFromLocation(final Date fromDate, final Date toDate, final Integer location) {
+	public ReportData<UserObs> getAllMonthObsFromLocation(final Date fromDate, final Date toDate,
+			final Integer location) {
 
 		final String hql = "SELECT c.username, l.name, MONTH(o.dateCreated), COUNT(o.obsId) FROM Obs o "
 				+ "INNER JOIN o.creator c INNER JOIN o.location l "
@@ -155,7 +158,6 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		final List<Object[]> list = query.list();
 
 		final ReportData<UserObs> reportData = new ReportData<UserObs>(null, null, null, fromDate, toDate);
-
 
 		for (final Object[] object : list) {
 
@@ -245,7 +247,8 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		query.setParameter("voided", false);
 
 		final List<Object[]> list = query.list();
-		final ReportData<UserObsByFormType> reportData = new ReportData<UserObsByFormType>(null, null, null, fromDate, toDate);
+		final ReportData<UserObsByFormType> reportData = new ReportData<UserObsByFormType>(null, null, null, fromDate,
+				toDate);
 		for (final Object[] object : list) {
 
 			final UserObsByFormType userObsByFormType = new UserObsByFormType();
@@ -281,7 +284,6 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		final List<Object[]> list = query.list();
 
 		final ReportData<UserObs> reportData = new ReportData<UserObs>(null, null, null, fromDate, toDate);
-
 
 		for (final Object[] object : list) {
 
