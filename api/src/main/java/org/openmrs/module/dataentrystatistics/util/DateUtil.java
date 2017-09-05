@@ -28,4 +28,18 @@ public class DateUtil {
 		final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 		return format.format(date);
 	}
+
+	public static boolean isWeekEnd(final Date date) {
+
+		final Calendar instance = Calendar.getInstance();
+		instance.setTime(date);
+
+		final int dayOfWeek = instance.get(Calendar.DAY_OF_WEEK);
+
+		if ((dayOfWeek == Calendar.SATURDAY) || (dayOfWeek == Calendar.SUNDAY)) {
+			return true;
+		}
+
+		return false;
+	}
 }

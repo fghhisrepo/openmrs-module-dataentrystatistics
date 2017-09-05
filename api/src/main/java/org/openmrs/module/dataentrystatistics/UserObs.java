@@ -2,6 +2,8 @@ package org.openmrs.module.dataentrystatistics;
 
 import java.util.Date;
 
+import org.openmrs.Location;
+
 public class UserObs {
 
 	private String user;
@@ -11,6 +13,8 @@ public class UserObs {
 	private Long totalObs;
 	private String location;
 	private Date creationDate;
+	private Location parentLocation;
+
 
 	public String getUser() {
 		return this.user;
@@ -66,5 +70,13 @@ public class UserObs {
 
 	public Date getCreationDate() {
 		return this.creationDate;
+	}
+
+	public Location getParentLocation() {
+		return this.parentLocation;
+	}
+
+	public void setParentLocation(final Location parentLocation) {
+		this.parentLocation = parentLocation;
 	}
 }

@@ -53,6 +53,15 @@ $('#reportType').on('change', function() {
 
 });
 
+$('#orderBy').on('change', function() {
+	var orderBy = $('#orderBy').val();
+	if (orderBy == 'DISTRIC' || orderBy == "") {
+		$('#locationTr').hide();
+		return;
+	}
+	$('#locationTr').show();
+});
+
 // EXPORT TO CSV
 function exportTableToCSV($table, filename) {
 

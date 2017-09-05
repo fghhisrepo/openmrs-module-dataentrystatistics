@@ -1,6 +1,7 @@
 package org.openmrs.module.dataentrystatistics.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,6 +36,17 @@ public class DateUtilTest {
 			final Date date = this.format.parse("25-02-2017");
 			final Date lastDay = DateUtil.getFirstDay(date);
 			assertEquals(0, lastDay.compareTo(this.format.parse("01-02-2017")));
+		} catch (final ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void shouldVerifyIfTheDateIsAWeekend() {
+		try {
+			final Date date = this.format.parse("03-08-2017");
+			final boolean value = DateUtil.isWeekEnd(date);
+			assertTrue(value);
 		} catch (final ParseException e) {
 			e.printStackTrace();
 		}

@@ -27,14 +27,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface DataEntryStatisticService extends OpenmrsService {
 
-	public ReportData<UserObsByDate> getAllObsByUsersAndDate(Date fromDate, Date toDate, Integer location);
+	public ReportData<UserObsByDate> findObservationsByPeriodAndLocation(Date fromDate, Date toDate, Integer location);
+
+	public ReportData<UserObsByDate> findObservationsByPeriod(final Date fromDate, final Date toDate,
+			final Integer location);
 
 	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location);
 
-	public List<UserObsByFormType> getAllObsByUsersAndForm(Date fromDate, Date toDate, Integer location);
+	public ReportData<UserObsByFormType>  getAllObsByUsersAndFormAndLocation(Date fromDate, Date toDate, Integer location);
+	public ReportData<UserObsByFormType> getAllObsByUsersAndForm(final Date fromDate, final Date toDate,
+			final Integer location);
 
-	public List<UserObs> getAllMonthObs(Date fromDate, Date toDate, Integer location);
+
+	public ReportData<UserObs> getAllMonthObsFromLocation(Date fromDate, Date toDate, Integer location);
+	public ReportData<UserObs>  getAllMonthObs(Date fromDate, Date toDate, Integer location);
+
 
 	public List<Role> getAllRoles();
+
 
 }
