@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.openmrs.Role;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
 import org.openmrs.module.dataentrystatistics.UserObs;
 import org.openmrs.module.dataentrystatistics.UserObsByDate;
@@ -68,7 +69,7 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	}
 
 	@Override
-	public ReportData<UserObs>  getAllMonthObs(final Date fromDate, final Date toDate, final Integer location) {
+	public ReportData<UserObs> getAllMonthObs(final Date fromDate, final Date toDate, final Integer location) {
 		return this.dao.getAllMonthObs(fromDate, toDate, location);
 	}
 
@@ -85,14 +86,27 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	}
 
 	@Override
-	public ReportData<UserObsByFormType>  getAllObsByUsersAndFormAndLocation(final Date fromDate, final Date toDate,
+	public ReportData<UserObsByFormType> getAllObsByUsersAndFormAndLocation(final Date fromDate, final Date toDate,
 			final Integer location) {
 		return this.dao.getAllObsByUsersAndFormAndLocation(fromDate, toDate, location);
 	}
 
 	@Override
-	public ReportData<UserObs>  getAllMonthObsFromLocation(final Date fromDate, final Date toDate, final Integer location) {
+	public ReportData<UserObs> getAllMonthObsFromLocation(final Date fromDate, final Date toDate,
+			final Integer location) {
 		return this.dao.getAllMonthObsFromLocation(fromDate, toDate, location);
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public List<DataEntryStatistic> getDataEntryStatistics(final Date fromDate, final Date toDate,
+			final String encounterUserColumn, final String orderUserColumn, final String groupBy) {
+		return this.dao.getDataEntryStatistics(fromDate, toDate, encounterUserColumn, orderUserColumn, groupBy);
+	}
+
+	@Override
+	public String findLocationByID(final Integer locaationId) {
+		return this.dao.findLocationByID(locaationId);
 	}
 
 }

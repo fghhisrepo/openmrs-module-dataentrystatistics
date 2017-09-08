@@ -6,5 +6,7 @@ public enum ReportType {
 
 	DAILY_OBS,
 
-	MONTHLY_OBS
+	MONTHLY_OBS, 
+	
+	FORM_TYPES_OLD;
 }

@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.openmrs.Role;
+import org.openmrs.api.db.DAOException;
+import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.UserObs;
 import org.openmrs.module.dataentrystatistics.UserObsByDate;
 import org.openmrs.module.dataentrystatistics.UserObsByFormType;
@@ -44,5 +46,11 @@ public interface DataEntryStatisticDAO {
 
 
 	public List<Role> getAllRoles();
+	public String findLocationByID(Integer locaationId);
+	
+	@SuppressWarnings("rawtypes")
+	public List<DataEntryStatistic> getDataEntryStatistics(Date fromDate, Date toDate, String encounterUserColumn,
+            String orderUserColumn, String groupBy) throws DAOException;
+
 
 }

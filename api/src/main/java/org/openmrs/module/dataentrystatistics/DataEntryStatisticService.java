@@ -27,6 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface DataEntryStatisticService extends OpenmrsService {
 
+	@SuppressWarnings("rawtypes")
+	public List<DataEntryStatistic> getDataEntryStatistics(Date fromDate, Date toDate, String encounterUserColumn,
+			String orderUserColumn, String groupBy);
+
 	public ReportData<UserObsByDate> findObservationsByPeriodAndLocation(Date fromDate, Date toDate, Integer location);
 
 	public ReportData<UserObsByDate> findObservationsByPeriod(final Date fromDate, final Date toDate,
@@ -34,16 +38,18 @@ public interface DataEntryStatisticService extends OpenmrsService {
 
 	public List<UserObsByDate> countTotalObsPerUserAndDate(Date fromDate, Date toDate, Integer location);
 
-	public ReportData<UserObsByFormType>  getAllObsByUsersAndFormAndLocation(Date fromDate, Date toDate, Integer location);
+	public ReportData<UserObsByFormType> getAllObsByUsersAndFormAndLocation(Date fromDate, Date toDate,
+			Integer location);
+
 	public ReportData<UserObsByFormType> getAllObsByUsersAndForm(final Date fromDate, final Date toDate,
 			final Integer location);
 
-
 	public ReportData<UserObs> getAllMonthObsFromLocation(Date fromDate, Date toDate, Integer location);
-	public ReportData<UserObs>  getAllMonthObs(Date fromDate, Date toDate, Integer location);
 
+	public ReportData<UserObs> getAllMonthObs(Date fromDate, Date toDate, Integer location);
 
 	public List<Role> getAllRoles();
+	public String findLocationByID(final Integer locaationId);
 
 
 }

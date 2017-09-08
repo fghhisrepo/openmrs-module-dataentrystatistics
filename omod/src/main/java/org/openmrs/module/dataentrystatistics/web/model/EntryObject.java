@@ -32,6 +32,13 @@ public class EntryObject {
 	private String reportType;
 	
 	private Location parentLocation;
+	private String encUserColumn;
+	
+	private String orderUserColumn;
+	
+	private String groupBy;
+	
+	private Boolean hideAverageObs = false;
 
 	public Date getFromMonth() {
 		return this.fromMonth;
@@ -138,6 +145,38 @@ public class EntryObject {
 
 	public void setParentLocation(final Location parentLocation) {
 		this.parentLocation = parentLocation;
+	}
+
+	public String getEncUserColumn() {
+		return this.encUserColumn;
+	}
+
+	public void setEncUserColumn(final String encUserColumn) {
+		this.encUserColumn = encUserColumn;
+	}
+
+	public String getOrderUserColumn() {
+		return this.orderUserColumn;
+	}
+
+	public void setOrderUserColumn(final String orderUserColumn) {
+		this.orderUserColumn = orderUserColumn;
+	}
+
+	public String getGroupBy() {
+		return this.groupBy;
+	}
+
+	public void setGroupBy(final String groupBy) {
+		this.groupBy = groupBy;
+	}
+
+	public Boolean getHideAverageObs() {
+		return this.hideAverageObs;
+	}
+
+	public void setHideAverageObs(final Boolean hideAverageObs) {
+		this.hideAverageObs = hideAverageObs;
 	}
 
 
