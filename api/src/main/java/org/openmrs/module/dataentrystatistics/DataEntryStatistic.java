@@ -17,18 +17,33 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Person;
 import org.openmrs.module.dataentrystatistics.model.ReportData;
 import org.openmrs.module.dataentrystatistics.util.CollectionUtil;
 import org.openmrs.module.dataentrystatistics.util.DateUtil;
 import org.openmrs.module.dataentrystatistics.util.Month;
 
 public class DataEntryStatistic<K> {
+
+	private Person user;
+
+	private String entryType;
+
+	private Integer numberOfEntries;
+
+	private Integer numberOfObs;
+
+	private Object groupBy = null;
 
 	protected final Log log = LogFactory.getLog(this.getClass());
 
@@ -492,4 +507,118 @@ public class DataEntryStatistic<K> {
 
 		return 0L;
 	}
+
+	// convenience utility methods
+
+	@SuppressWarnings("rawtypes")
+	public static DataTable tableByUserAndType(final List<DataEntryStatistic> stats, final Boolean hideAverageObs) {
+		final Set<Person> users = new HashSet<Person>();
+		final SortedSet<String> types = new TreeSet<String>();
+		final Set<Object> groups = new HashSet<Object>();
+		final Map<String, Integer> totals = new HashMap<String, Integer>();
+		final Map<String, Integer> totalObs = new HashMap<String, Integer>();
+		for (final DataEntryStatistic s : stats) {
+			users.add(s.getUser());
+			types.add(s.getEntryType());
+			groups.add(s.getGroupBy());
+			final String temp = s.getUser().getPersonId() + "." + s.getEntryType() + "." + s.getGroupBy();
+			final Integer soFar = totals.get(temp);
+			totals.put(temp, soFar == null ? s.getNumberOfEntries() : (soFar + s.getNumberOfEntries()));
+			totalObs.put(temp, soFar == null ? s.getNumberOfObs() : (soFar + s.getNumberOfObs()));
+		}
+		final DataTable table = new DataTable();
+		table.addColumn("User");
+		table.addColumns(types);
+		for (final Object group : groups) {
+			final Map<String, Integer> groupTotals = new HashMap<String, Integer>();
+			for (final Person u : users) {
+				final TableRow tr = new TableRow();
+				tr.put("User", u.getPersonName().getFullName());
+				Integer rowTotal = 0;
+				for (final String entryType : types) {
+					Integer i = totals.get(u.getPersonId() + "." + entryType + "." + group);
+					Integer j = totalObs.get(u.getPersonId() + "." + entryType + "." + group);
+					if (i == null) {
+						i = 0;
+					}
+					if (j == null) {
+						j = 0;
+					}
+					String averageObs = "";
+					if (!hideAverageObs && (i > 0) && (j > 0)) {
+						final DecimalFormat df = new DecimalFormat("###,###.##");
+						final float obss = j;
+						final float encs = i;
+						final float avgObs = obss / encs;
+						averageObs += " (avg. " + df.format(avgObs) + " obs per enc)";
+					}
+					tr.put(entryType, i + averageObs);
+					Integer groupTotalSoFar = groupTotals.get(entryType);
+					groupTotalSoFar = groupTotalSoFar == null ? i : groupTotalSoFar + i;
+					groupTotals.put(entryType, groupTotalSoFar);
+					rowTotal += i;
+				}
+				if (rowTotal > 0) {
+					table.addRow(tr);
+				}
+			}
+			// add grouping totals
+			final TableRow totalTR = new TableRow();
+			totalTR.put("User", "--" + (group == null ? "Total" : group.toString()) + "--");
+			for (final String entryType : types) {
+				totalTR.put(entryType, groupTotals.get(entryType));
+			}
+			table.addRow(totalTR);
+		}
+		return table;
+	}
+
+	public DataEntryStatistic() {
+	}
+
+	@Override
+	public String toString() {
+		return this.user + " entered " + this.numberOfEntries + " of " + this.entryType;
+	}
+
+	public Integer getNumberOfEntries() {
+		return this.numberOfEntries;
+	}
+
+	public void setNumberOfEntries(final Integer numberOfEntries) {
+		this.numberOfEntries = numberOfEntries;
+	}
+
+	public String getEntryType() {
+		return this.entryType;
+	}
+
+	public void setEntryType(final String entryType) {
+		this.entryType = entryType;
+	}
+
+	public Person getUser() {
+		return this.user;
+	}
+
+	public void setUser(final Person user) {
+		this.user = user;
+	}
+
+	public Object getGroupBy() {
+		return this.groupBy;
+	}
+
+	public void setGroupBy(final Object groupBy) {
+		this.groupBy = groupBy;
+	}
+
+	public Integer getNumberOfObs() {
+		return this.numberOfObs;
+	}
+
+	public void setNumberOfObs(final Integer numberOfObs) {
+		this.numberOfObs = numberOfObs;
+	}
+
 }

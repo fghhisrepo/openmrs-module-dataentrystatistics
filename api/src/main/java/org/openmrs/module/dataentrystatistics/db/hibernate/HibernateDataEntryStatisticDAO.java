@@ -22,8 +22,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.openmrs.EncounterType;
+import org.openmrs.Form;
 import org.openmrs.Location;
+import org.openmrs.Person;
 import org.openmrs.Role;
+import org.openmrs.User;
+import org.openmrs.api.db.DAOException;
+import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.UserObs;
 import org.openmrs.module.dataentrystatistics.UserObsByDate;
 import org.openmrs.module.dataentrystatistics.UserObsByFormType;
@@ -215,8 +221,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		final String hql = "SELECT DATE(o.dateCreated), COUNT(o.obsId), c.username,  l.parentLocation FROM Obs o "
 				+ "INNER JOIN o.creator c INNER JOIN o.location l "
 				+ "WHERE DATE(o.dateCreated) BETWEEN :fromDate AND :toDate AND o.voided = :voided "
-				+ "GROUP BY DATE(o.dateCreated), c.username "
-				+ "ORDER BY DATE(o.dateCreated) ASC ";
+				+ "GROUP BY DATE(o.dateCreated), c.username " + "ORDER BY DATE(o.dateCreated) ASC ";
 
 		final Query query = this.getCurrentSession().createQuery(hql);
 
@@ -310,6 +315,173 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 		}
 
 		return reportData;
+
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public List<DataEntryStatistic> getDataEntryStatistics(final Date fromDate, final Date toDate,
+			String encounterColumn, String orderColumn, String groupBy) throws DAOException {
+
+		if (encounterColumn == null) {
+			encounterColumn = "creator";
+		}
+		encounterColumn = encounterColumn.toLowerCase();
+
+		final List<DataEntryStatistic> ret = new ArrayList<DataEntryStatistic>();
+
+		// data entry stats with extended info
+		// check if there's anything else to group by
+		if (groupBy == null) {
+			groupBy = "";
+		}
+		if (groupBy.length() != 0) {
+			groupBy = "e." + groupBy + ", ";
+		}
+		this.log.debug("GROUP BY IS " + groupBy);
+
+		String hql = "select " + groupBy + "e." + encounterColumn + ", e.encounterType"
+				+ ", e.form, count(distinct e.encounterId), count(o.obsId) "
+				+ "from Obs o right join o.encounter as e ";
+		if ((fromDate != null) || (toDate != null)) {
+			String s = "where ";
+			if (fromDate != null) {
+				s += "e.dateCreated >= :fromDate ";
+			}
+			if (toDate != null) {
+				if (fromDate != null) {
+					s += "and ";
+				}
+				s += "e.dateCreated <= :toDate ";
+			}
+			hql += s;
+		}
+
+		// remove voided obs and encounters.
+		if ((fromDate != null) || (toDate != null)) {
+			hql += " and ";
+		} else {
+			hql += " where ";
+		}
+		hql += " e.voided = :voided and o.voided = :voided ";
+
+		hql += "group by ";
+		if (groupBy.length() > 0) {
+			hql += groupBy + " ";
+		}
+		hql += "e." + encounterColumn + ", e.encounterType, e.form ";
+		Query q = this.getCurrentSession().createQuery(hql);
+		if (fromDate != null) {
+			q.setParameter("fromDate", fromDate);
+		}
+		if (toDate != null) {
+			q.setParameter("toDate", toDate);
+		}
+
+		q.setParameter("voided", false);
+
+		List<Object[]> l = q.list();
+		for (final Object[] holder : l) {
+			final DataEntryStatistic s = new DataEntryStatistic();
+			int offset = 0;
+			if (groupBy.length() > 0) {
+				s.setGroupBy(holder[0]);
+				offset = 1;
+			}
+
+			final Object temp = holder[0 + offset];
+			if (temp instanceof User) {
+				s.setUser(((User) temp).getPerson());
+			} else {
+				s.setUser((Person) holder[0 + offset]);
+			}
+			final EncounterType encType = ((EncounterType) holder[1 + offset]);
+			final Form form = ((Form) holder[2 + offset]);
+			s.setEntryType(form != null ? form.getName() : (encType != null ? encType.getName() : "null"));
+			final int numEncounters = ((Number) holder[3 + offset]).intValue();
+			final int numObs = ((Number) holder[4 + offset]).intValue();
+			s.setNumberOfEntries(numEncounters); // not sure why this comes out
+													// as a Long instead of an
+													// Integer
+			this.log.debug("NEW Num encounters is " + numEncounters);
+			s.setNumberOfObs(numObs);
+			this.log.debug("NEW Num obs is " + numObs);
+			ret.add(s);
+		}
+
+		// default userColumn to creator
+		if (orderColumn == null) {
+			orderColumn = "creator";
+		}
+		orderColumn = orderColumn.toLowerCase();
+
+		// for orders, count how many were created. (should eventually count
+		// something with voided/changed)
+		hql = "select o." + orderColumn + ", o.orderType.name, count(*) " + "from Order o ";
+		if ((fromDate != null) || (toDate != null)) {
+			String s = "where ";
+			if (fromDate != null) {
+				s += "o.dateCreated >= :fromDate ";
+			}
+			if (toDate != null) {
+				if (fromDate != null) {
+					s += "and ";
+				}
+				s += "o.dateCreated <= :toDate ";
+			}
+			hql += s;
+		}
+
+		// remove voided orders.
+		if ((fromDate != null) || (toDate != null)) {
+			hql += " and ";
+		} else {
+			hql += " where ";
+		}
+		hql += " o.voided = :voided ";
+
+		hql += "group by o." + orderColumn + ", o.orderType.name ";
+		q = this.getCurrentSession().createQuery(hql);
+		if (fromDate != null) {
+			q.setParameter("fromDate", fromDate);
+		}
+		if (toDate != null) {
+			q.setParameter("toDate", toDate);
+		}
+
+		q.setParameter("voided", false);
+
+		l = q.list();
+		for (final Object[] holder : l) {
+			final DataEntryStatistic s = new DataEntryStatistic();
+			final Object temp = holder[0];
+			if (temp instanceof User) {
+				s.setUser(((User) temp).getPerson());
+			} else {
+				s.setUser((Person) temp);
+			}
+			s.setEntryType((String) holder[1]);
+			s.setNumberOfEntries(((Number) holder[2]).intValue()); // not sure
+																	// why this
+																	// comes out
+																	// as a Long
+																	// instead
+																	// of an
+																	// Integer
+			s.setNumberOfObs(0);
+			ret.add(s);
+		}
+
+		return ret;
+	}
+
+	@Override
+	public String findLocationByID(final Integer locationId) {
+		final String hql = "SELECT  l FROM Location l WHERE l.locationId=:locationId";
+		final Query query = this.getCurrentSession().createQuery(hql);
+		query.setParameter("locationId", locationId);
+
+		return query.uniqueResult().toString();
 
 	}
 
