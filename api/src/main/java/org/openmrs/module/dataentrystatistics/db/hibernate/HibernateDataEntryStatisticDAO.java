@@ -117,7 +117,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		final String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId),  l.name   FROM  Obs o "
 				+ "INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l "
-				+ "WHERE DATE(o.dateCreated) >= :fromDate AND DATE(o.dateCreated) <= :toDate AND l.locationId =:location "
+				+ "WHERE DATE(o.dateCreated) >= :fromDate AND DATE(o.dateCreated) <= :toDate AND  l.locationId =:location AND c.username IS NOT null "
 				+ "AND o.voided = :voided GROUP BY f.name, c.username";
 
 		final Query query = this.getCurrentSession().createQuery(hql);
@@ -191,7 +191,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		final String hql = "SELECT COUNT(o.obsId), c.username FROM  Obs o "
 				+ "INNER JOIN o.creator c INNER JOIN o.location l WHERE "
-				+ "DATE(o.dateCreated) >= :fromDate AND DATE(o.dateCreated) <= :toDate AND l.locationId =:location  "
+				+ "DATE(o.dateCreated) >= :fromDate AND DATE(o.dateCreated) <= :toDate AND l.locationId =:location AND c.username IS NOT null "
 				+ "GROUP BY c.username";
 
 		final Query query = this.getCurrentSession().createQuery(hql);
@@ -220,7 +220,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 			final Integer location) {
 		final String hql = "SELECT DATE(o.dateCreated), COUNT(o.obsId), c.username,  l.parentLocation FROM Obs o "
 				+ "INNER JOIN o.creator c INNER JOIN o.location l "
-				+ "WHERE DATE(o.dateCreated) BETWEEN :fromDate AND :toDate AND o.voided = :voided "
+				+ "WHERE DATE(o.dateCreated) BETWEEN :fromDate AND :toDate AND o.voided = :voided AND c.username IS NOT null "
 				+ "GROUP BY DATE(o.dateCreated), c.username " + "ORDER BY DATE(o.dateCreated) ASC ";
 
 		final Query query = this.getCurrentSession().createQuery(hql);
@@ -256,7 +256,7 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		final String hql = "SELECT f.name, c.username, COUNT(DISTINCT e.encounterId), COUNT(o.obsId),  l.parentLocation FROM  Obs o "
 				+ "INNER JOIN o.encounter e INNER JOIN e.form f INNER JOIN e.creator c  INNER JOIN e.location l "
-				+ "WHERE DATE(e.dateCreated) >= :fromDate AND DATE(e.dateCreated) <= :toDate AND e.voided = :voided "
+				+ "WHERE DATE(e.dateCreated) >= :fromDate AND DATE(e.dateCreated) <= :toDate AND e.voided = :voided AND c.username IS NOT null "
 				+ "GROUP BY f.name, c.username";
 		final Query query = this.getCurrentSession().createQuery(hql);
 		query.setParameter("fromDate", fromDate);
