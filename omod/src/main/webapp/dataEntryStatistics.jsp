@@ -42,7 +42,7 @@
 						</select>
 					</spring:bind></td>
 			</tr>
-			<tr>
+			<tr id="orderByTr">
 				<td><spring:message code="dataentrystatistics.orderBy" />:</td>
 				<td><spring:bind path="command.orderBy">
 						<select name="${status.expression}" width="60%" id="orderBy">
