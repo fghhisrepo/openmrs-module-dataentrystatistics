@@ -45,11 +45,18 @@ $('#reportType').on('change', function() {
 		$('#toMonthTr').show();
 		return;
 	}
+	if (reportType == 'FORM_TYPES_OLD') {
+		$('#locationTr').hide();
+		$('#orderByTr').hide();
+		return;
+	}
 
 	$('#fromMonthTr').hide();
 	$('#toMonthTr').hide();
 	$('#startDateTr').show();
 	$('#endDateTr').show();
+	$('#orderByTr').show();
+	$('#locationTr').show();
 
 });
 

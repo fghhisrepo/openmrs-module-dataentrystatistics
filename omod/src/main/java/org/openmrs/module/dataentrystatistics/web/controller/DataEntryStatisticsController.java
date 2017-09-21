@@ -103,12 +103,20 @@ public class DataEntryStatisticsController extends SimpleFormController {
 		if (this.entryObject.getReportType().equals(ReportType.DAILY_OBS.name())) {
 
 			if (this.entryObject.getOrderBy().equals(OrderBy.HEALTHY_FACILITIES.name())) {
+
+				if (this.entryObject.getLocation().isEmpty() || (this.entryObject.getFromDate() == null)
+						|| (this.entryObject.getToDate() == null)) {
+
+					this.entryObject.setTable(this.table);
+
+				}
 				this.table = DataEntryStatistic.tableByDateAndObs(
 						dataEntryStatisticService.findObservationsByPeriodAndLocation(this.entryObject.getFromDate(),
 								this.entryObject.getToDate(), this.parse(this.entryObject.getLocation())));
 
 				this.table.setLocation(
 						dataEntryStatisticService.findLocationByID(this.parse(this.entryObject.getLocation())));
+				this.entryObject.setTable(this.table);
 
 			}
 			if (this.entryObject.getOrderBy().equals(OrderBy.DISTRIC.name())) {
@@ -116,8 +124,11 @@ public class DataEntryStatisticsController extends SimpleFormController {
 				this.table = DataEntryStatistic.tableByDateAndObs(dataEntryStatisticService
 						.findObservationsByPeriod(this.entryObject.getFromDate(), this.entryObject.getToDate(), null));
 
-				this.table.setLocation(
-						dataEntryStatisticService.findLocationByID(this.parse(this.entryObject.getLocation())));
+				final String location = dataEntryStatisticService
+						.findObservationsByPeriod(this.entryObject.getFromDate(), this.entryObject.getToDate(), null)
+						.getData().get(0).getParentLocation().getName();
+
+				this.table.setLocation(location);
 
 			}
 			this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
@@ -144,11 +155,14 @@ public class DataEntryStatisticsController extends SimpleFormController {
 				this.table = DataEntryStatistic.tableByFormAndEncounters(dataEntryStatisticService
 						.getAllObsByUsersAndForm(this.entryObject.getFromDate(), this.entryObject.getToDate(), null));
 
+				final String location = dataEntryStatisticService
+						.findObservationsByPeriod(this.entryObject.getFromDate(), this.entryObject.getToDate(), null)
+						.getData().get(0).getParentLocation().getName();
+
 				this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
 				this.table.setToDate(DateUtil.format(this.entryObject.getToDate()));
 
-				this.table.setLocation(
-						dataEntryStatisticService.findLocationByID(this.parse(this.entryObject.getLocation())));
+				this.table.setLocation(location);
 
 			}
 		}
@@ -173,10 +187,14 @@ public class DataEntryStatisticsController extends SimpleFormController {
 				this.table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService.getAllMonthObs(
 						this.entryObject.getFromMonth(), DateUtil.getLastDay(this.entryObject.getToMonth()), null));
 
+				final String location = dataEntryStatisticService
+						.getAllMonthObs(this.entryObject.getFromMonth(),
+								DateUtil.getLastDay(this.entryObject.getToMonth()), null)
+						.getData().get(0).getParentLocation().getName();
+
 				this.table.setFromDate(DateUtil.format(this.entryObject.getFromMonth()));
 				this.table.setToDate(DateUtil.format(this.entryObject.getToMonth()));
-				this.table.setLocation(
-						dataEntryStatisticService.findLocationByID(this.parse(this.entryObject.getLocation())));
+				this.table.setLocation(location);
 
 			}
 
@@ -195,8 +213,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 			this.table = DataEntryStatistic.tableByUserAndType(stats, this.entryObject.getHideAverageObs());
 			this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
 			this.table.setToDate(DateUtil.format(this.entryObject.getToDate()));
-			this.table.setLocation(
-					dataEntryStatisticService.findLocationByID(this.parse(this.entryObject.getLocation())));
+			this.table.setLocation("ALL LOCATION");
 
 		}
 

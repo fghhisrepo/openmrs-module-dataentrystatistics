@@ -173,9 +173,10 @@ public class DataEntryStatistic<K> {
 			final Date date) {
 
 		for (final UserObsByDate userObsByDate : userObsByDates) {
-
-			if ((date.compareTo(userObsByDate.getDate()) == 0) && user.equals(userObsByDate.getUser())) {
-				return userObsByDate.getTotalObs();
+			if (!userObsByDate.getUser().equals(null) || !userObsByDate.getUser().isEmpty()) {
+				if ((date.compareTo(userObsByDate.getDate()) == 0) && user.equals(userObsByDate.getUser())) {
+					return userObsByDate.getTotalObs();
+				}
 			}
 		}
 
@@ -190,10 +191,16 @@ public class DataEntryStatistic<K> {
 
 		final DataTable table = new DataTable();
 
+		if (reportData.getData().isEmpty()) {
+			return table;
+		}
+
 		for (final UserObsByFormType userObsByFormType : reportData.getData()) {
 
-			users.add(userObsByFormType.getUser().toUpperCase());
-			forms.add(userObsByFormType.getForm());
+			if ((userObsByFormType.getUser() != null) || !userObsByFormType.getUser().isEmpty()) {
+				users.add(userObsByFormType.getUser().toUpperCase());
+				forms.add(userObsByFormType.getForm());
+			}
 
 		}
 		table.addColumn("FORMULARIOS");

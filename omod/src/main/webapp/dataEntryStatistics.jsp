@@ -42,7 +42,7 @@
 						</select>
 					</spring:bind></td>
 			</tr>
-			<tr>
+			<tr id="orderByTr">
 				<td><spring:message code="dataentrystatistics.orderBy" />:</td>
 				<td><spring:bind path="command.orderBy">
 						<select name="${status.expression}" width="60%" id="orderBy">
@@ -53,7 +53,7 @@
 						</select>
 					</spring:bind></td>
 			</tr>
-			<tr id="locationTr">
+			<tr id="locationTr" style="display:none;">
 				<td><spring:message code="dataentrystatistics.location" /></td>
 				<td><spring:bind path="command.location">
 						<openmrs_tag:locationField formFieldName="location"
