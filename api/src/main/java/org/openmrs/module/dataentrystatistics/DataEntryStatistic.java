@@ -191,6 +191,10 @@ public class DataEntryStatistic<K> {
 
 		final DataTable table = new DataTable();
 
+		if (reportData.getData().isEmpty()) {
+			return table;
+		}
+
 		for (final UserObsByFormType userObsByFormType : reportData.getData()) {
 
 			if ((userObsByFormType.getUser() != null) || !userObsByFormType.getUser().isEmpty()) {
