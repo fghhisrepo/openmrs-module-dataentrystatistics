@@ -53,7 +53,7 @@
 						</select>
 					</spring:bind></td>
 			</tr>
-			<tr id="locationTr">
+			<tr id="locationTr" style="display:none;">
 				<td><spring:message code="dataentrystatistics.location" /></td>
 				<td><spring:bind path="command.location">
 						<openmrs_tag:locationField formFieldName="location"

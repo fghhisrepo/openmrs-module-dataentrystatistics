@@ -55,6 +55,8 @@ $('#reportType').on('change', function() {
 	$('#toMonthTr').hide();
 	$('#startDateTr').show();
 	$('#endDateTr').show();
+	$('#orderByTr').show();
+	$('#locationTr').show();
 
 });
 

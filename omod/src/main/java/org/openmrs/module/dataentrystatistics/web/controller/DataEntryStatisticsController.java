@@ -114,12 +114,8 @@ public class DataEntryStatisticsController extends SimpleFormController {
 						dataEntryStatisticService.findObservationsByPeriodAndLocation(this.entryObject.getFromDate(),
 								this.entryObject.getToDate(), this.parse(this.entryObject.getLocation())));
 
-				final String location = dataEntryStatisticService
-						.findObservationsByPeriodAndLocation(this.entryObject.getFromDate(),
-								this.entryObject.getToDate(), this.parse(this.entryObject.getLocation()))
-						.getData().get(0).getLocation();
-
-				this.table.setLocation(location);
+				this.table.setLocation(
+						dataEntryStatisticService.findLocationByID(this.parse(this.entryObject.getLocation())));
 				this.entryObject.setTable(this.table);
 
 			}
@@ -147,12 +143,8 @@ public class DataEntryStatisticsController extends SimpleFormController {
 						dataEntryStatisticService.getAllObsByUsersAndFormAndLocation(this.entryObject.getFromDate(),
 								this.entryObject.getToDate(), this.parse(this.entryObject.getLocation())));
 
-				final String location = dataEntryStatisticService
-						.getAllObsByUsersAndFormAndLocation(this.entryObject.getFromDate(),
-								this.entryObject.getToDate(), this.parse(this.entryObject.getLocation()))
-						.getData().get(0).getLocation();
-
-				this.table.setLocation(location);
+				this.table.setLocation(
+						dataEntryStatisticService.findLocationByID(this.parse(this.entryObject.getLocation())));
 
 				this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
 				this.table.setToDate(DateUtil.format(this.entryObject.getToDate()));
@@ -183,12 +175,8 @@ public class DataEntryStatisticsController extends SimpleFormController {
 						this.entryObject.getFromMonth(), DateUtil.getLastDay(this.entryObject.getToMonth()),
 						this.parse(this.entryObject.getLocation())));
 
-				final String location = dataEntryStatisticService
-						.getAllMonthObsFromLocation(this.entryObject.getFromMonth(),
-								DateUtil.getLastDay(this.entryObject.getToMonth()),
-								this.parse(this.entryObject.getLocation()))
-						.getData().get(0).getLocation();
-				this.table.setLocation(location);
+				this.table.setLocation(
+						dataEntryStatisticService.findLocationByID(this.parse(this.entryObject.getLocation())));
 
 				this.table.setFromDate(DateUtil.format(this.entryObject.getFromMonth()));
 				this.table.setToDate(DateUtil.format(this.entryObject.getToMonth()));
