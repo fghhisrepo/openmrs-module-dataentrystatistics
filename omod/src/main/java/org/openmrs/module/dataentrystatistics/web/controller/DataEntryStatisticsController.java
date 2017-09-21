@@ -57,6 +57,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		binder.registerCustomEditor(java.util.Date.class,
 				new CustomDateEditor(OpenmrsUtil.getDateFormat(Context.getLocale()), true, 10));
+
 	}
 
 	@Override
@@ -124,11 +125,8 @@ public class DataEntryStatisticsController extends SimpleFormController {
 				this.table = DataEntryStatistic.tableByDateAndObs(dataEntryStatisticService
 						.findObservationsByPeriod(this.entryObject.getFromDate(), this.entryObject.getToDate(), null));
 
-				final String location = dataEntryStatisticService
-						.findObservationsByPeriod(this.entryObject.getFromDate(), this.entryObject.getToDate(), null)
-						.getData().get(0).getParentLocation().getName();
-
-				this.table.setLocation(location);
+				this.table.setLocation(
+						dataEntryStatisticService.findLocationByID(this.parse(this.entryObject.getLocation())));
 
 			}
 			this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
@@ -217,8 +215,9 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		}
 
-		this.table.setReportType(this.entryObject.getReportType());
-
+		if (!this.entryObject.getReportType().isEmpty()) {
+			this.table.setReportType(this.entryObject.getReportType());
+		}
 		this.entryObject.setTable(this.table);
 
 		return this.showForm(request, response, errors);
