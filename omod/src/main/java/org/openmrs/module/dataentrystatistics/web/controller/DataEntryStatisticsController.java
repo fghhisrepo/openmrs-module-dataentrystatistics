@@ -29,6 +29,9 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
 import org.openmrs.module.dataentrystatistics.DataTable;
+import org.openmrs.module.dataentrystatistics.UserObs;
+import org.openmrs.module.dataentrystatistics.UserObsByDate;
+import org.openmrs.module.dataentrystatistics.UserObsByFormType;
 import org.openmrs.module.dataentrystatistics.model.OrderBy;
 import org.openmrs.module.dataentrystatistics.model.ReportType;
 import org.openmrs.module.dataentrystatistics.util.DateUtil;
@@ -125,8 +128,13 @@ public class DataEntryStatisticsController extends SimpleFormController {
 				this.table = DataEntryStatistic.tableByDateAndObs(dataEntryStatisticService
 						.findObservationsByPeriod(this.entryObject.getFromDate(), this.entryObject.getToDate(), null));
 
-				this.table.setLocation(
-						dataEntryStatisticService.findLocationByID(this.parse(this.entryObject.getLocation())));
+				final List<UserObsByDate> userObsByDates = dataEntryStatisticService
+						.findObservationsByPeriod(this.entryObject.getFromDate(), this.entryObject.getToDate(), null)
+						.getData();
+
+				if (!userObsByDates.isEmpty()) {
+					this.table.setLocation(userObsByDates.get(0).getParentLocation().getName());
+				}
 
 			}
 			this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
@@ -153,14 +161,16 @@ public class DataEntryStatisticsController extends SimpleFormController {
 				this.table = DataEntryStatistic.tableByFormAndEncounters(dataEntryStatisticService
 						.getAllObsByUsersAndForm(this.entryObject.getFromDate(), this.entryObject.getToDate(), null));
 
-				final String location = dataEntryStatisticService
-						.findObservationsByPeriod(this.entryObject.getFromDate(), this.entryObject.getToDate(), null)
-						.getData().get(0).getParentLocation().getName();
+				final List<UserObsByFormType> obsByFormTypes = dataEntryStatisticService
+						.getAllObsByUsersAndForm(this.entryObject.getFromDate(), this.entryObject.getToDate(), null)
+						.getData();
+
+				if (!obsByFormTypes.isEmpty()) {
+					this.table.setLocation(obsByFormTypes.get(0).getParentLocation().getName());
+				}
 
 				this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
 				this.table.setToDate(DateUtil.format(this.entryObject.getToDate()));
-
-				this.table.setLocation(location);
 
 			}
 		}
@@ -185,14 +195,15 @@ public class DataEntryStatisticsController extends SimpleFormController {
 				this.table = DataEntryStatistic.tableByMonthsByObs(dataEntryStatisticService.getAllMonthObs(
 						this.entryObject.getFromMonth(), DateUtil.getLastDay(this.entryObject.getToMonth()), null));
 
-				final String location = dataEntryStatisticService
-						.getAllMonthObs(this.entryObject.getFromMonth(),
-								DateUtil.getLastDay(this.entryObject.getToMonth()), null)
-						.getData().get(0).getParentLocation().getName();
+				final List<UserObs> userObs = dataEntryStatisticService.getAllMonthObs(this.entryObject.getFromMonth(),
+						DateUtil.getLastDay(this.entryObject.getToMonth()), null).getData();
+
+				if (!userObs.isEmpty()) {
+					this.table.setLocation(userObs.get(0).getParentLocation().getName());
+				}
 
 				this.table.setFromDate(DateUtil.format(this.entryObject.getFromMonth()));
 				this.table.setToDate(DateUtil.format(this.entryObject.getToMonth()));
-				this.table.setLocation(location);
 
 			}
 
