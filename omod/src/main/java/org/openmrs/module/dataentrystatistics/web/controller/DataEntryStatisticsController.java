@@ -57,6 +57,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		binder.registerCustomEditor(java.util.Date.class,
 				new CustomDateEditor(OpenmrsUtil.getDateFormat(Context.getLocale()), true, 10));
+
 	}
 
 	@Override
@@ -114,6 +115,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 						dataEntryStatisticService.findObservationsByPeriodAndLocation(this.entryObject.getFromDate(),
 								this.entryObject.getToDate(), this.parse(this.entryObject.getLocation())));
 
+
 				if (!dataEntryStatisticService
 						.findObservationsByPeriodAndLocation(this.entryObject.getFromDate(),
 								this.entryObject.getToDate(), this.parse(this.entryObject.getLocation()))
@@ -127,6 +129,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 					this.table.setLocation(location);
 					this.entryObject.setTable(this.table);
 				}
+
 
 			}
 			if (this.entryObject.getOrderBy().equals(OrderBy.DISTRIC.name())) {
@@ -145,6 +148,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 					this.table.setLocation(location);
 				}
 
+
 			}
 			this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
 			this.table.setToDate(DateUtil.format(this.entryObject.getToDate()));
@@ -157,6 +161,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 				this.table = DataEntryStatistic.tableByFormAndEncounters(
 						dataEntryStatisticService.getAllObsByUsersAndFormAndLocation(this.entryObject.getFromDate(),
 								this.entryObject.getToDate(), this.parse(this.entryObject.getLocation())));
+
 
 				if (!dataEntryStatisticService
 						.getAllObsByUsersAndFormAndLocation(this.entryObject.getFromDate(),
@@ -218,6 +223,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 					this.table.setFromDate(DateUtil.format(this.entryObject.getFromMonth()));
 					this.table.setToDate(DateUtil.format(this.entryObject.getToMonth()));
 				}
+
 			}
 
 			if (this.entryObject.getOrderBy().equals(OrderBy.DISTRIC.name())) {
@@ -259,8 +265,9 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		}
 
-		this.table.setReportType(this.entryObject.getReportType());
-
+		if (!this.entryObject.getReportType().isEmpty()) {
+			this.table.setReportType(this.entryObject.getReportType());
+		}
 		this.entryObject.setTable(this.table);
 
 		return this.showForm(request, response, errors);

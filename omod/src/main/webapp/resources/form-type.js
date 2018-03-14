@@ -46,10 +46,19 @@ $('#reportType').on('change', function() {
 		return;
 	}
 
+	if (reportType == 'FORM_TYPES_OLD') {
+		$('#startDateTr').show();
+		$('#endDateTr').show();
+		$('#locationTr').hide();
+		$('#orderByTr').hide();
+		return;
+	}
+
 	$('#fromMonthTr').hide();
 	$('#toMonthTr').hide();
 	$('#startDateTr').show();
 	$('#endDateTr').show();
+	$('#orderByTr').show();
 
 });
 
@@ -59,7 +68,11 @@ $('#orderBy').on('change', function() {
 		$('#locationTr').hide();
 		return;
 	}
-	$('#locationTr').show();
+
+	if (orderBy == 'HEALTHY_FACILITIES') {
+		$('#locationTr').show();
+		return;
+	}
 });
 
 // EXPORT TO CSV
