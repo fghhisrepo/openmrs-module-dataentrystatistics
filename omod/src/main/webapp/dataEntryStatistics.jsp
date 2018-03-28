@@ -53,7 +53,7 @@
 						</select>
 					</spring:bind></td>
 			</tr>
-			<tr id="locationTr">
+			<tr id="locationTr" style="display: none;">
 				<td><spring:message code="dataentrystatistics.location" /></td>
 				<td><spring:bind path="command.location">
 						<openmrs_tag:locationField formFieldName="location"
@@ -68,7 +68,7 @@
 				<td><spring:message code="dataentrystatistics.type" />:</td>
 				<td><spring:bind path="command.reportType">
 
-						<select name="${status.expression}" width="60%" id="reportType" >
+						<select name="${status.expression}" width="60%" id="reportType">
 							<option></option>
 							<c:forEach items="${reportTypes}" var="reportType">
 								<option>${reportType}</option>
@@ -82,8 +82,8 @@
 				<td><spring:bind path="command.fromDate">
 						<input type="text" name="${status.expression}" size="10"
 							value="${status.value}" id="startDate" />
-						<c:if test="${status.errorMessage != ''}">
-							<span class="error">${status.errorMessage}</span>
+						<c:if test="${command.fromDate > command.toDate}">
+							<span class="error"> Start Date > End Date </span>
 						</c:if>
 					</spring:bind></td>
 			</tr>
@@ -115,6 +115,18 @@
 				<td><spring:bind path="command.toMonth">
 						<input type="text" name="${status.expression}" size="10"
 							value="${status.value}" id="toMonth" />
+						<c:if test="${status.errorMessage != ''}">
+							<span class="error">${status.errorMessage}</span>
+						</c:if>
+					</spring:bind></td>
+			</tr>
+
+			<tr id="hideTr" style="display: none;">
+				<td><spring:message code="dataentrystatistics.hideAverageObs" />:</td>
+				<td><spring:bind path="command.hideAverageObs">
+						<input type="hidden" name="_${status.expression}" />
+						<input type="checkbox" name="${status.expression}"
+							<c:if test="${status.value}">checked</c:if> />
 						<c:if test="${status.errorMessage != ''}">
 							<span class="error">${status.errorMessage}</span>
 						</c:if>

@@ -60,23 +60,32 @@ public class DataEntryStatistic<K> {
 		final List<Date> dates = CollectionUtil.daysBetween(reportData.getStartDate(), reportData.getEndDate());
 
 		table.addColumn("DATE");
+		table.addColumn("WORKING DAY");
 		table.addColumns(users);
 		table.addColumn("TOTAL");
-		table.addColumn("WORKING DAY");
 
 		final TableRow workingDaysRow = new TableRow();
+		final TableRow daysLessThanFiftyOrZeroWorkingDaysRow = new TableRow();
+		final TableRow DaysRow0Obs = new TableRow();
+
+		table.addRow(daysLessThanFiftyOrZeroWorkingDaysRow);
+		table.addRow(DaysRow0Obs);
 
 		for (final Date date : dates) {
 
 			final TableRow tableRow = new TableRow();
 
 			tableRow.put("DATE", formatDate.format(date));
+			daysLessThanFiftyOrZeroWorkingDaysRow.put("DATE", "DAYS WITH LESS THAN 50 OBS (INCLUDING DAYS WITH 0)");
+			DaysRow0Obs.put("DATE", "DAYS WITH 0 OBS");
 
 			Long totalPerDate = 0L;
 
 			for (final String user : users) {
 				final Long totalPerUserAndDate = getTotalObsPerUserAndDate(reportData.getData(), user, date);
-
+				DaysWithLessThan50ObservationsIncludingDaysWithZero(daysLessThanFiftyOrZeroWorkingDaysRow, user,
+						totalPerUserAndDate, date);
+				DaysWith0bservations(DaysRow0Obs, user, totalPerUserAndDate, date);
 				updateWorkingTime(workingDaysRow, user, totalPerUserAndDate);
 
 				totalPerDate += totalPerUserAndDate;
@@ -85,7 +94,6 @@ public class DataEntryStatistic<K> {
 
 			tableRow.put("TOTAL", totalPerDate);
 			tableRow.put("WORKING DAY", DateUtil.isWeekEnd(date) ? "N" : "Y ");
-
 			table.addRow(tableRow);
 		}
 
@@ -96,12 +104,16 @@ public class DataEntryStatistic<K> {
 		totalObsRow.put("WORKING DAY", "N/A");
 		workingDaysRow.put("DATE", "TOTAL WORKING DAYS");
 		workingDaysRow.put("WORKING DAY", "N/A");
+		daysLessThanFiftyOrZeroWorkingDaysRow.put("TOTAL", "N/A");
+		daysLessThanFiftyOrZeroWorkingDaysRow.put("WORKING DAY", "N/A");
+		DaysRow0Obs.put("TOTAL", "N/A");
+		DaysRow0Obs.put("WORKING DAY", "N/A");
+
 		averageRow.put("DATE", "AVERAGE (OBS/DAY)");
 		averageRow.put("WORKING DAY", "N/A");
 
 		Long totalObservation = 0L;
 		Integer totalWorkingDays = 0;
-
 		for (final String user : users) {
 
 			final Long totalObservationPerUser = getTotalObservationPerUser(reportData.getData(), user);
@@ -111,7 +123,6 @@ public class DataEntryStatistic<K> {
 
 			final Integer workingDays = (Integer) workingDaysRow.get(user);
 			totalWorkingDays += workingDays;
-
 			averageRow.put(user, calculateAverage(totalObservationPerUser, workingDays));
 		}
 
@@ -153,6 +164,48 @@ public class DataEntryStatistic<K> {
 		workingTime++;
 
 		workingDaysRow.put(user, workingTime);
+	}
+
+	private static void DaysWithLessThan50ObservationsIncludingDaysWithZero(final TableRow nonWorkingDaysRow,
+			final String user, final Long totalObsPerDate, final Date date) {
+
+		if ((totalObsPerDate >= 50)) {
+			return;
+		}
+
+		if (DateUtil.isWeekEnd(date)) {
+			return;
+		}
+
+		Integer daysNotworking = (Integer) nonWorkingDaysRow.get(user);
+
+		if (daysNotworking == null) {
+			nonWorkingDaysRow.put(user, 1);
+			return;
+		}
+
+		nonWorkingDaysRow.put(user, ++daysNotworking);
+	}
+
+	private static void DaysWith0bservations(final TableRow nonWorkingDaysRow, final String user, final Long totalObsPerDate,
+			final Date date) {
+
+		if ((totalObsPerDate > 0)) {
+			return;
+		}
+
+		if (DateUtil.isWeekEnd(date)) {
+			return;
+		}
+
+		Integer daysNotworking = (Integer) nonWorkingDaysRow.get(user);
+
+		if (daysNotworking == null) {
+			nonWorkingDaysRow.put(user, 1);
+			return;
+		}
+
+		nonWorkingDaysRow.put(user, ++daysNotworking);
 	}
 
 	private static Long getTotalObservationPerUser(final List<UserObsByDate> obsByDates, final String user) {

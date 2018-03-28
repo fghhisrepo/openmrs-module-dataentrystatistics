@@ -49,6 +49,7 @@ $('#reportType').on('change', function() {
 	if (reportType == 'FORM_TYPES_OLD') {
 		$('#startDateTr').show();
 		$('#endDateTr').show();
+		$('#hideTr').show();
 		$('#locationTr').hide();
 		$('#orderByTr').hide();
 		return;
@@ -66,13 +67,11 @@ $('#orderBy').on('change', function() {
 	var orderBy = $('#orderBy').val();
 	if (orderBy == 'DISTRIC' || orderBy == "") {
 		$('#locationTr').hide();
-		return;
 	}
-
 	if (orderBy == 'HEALTHY_FACILITIES') {
 		$('#locationTr').show();
-		return;
 	}
+
 });
 
 // EXPORT TO CSV
@@ -128,5 +127,5 @@ $("#export").click(
 			fileName = 'DES_' + report + '_' + fileName + '_' + formatedDate;
 
 			exportTableToCSV.apply(this, [ $('#dvData>table'),
-					fileName + '.csv' ]);
+					fileName + '.xls' ]);
 		});
