@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.2//EN" "../lib-common/config-1.2.dtd">
 
-<module configVersion="2.0">
+<module configVersion="1.2">
 	
 	<!-- Base Module Properties -->
 	
@@ -9,7 +9,7 @@
 	<name>Data Entry Statistics</name>
 	<version>2.0</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
-	<author>Michael Seaton && (Eusebio Maposse && Stelio Moiane) - FGH</author>
+	<author>Michael Seato, Eusebio Maposse, Stelio Moiane</author>
 	<description>Provides various views of data entry statistics</description>
 	<activator>@MODULE_PACKAGE@.ModuleActivator</activator>
 	<updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL>
