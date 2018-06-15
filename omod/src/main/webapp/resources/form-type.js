@@ -74,6 +74,8 @@ $('#orderBy').on('change', function() {
 
 });
 
+
+
 // EXPORT TO CSV
 function exportTableToCSV($table, filename) {
 
@@ -118,8 +120,10 @@ $("#export").click(
 		function(event) {
 
 			var today = new Date();
+	
 			var formatedDate = today.getFullYear() + ''
 					+ (today.getMonth() + 1) + '' + today.getDate();
+			
 			var fileName = $('#location').find(":selected").text().trim()
 					.toUpperCase();
 			var report = $('#reportSelected').text();
@@ -129,3 +133,46 @@ $("#export").click(
 			exportTableToCSV.apply(this, [ $('#dvData>table'),
 					fileName + '.xls' ]);
 		});
+
+function exportTableToExcel(tableID, filename = ''){
+    var downloadLink;
+    var dataType = 'application/vnd.ms-excel';
+    var tableSelect = document.getElementById(tableID);
+    var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+    
+	var today = new Date();
+    
+	var formatedDate = today.getFullYear() + ''+ (today.getMonth() + 1) + '' + today.getDate();
+
+	var name = $('#location').find(":selected").text().trim().toUpperCase();
+	
+	var report = $('#reportSelected').text();
+
+	fileName = 'DES_' + report + '_' + name + '_' + formatedDate;
+
+    
+    // Specify file name
+    filename = fileName?fileName+'.xls':'excel_data.xls';
+    
+    // Create download link element
+    downloadLink = document.createElement("a");
+    
+    document.body.appendChild(downloadLink);
+    
+    if(navigator.msSaveOrOpenBlob){
+        var blob = new Blob(['\ufeff', tableHTML], {
+            type: dataType
+        });
+        
+        navigator.msSaveOrOpenBlob( blob, fileName);
+    }else{
+        // Create a link to the file
+        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+    
+        // Setting the file name
+        downloadLink.download = filename;
+        
+        // triggering the function
+        downloadLink.click();
+    }
+};
