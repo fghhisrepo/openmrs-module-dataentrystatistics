@@ -23,6 +23,7 @@ import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
 import org.openmrs.module.dataentrystatistics.UserObs;
 import org.openmrs.module.dataentrystatistics.UserObsByDate;
 import org.openmrs.module.dataentrystatistics.UserObsByFormType;
+import org.openmrs.module.dataentrystatistics.UserObsLocation;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 import org.openmrs.module.dataentrystatistics.model.ReportData;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,6 +108,11 @@ public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements
 	@Override
 	public String findLocationByID(final Integer locaationId) {
 		return this.dao.findLocationByID(locaationId);
+	}
+
+	@Override
+	public ReportData<UserObsLocation> countObsPerUSerALocation(Date fromDate, Date toDate) {
+		return dao.countObsPerUSerALocation(fromDate, toDate);
 	}
 
 }

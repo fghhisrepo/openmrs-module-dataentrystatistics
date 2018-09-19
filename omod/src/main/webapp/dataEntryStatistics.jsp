@@ -26,11 +26,8 @@
 <form method="post">
 
 	<p align="right">
-		<a href="#" id="exportCsv" role='button'>Export Table Data Into a CSV
+		<a href="#" id="export" role='button'>Export Table Data Into a CSV
 			File</a>
-   </p>
-	<p align="right">
-		<a href="#" onclick = "exportTableToExcel ('result')" > Export Table Data Into a Excel File</a>
 	</p>
 
 	<fieldset>

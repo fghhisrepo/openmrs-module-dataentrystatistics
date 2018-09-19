@@ -82,9 +82,12 @@ public class DataEntryStatistic<K> {
 			Long totalPerDate = 0L;
 
 			for (final String user : users) {
+
 				final Long totalPerUserAndDate = getTotalObsPerUserAndDate(reportData.getData(), user, date);
+
 				DaysWithLessThan50ObservationsIncludingDaysWithZero(daysLessThanFiftyOrZeroWorkingDaysRow, user,
 						totalPerUserAndDate, date);
+
 				DaysWith0bservations(DaysRow0Obs, user, totalPerUserAndDate, date);
 				updateWorkingTime(workingDaysRow, user, totalPerUserAndDate);
 
@@ -133,6 +136,41 @@ public class DataEntryStatistic<K> {
 		table.addRow(totalObsRow);
 		table.addRow(workingDaysRow);
 		table.addRow(averageRow);
+
+		return table;
+	}
+
+	public static DataTable tableByDateAndObsAndLocation(final ReportData<UserObsLocation> reportData) {
+		final DataTable table = new DataTable();
+
+		if (reportData.getData().isEmpty()) {
+			return table;
+		}
+
+		final List<String> users = CollectionUtil.mapWithoutDuplication(reportData.getData(), "user", String.class);
+
+		final List<String> locations = CollectionUtil.mapWithoutDuplication(reportData.getData(), "location",
+				String.class);
+
+		table.addColumn("LOCATION");
+		table.addColumns(users);
+
+		for (String location : locations) {
+
+			final TableRow tableRow = new TableRow();
+
+			tableRow.put("LOCATION", location);
+
+			for (final String user : users) {
+
+				final Long totalObservationPerUserAndLocation = getTotalObsPerUserAndLocation(reportData.getData(),
+						user, location);
+
+				tableRow.put(user, totalObservationPerUserAndLocation);
+			}
+			table.addRow(tableRow);
+
+		}
 
 		return table;
 	}
@@ -187,8 +225,8 @@ public class DataEntryStatistic<K> {
 		nonWorkingDaysRow.put(user, ++daysNotworking);
 	}
 
-	private static void DaysWith0bservations(final TableRow nonWorkingDaysRow, final String user, final Long totalObsPerDate,
-			final Date date) {
+	private static void DaysWith0bservations(final TableRow nonWorkingDaysRow, final String user,
+			final Long totalObsPerDate, final Date date) {
 
 		if ((totalObsPerDate > 0)) {
 			return;
@@ -229,6 +267,23 @@ public class DataEntryStatistic<K> {
 			if (!userObsByDate.getUser().equals(null) || !userObsByDate.getUser().isEmpty()) {
 				if ((date.compareTo(userObsByDate.getDate()) == 0) && user.equals(userObsByDate.getUser())) {
 					return userObsByDate.getTotalObs();
+				}
+			}
+		}
+
+		return 0L;
+	}
+
+	private static Long getTotalObsPerUserAndLocation(final List<UserObsLocation> userObsLocations, final String user,
+			final String location) {
+
+		for (final UserObsLocation userObsLocation : userObsLocations) {
+
+			if (!userObsLocation.getUser().equals(null) || !userObsLocation.getUser().isEmpty()) {
+
+				if (location.equals(userObsLocation.getLocation()) && user.equals(userObsLocation.getUser())) {
+
+					return userObsLocation.getTotalObs();
 				}
 			}
 		}
