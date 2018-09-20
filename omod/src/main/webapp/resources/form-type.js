@@ -127,5 +127,5 @@ $("#export").click(
 			fileName = 'DES_' + report + '_' + fileName + '_' + formatedDate;
 
 			exportTableToCSV.apply(this, [ $('#dvData>table'),
-					fileName + '.xls' ]);
+					fileName + '.csv' ]);
 		});

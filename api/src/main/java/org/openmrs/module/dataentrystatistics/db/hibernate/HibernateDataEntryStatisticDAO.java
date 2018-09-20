@@ -33,6 +33,7 @@ import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.UserObs;
 import org.openmrs.module.dataentrystatistics.UserObsByDate;
 import org.openmrs.module.dataentrystatistics.UserObsByFormType;
+import org.openmrs.module.dataentrystatistics.UserObsLocation;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
 import org.openmrs.module.dataentrystatistics.model.ReportData;
 
@@ -105,6 +106,15 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 	@Override
 	public List<Role> getAllRoles() {
 		final String hql = "SELECT  r FROM Role r ";
+		final Query query = this.getCurrentSession().createQuery(hql);
+		return query.list();
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Location> getAllLocations() {
+		final String hql = "SELECT  l FROM Locationl ";
 		final Query query = this.getCurrentSession().createQuery(hql);
 		return query.list();
 
@@ -483,6 +493,38 @@ public class HibernateDataEntryStatisticDAO implements DataEntryStatisticDAO {
 
 		return query.uniqueResult().toString();
 
+	}
+
+	@Override
+	public ReportData<UserObsLocation> countObsPerUSerALocation(Date fromDate, Date toDate) {
+		final String hql = "SELECT l.name, COUNT(o.obsId), c.username FROM Obs o "
+				+ "INNER JOIN o.creator c INNER JOIN o.location l "
+				+ "WHERE DATE(o.dateCreated) BETWEEN :fromDate AND :toDate AND o.voided = :voided AND c.username IS NOT null "
+				+ "GROUP BY l.name, c.username " + "ORDER BY l.name ";
+
+		final Query query = this.getCurrentSession().createQuery(hql);
+
+		query.setParameter("fromDate", fromDate);
+		query.setParameter("toDate", toDate);
+		query.setParameter("voided", false);
+
+		@SuppressWarnings("unchecked")
+		final List<Object[]> list = query.list();
+
+		final ReportData<UserObsLocation> reportData = new ReportData<UserObsLocation>(null, null, null, null, fromDate,
+				toDate);
+
+		for (final Object[] object : list) {
+			final UserObsLocation userObsLocation = new UserObsLocation();
+
+			userObsLocation.setUser((String) object[2]);
+			userObsLocation.setTotalObs((Long) object[1]);
+			userObsLocation.setLocation(((String) object[0]));
+
+			reportData.addData(userObsLocation);
+		}
+
+		return reportData;
 	}
 
 }

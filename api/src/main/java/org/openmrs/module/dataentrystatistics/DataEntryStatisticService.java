@@ -47,6 +47,8 @@ public interface DataEntryStatisticService extends OpenmrsService {
 	public ReportData<UserObs> getAllMonthObsFromLocation(Date fromDate, Date toDate, Integer location);
 
 	public ReportData<UserObs> getAllMonthObs(Date fromDate, Date toDate, Integer location);
+	public ReportData<UserObsLocation> countObsPerUSerALocation(Date fromDate, Date toDate);
+
 
 	public List<Role> getAllRoles();
 	public String findLocationByID(final Integer locaationId);

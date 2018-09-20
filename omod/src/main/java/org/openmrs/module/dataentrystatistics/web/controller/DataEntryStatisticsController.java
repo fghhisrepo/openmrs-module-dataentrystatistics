@@ -192,6 +192,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 				this.table = DataEntryStatistic.tableByFormAndEncounters(dataEntryStatisticService
 						.getAllObsByUsersAndForm(this.entryObject.getFromDate(), this.entryObject.getToDate(), null));
+
 				if (!dataEntryStatisticService
 						.findObservationsByPeriod(this.entryObject.getFromDate(), this.entryObject.getToDate(), null)
 						.getData().isEmpty()) {
@@ -279,9 +280,11 @@ public class DataEntryStatisticsController extends SimpleFormController {
 		if (this.entryObject.getReportType().equals(ReportType.FORM_TYPES_OLD.name())) {
 
 			final Date toDateToUse = this.entryObject.getToDate() != null
-					? OpenmrsUtil.getLastMomentOfDay(this.entryObject.getToDate()) : null;
+					? OpenmrsUtil.getLastMomentOfDay(this.entryObject.getToDate())
+					: null;
 			final String encUserColumn = this.entryObject.getEncUserColumn();
 			final String orderUserColumn = this.entryObject.getOrderUserColumn();
+
 			final List<DataEntryStatistic> stats = dataEntryStatisticService.getDataEntryStatistics(
 					this.entryObject.getFromDate(), toDateToUse, encUserColumn, orderUserColumn,
 					this.entryObject.getGroupBy());
@@ -293,6 +296,21 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		}
 
+		if (this.entryObject.getReportType().equals(ReportType.USER_OBS.name())) {
+
+			this.table = DataEntryStatistic.tableByDateAndObsAndLocation(dataEntryStatisticService
+					.countObsPerUSerALocation(this.entryObject.getFromDate(), this.entryObject.getToDate()));
+
+			if (!dataEntryStatisticService.countObsPerUSerALocation(entryObject.getFromDate(), entryObject.getToDate())
+					.getData().isEmpty()) {
+
+				this.table.setLocation("ALL DISTRICT");
+
+				this.table.setFromDate(DateUtil.format(this.entryObject.getFromDate()));
+				this.table.setToDate(DateUtil.format(this.entryObject.getToDate()));
+
+			}
+		}
 		if (!this.entryObject.getReportType().isEmpty()) {
 			this.table.setReportType(this.entryObject.getReportType());
 		}
