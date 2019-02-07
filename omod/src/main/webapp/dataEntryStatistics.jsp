@@ -11,11 +11,11 @@
 
 <openmrs:htmlInclude file="/scripts/calendar/calendar.js" />
 
-<script type='text/javascript'
-	src='https://code.jquery.com/jquery-1.11.0.min.js'></script>
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<!-- <script type='text/javascript' -->
+<!-- 	src='https://code.jquery.com/jquery-1.11.0.min.js'></script> -->
+<!-- <script -->
+<!-- 	src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> -->
+<!-- <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script> -->
 
 <openmrs:htmlInclude file="/scripts/validation.js" />
 
@@ -147,8 +147,19 @@
 <c:out value="${command.table.htmlTable}" escapeXml="false" />
 
 <openmrs:htmlInclude
+	file="/moduleResources/dataentrystatistics/jquery-1.11.0.min.js"/>
+	<openmrs:htmlInclude
+	file="/moduleResources/dataentrystatistics/jquery.min.js"/>	
+		<openmrs:htmlInclude
+	file="/moduleResources/dataentrystatistics/jquery-ui.min.js"/>	
+	
+<openmrs:htmlInclude
 	file="/moduleResources/dataentrystatistics/form-type.css" />
 <openmrs:htmlInclude
 	file="/moduleResources/dataentrystatistics/form-type.js" />
+	
+	
+
+			
 
 <%@ include file="/WEB-INF/template/footer.jsp"%>
