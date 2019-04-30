@@ -13,17 +13,21 @@
  */
 package org.openmrs.module.dataentrystatistics.web.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
 import org.openmrs.Role;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
@@ -46,6 +50,8 @@ import org.springframework.web.servlet.mvc.SimpleFormController;
 
 @SuppressWarnings({ "rawtypes", "deprecation" })
 public class DataEntryStatisticsController extends SimpleFormController {
+	private static final String DEFAULT_SPREADSHEET_PASSWORD = "segredo";
+	public static final String PASSWORD_PROPERTY_NAME = "dataentrystatistics.spreadsheet.password";
 
 	protected final Log log = LogFactory.getLog(this.getClass());
 	private final ModelMap modelMap = new ModelMap();
@@ -65,9 +71,8 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 	@Override
 	protected Object formBackingObject(final HttpServletRequest request) throws ServletException {
-
-		return new EntryObject();
-
+		Object commandObject = request.getAttribute("command");
+		return commandObject != null ? commandObject : new EntryObject();
 	}
 
 	@Override
@@ -316,7 +321,23 @@ public class DataEntryStatisticsController extends SimpleFormController {
 		}
 		this.entryObject.setTable(this.table);
 
-		return this.showForm(request, response, errors);
+		if(request.getParameterMap().containsKey("download")) {
+			Biff8EncryptionKey.setCurrentUserPassword(fetchSpreadsheetPassword(request));
+
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + generateSpreadsheetFilename() + "\"");
+			try {
+				table.generateSpreadsheet().write(response.getOutputStream());
+			} catch (Exception e) {
+				log.error(e.getMessage());
+				e.printStackTrace();
+			} finally {
+				Biff8EncryptionKey.setCurrentUserPassword(null);
+				return null;
+			}
+		} else {
+			return this.showForm(request, response, errors);
+		}
 	}
 
 	public DataEntryStatisticService getDataEntryStatisticService() {
@@ -329,6 +350,38 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 	public void setDataEntryStatisticService(final DataEntryStatisticService dataEntryStatisticService) {
 		this.dataEntryStatisticService = dataEntryStatisticService;
+	}
+
+	private String generateSpreadsheetFilename() {
+		SimpleDateFormat format = new SimpleDateFormat("ddMMMY");
+		StringBuilder filename = new StringBuilder("dataentrystats");
+		if(table != null && table.getLocation() != null) {
+			filename.append("-").append(table.getLocation());
+		}
+		if(entryObject.getFromDate() != null) {
+			filename.append("-").append(format.format(entryObject.getFromDate()));
+		}
+		if(entryObject.getToDate() != null) {
+			filename.append("-").append(format.format(entryObject.getToDate()));
+		}
+		filename.append(".xls");
+
+		return filename.toString();
+	}
+
+	private String fetchSpreadsheetPassword(HttpServletRequest request) {
+		String contextPath = request.getSession().getServletContext().getContextPath();
+		if(contextPath == null || "".equals(contextPath)) {
+			contextPath = request.getContextPath();
+		}
+
+		if(contextPath != null && contextPath.startsWith("/")) {
+			contextPath = contextPath.substring(1);
+		}
+
+		Properties props = OpenmrsUtil.getRuntimeProperties(contextPath);
+
+		return props.getProperty(PASSWORD_PROPERTY_NAME, DEFAULT_SPREADSHEET_PASSWORD);
 	}
 
 }

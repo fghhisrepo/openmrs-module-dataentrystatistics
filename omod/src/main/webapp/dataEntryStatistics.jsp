@@ -24,12 +24,6 @@
 </h2>
 
 <form method="post">
-
-	<p align="right">
-		<a href="#" id="export" role='button'>Export Table Data Into a CSV
-			File</a>
-	</p>
-
 	<fieldset>
 		<table style="width: 30%;">
 			<tr>
@@ -37,7 +31,14 @@
 				<td><spring:bind path="command.obsCreator">
 						<select name="${status.expression}">
 							<c:forEach items="${roles}" var="role">
-								<option>${role}</option>
+								<c:choose>
+									<c:when test="${ role == command.obsCreator }">
+										<option selected>${role}</option>
+									</c:when>
+									<c:otherwise>
+										<option>${role}</option>
+									</c:otherwise>
+								</c:choose>
 							</c:forEach>
 						</select>
 					</spring:bind></td>
@@ -48,7 +49,14 @@
 						<select name="${status.expression}" width="60%" id="orderBy">
 							<option></option>
 							<c:forEach items="${orderBys}" var="orderBy">
-								<option>${orderBy}</option>
+								<c:choose>
+									<c:when test="${ orderBy == command.orderBy }">
+										<option selected>${orderBy}</option>
+									</c:when>
+									<c:otherwise>
+										<option>${orderBy}</option>
+									</c:otherwise>
+								</c:choose>
 							</c:forEach>
 						</select>
 					</spring:bind></td>
@@ -71,7 +79,14 @@
 						<select name="${status.expression}" width="60%" id="reportType">
 							<option></option>
 							<c:forEach items="${reportTypes}" var="reportType">
-								<option>${reportType}</option>
+								<c:choose>
+									<c:when test="${ reportType == command.reportType }">
+										<option selected>${reportType}</option>
+									</c:when>
+									<c:otherwise>
+										<option>${reportType}</option>
+									</c:otherwise>
+								</c:choose>
 							</c:forEach>
 						</select>
 					</spring:bind></td>
@@ -135,8 +150,10 @@
 
 			<tr>
 				<td></td>
-				<td><input type="submit"
-					value="<spring:message code="general.view"/>" /></td>
+				<td>
+					<input type="submit" name="view" value="<spring:message code="general.view"/>" />&nbsp;&nbsp;
+					<input type="submit" name="download" value="Download Excel file" />
+				</td>
 			</tr>
 		</table>
 	</fieldset>
