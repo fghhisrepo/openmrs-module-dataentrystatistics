@@ -16,11 +16,16 @@ package org.openmrs.module.dataentrystatistics.impl;
 import java.util.Date;
 import java.util.List;
 
-import org.openmrs.api.APIException;
+import org.openmrs.Role;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.dataentrystatistics.DataEntryStatistic;
 import org.openmrs.module.dataentrystatistics.DataEntryStatisticService;
+import org.openmrs.module.dataentrystatistics.UserObs;
+import org.openmrs.module.dataentrystatistics.UserObsByDate;
+import org.openmrs.module.dataentrystatistics.UserObsByFormType;
+import org.openmrs.module.dataentrystatistics.UserObsLocation;
 import org.openmrs.module.dataentrystatistics.db.DataEntryStatisticDAO;
+import org.openmrs.module.dataentrystatistics.model.ReportData;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -28,28 +33,86 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class DataEntryStatisticServiceImpl extends BaseOpenmrsService implements DataEntryStatisticService {
-	
+
 	protected DataEntryStatisticDAO dao;
-	
-	/**
-	 * @see DataEntryStatisticService#getDataEntryStatistics(Date,Date,String,String,String)
-	 */
-	public List<DataEntryStatistic> getDataEntryStatistics(Date fromDate, Date toDate, String encounterUserColumn,
-	                                                       String orderUserColumn, String groupBy) throws APIException {
-		return dao.getDataEntryStatistics(fromDate, toDate, encounterUserColumn, orderUserColumn, groupBy);
-	}
 
 	/**
 	 * @return the dao
 	 */
 	public DataEntryStatisticDAO getDao() {
-		return dao;
+		return this.dao;
 	}
 
 	/**
-	 * @param dao the dao to set
+	 * @param dao
+	 *            the dao to set
 	 */
-	public void setDao(DataEntryStatisticDAO dao) {
+	public void setDao(final DataEntryStatisticDAO dao) {
 		this.dao = dao;
 	}
+
+	@Override
+	public ReportData<UserObsByDate> findObservationsByPeriodAndLocation(final Date fromDate, final Date toDate,
+			final Integer location) {
+		return this.dao.findObservationsByPeriodAndLocation(fromDate, toDate, location);
+	}
+
+	@Override
+	public List<Role> getAllRoles() {
+		return this.dao.getAllRoles();
+	}
+
+	@Override
+	public ReportData<UserObsByFormType> getAllObsByUsersAndForm(final Date fromDate, final Date toDate,
+			final Integer location) {
+
+		return this.dao.getAllObsByUsersAndForm(fromDate, toDate, location);
+	}
+
+	@Override
+	public ReportData<UserObs> getAllMonthObs(final Date fromDate, final Date toDate, final Integer location) {
+		return this.dao.getAllMonthObs(fromDate, toDate, location);
+	}
+
+	@Override
+	public List<UserObsByDate> countTotalObsPerUserAndDate(final Date fromDate, final Date toDate,
+			final Integer location) {
+		return this.dao.countTotalObsPerUserAndDate(fromDate, toDate, location);
+	}
+
+	@Override
+	public ReportData<UserObsByDate> findObservationsByPeriod(final Date fromDate, final Date toDate,
+			final Integer location) {
+		return this.dao.findObservationsByPeriod(fromDate, toDate, location);
+	}
+
+	@Override
+	public ReportData<UserObsByFormType> getAllObsByUsersAndFormAndLocation(final Date fromDate, final Date toDate,
+			final Integer location) {
+		return this.dao.getAllObsByUsersAndFormAndLocation(fromDate, toDate, location);
+	}
+
+	@Override
+	public ReportData<UserObs> getAllMonthObsFromLocation(final Date fromDate, final Date toDate,
+			final Integer location) {
+		return this.dao.getAllMonthObsFromLocation(fromDate, toDate, location);
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public List<DataEntryStatistic> getDataEntryStatistics(final Date fromDate, final Date toDate,
+			final String encounterUserColumn, final String orderUserColumn, final String groupBy) {
+		return this.dao.getDataEntryStatistics(fromDate, toDate, encounterUserColumn, orderUserColumn, groupBy);
+	}
+
+	@Override
+	public String findLocationByID(final Integer locaationId) {
+		return this.dao.findLocationByID(locaationId);
+	}
+
+	@Override
+	public ReportData<UserObsLocation> countObsPerUSerALocation(Date fromDate, Date toDate) {
+		return dao.countObsPerUSerALocation(fromDate, toDate);
+	}
+
 }

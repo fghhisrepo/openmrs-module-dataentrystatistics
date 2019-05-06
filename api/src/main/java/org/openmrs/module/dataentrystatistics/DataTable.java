@@ -24,17 +24,27 @@ import java.util.Map;
 import org.openmrs.util.OpenmrsUtil;
 
 public class DataTable {
-	
+
 	private List<String> columnOrder;
-	
+
 	private ArrayList<TableRow> rows;
-	
+
+	private String location;
+
+	private String parentLocation;
+
+	private String reportType;
+
+	private String fromDate;
+
+	private String toDate;
+
 	public DataTable() {
-		columnOrder = new ArrayList<String>();
-		rows = new ArrayList<TableRow>();
+		this.columnOrder = new ArrayList<String>();
+		this.rows = new ArrayList<TableRow>();
 	}
-	
-	public DataTable(List<TableRow> rows) {
+
+	public DataTable(final List<TableRow> rows) {
 		if (rows instanceof ArrayList) {
 			this.rows = (ArrayList<TableRow>) rows;
 		} else {
@@ -42,49 +52,90 @@ public class DataTable {
 			this.rows.addAll(rows);
 		}
 	}
-	
-	public void addColumn(String colName) {
-		if (!columnOrder.contains(colName))
-			columnOrder.add(colName);
+
+	public void addColumn(final String colName) {
+		if (!this.columnOrder.contains(colName)) {
+			this.columnOrder.add(colName);
+		}
 	}
-	
-	public void addColumns(Collection<String> colNames) {
-		for (String colName : colNames)
-			addColumn(colName);
+
+	public void addColumns(final Collection<String> colNames) {
+		for (final String colName : colNames) {
+			this.addColumn(colName);
+		}
 	}
-	
+
+	public void addColumnsValues(final Collection<Long> colValues) {
+		for (final Long c : colValues) {
+			this.addColumn(c.toString());
+		}
+	}
+
 	public int getRowCount() {
-		return rows.size();
+		return this.rows.size();
 	}
-	
-	public void addRow(TableRow row) {
-		rows.add(row);
+
+	public void addRow(final TableRow row) {
+		this.rows.add(row);
 	}
-	
-	public void addRows(Collection<TableRow> rows) {
+
+	public void addRows(final Collection<TableRow> rows) {
 		this.rows.addAll(rows);
 	}
-	
+
 	public ArrayList<TableRow> getRows() {
-		return rows;
+		return this.rows;
 	}
-	
+
+	public String getLocation() {
+		return this.location;
+	}
+
+	public void setLocation(final String location) {
+		this.location = location;
+	}
+
+	public String getReportType() {
+		return this.reportType;
+	}
+
+	public void setReportType(final String reportType) {
+		this.reportType = reportType;
+	}
+
+	public String getFromDate() {
+		return this.fromDate;
+	}
+
+	public void setFromDate(final String fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public String getToDate() {
+		return this.toDate;
+	}
+
+	public void setToDate(final String toDate) {
+		this.toDate = toDate;
+	}
+
 	public void sortByColumn(final String colName) {
-		Collections.sort(rows, new Comparator<TableRow>() {
-			
-			@SuppressWarnings("unchecked")
-			public int compare(TableRow left, TableRow right) {
-				Comparable l = (Comparable) left.get(colName);
-				Comparable r = (Comparable) right.get(colName);
+		Collections.sort(this.rows, new Comparator<TableRow>() {
+
+			@Override
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			public int compare(final TableRow left, final TableRow right) {
+				final Comparable l = (Comparable) left.get(colName);
+				final Comparable r = (Comparable) right.get(colName);
 				return OpenmrsUtil.compareWithNullAsLowest(l, r);
 			}
 		});
 	}
-	
-	public Map<String, DataTable> split(TableRowClassifier trc) {
-		Map<String, DataTable> ret = new HashMap<String, DataTable>();
-		for (TableRow row : rows) {
-			String classification = trc.classify(row);
+
+	public Map<String, DataTable> split(final TableRowClassifier trc) {
+		final Map<String, DataTable> ret = new HashMap<String, DataTable>();
+		for (final TableRow row : this.rows) {
+			final String classification = trc.classify(row);
 			DataTable thisClass = ret.get(classification);
 			if (thisClass == null) {
 				thisClass = new DataTable();
@@ -94,57 +145,90 @@ public class DataTable {
 		}
 		return ret;
 	}
-	
+
+	@Override
 	public String toString() {
-		if (rows.size() == 0)
+		if (this.rows.size() == 0) {
 			return "DataTable with no rows";
+		}
 		List<String> columns;
-		if (columnOrder.size() > 0) {
-			columns = columnOrder;
+		if (this.columnOrder.size() > 0) {
+			columns = this.columnOrder;
 		} else {
-			columns = new ArrayList<String>(rows.get(0).getColumnNames());
+			columns = new ArrayList<String>(this.rows.get(0).getColumnNames());
 			Collections.sort(columns);
 		}
-		StringBuilder sb = new StringBuilder();
-		for (String colName : columns) {
+		final StringBuilder sb = new StringBuilder();
+		for (final String colName : columns) {
 			sb.append(colName).append(",");
 		}
-		for (TableRow row : rows) {
+		for (final TableRow row : this.rows) {
 			sb.append("\n");
-			for (String colName : columns) {
+			for (final String colName : columns) {
 				sb.append(row.get(colName)).append(",");
 			}
 		}
 		return sb.toString();
 	}
-	
+
 	public String getHtmlTable() {
-		if (rows.size() == 0)
+		if (this.rows.size() == 0) {
 			return "DataTable with no rows";
+		}
 		List<String> columns;
-		if (columnOrder.size() > 0) {
-			columns = columnOrder;
+		if (this.columnOrder.size() > 0) {
+			columns = this.columnOrder;
 		} else {
-			columns = new ArrayList<String>(rows.get(0).getColumnNames());
+			columns = new ArrayList<String>(this.rows.get(0).getColumnNames());
 			Collections.sort(columns);
 		}
-		StringBuilder sb = new StringBuilder();
-		sb.append("<table border=\"1\" cellspacing=\"0\" cellpadding=\"2\">");
-		sb.append("<thead><tr>");
-		for (String colName : columns) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("<div id=\"dvData\">");
+		sb.append("<table id=\"result\" class=\"display nowrap\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">");
+		sb.append("<thead>");
+
+		sb.append(this.getHtmlHeader(columns.size()));
+		sb.append("<tr><td colspan=" + columns.size() + "/></tr>");
+
+		sb.append("<tr>");
+		for (final String colName : columns) {
 			sb.append("<th>").append(colName).append("</th>");
 		}
 		sb.append("</tr></thead><tbody>");
-		for (TableRow row : rows) {
+		for (final TableRow row : this.rows) {
 			sb.append("<tr>");
-			for (String colName : columns) {
+			for (final String colName : columns) {
 				sb.append("<td>").append(row.get(colName)).append("</td>");
 			}
 			sb.append("</tr>");
 		}
 		sb.append("</tbody></table>");
+		sb.append("</div>");
+
 		return sb.toString();
-		
 	}
-	
+
+	private String getHtmlHeader(final int comlumnsSize) {
+		final StringBuilder builder = new StringBuilder();
+		
+		builder.append("<tr><th><strong>LOCATION:</strong></th>").append("<th colspan=" + comlumnsSize + ">")
+				.append(this.getLocation()).append("</th></tr>");
+		builder.append("<tr><th><strong>REPORT TYPE:</strong> ")
+				.append("<th colspan=" + comlumnsSize + " id=\"reportSelected\">").append(this.getReportType())
+				.append("</th></tr>");
+		builder.append("<tr><th><strong>FROM DATE:</strong> ").append("<th colspan=" + comlumnsSize + ">")
+				.append(this.getFromDate()).append("</th></tr>");
+		builder.append("<tr><th><strong>TO DATE:</strong> ").append("<th colspan=" + comlumnsSize + ">")
+				.append(this.getToDate()).append("</th></tr>");
+
+		return builder.toString();
+	}
+
+	public String getParentLocation() {
+		return this.parentLocation;
+	}
+
+	public void setParentLocation(final String parentLocation) {
+		this.parentLocation = parentLocation;
+	}
 }
