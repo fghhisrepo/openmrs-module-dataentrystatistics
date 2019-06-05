@@ -85,6 +85,12 @@ public class DataEntryStatistic<K> {
 
 				final Long totalPerUserAndDate = getTotalObsPerUserAndDate(reportData.getData(), user, date);
 
+				if (daysLessThanFiftyOrZeroWorkingDaysRow.get(user) == null) {
+					daysLessThanFiftyOrZeroWorkingDaysRow.put(user, 0);
+				}
+				if (DaysRow0Obs.get(user) == null) {
+					DaysRow0Obs.put(user, 0);
+				}
 				DaysWithLessThan50ObservationsIncludingDaysWithZero(daysLessThanFiftyOrZeroWorkingDaysRow, user,
 						totalPerUserAndDate, date);
 

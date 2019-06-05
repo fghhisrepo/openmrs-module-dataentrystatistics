@@ -7,13 +7,13 @@
 	
 	<id>dataentrystatistics</id>
 	<name>Data Entry Statistics</name>
-	<version>2.0</version>
+	<version>${project.parent.version}</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
-	<author>Michael Seato, Eusebio Maposse, Stelio Moiane</author>
+	<author>Michael Seaton, FGH Mozambique</author>
 	<description>Provides various views of data entry statistics</description>
 	<activator>@MODULE_PACKAGE@.ModuleActivator</activator>
 	<updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL>
-	<require_version>1.6.0.11652</require_version>
+	<require_version>1.9.0</require_version>
 	
 	<aware_of_modules>
 	    <aware_of_module>org.openmrs.module.legacyui</aware_of_module>
