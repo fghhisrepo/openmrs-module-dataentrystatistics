@@ -15,6 +15,7 @@ package org.openmrs.module.dataentrystatistics.web.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -359,16 +360,11 @@ public class DataEntryStatisticsController extends SimpleFormController {
 	}
 
 	private String generateSpreadsheetFilename() {
-		SimpleDateFormat format = new SimpleDateFormat("ddMMMY");
-		StringBuilder filename = new StringBuilder("dataentrystats");
+		SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+		StringBuilder filename = new StringBuilder("DES_");
 		if (table != null && table.getLocation() != null) {
-			filename.append("-").append(table.getLocation());
-		}
-		if (entryObject.getFromDate() != null) {
-			filename.append("-").append(format.format(entryObject.getFromDate()));
-		}
-		if (entryObject.getToDate() != null) {
-			filename.append("-").append(format.format(entryObject.getToDate()));
+			filename.append(table.getReportType()).append("_").append(table.getLocation().toUpperCase()).append("_")
+					.append(format.format(Calendar.getInstance().getTime()));
 		}
 		filename.append(".xls");
 

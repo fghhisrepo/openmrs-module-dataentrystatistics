@@ -40,6 +40,7 @@ public class DataTable {
 		public static final String START_DATE = "dataentrystatistics.startDate";
 		public static final String END_DATE = "dataentrystatistics.endDate";
 	}
+
 	private List<String> columnOrder;
 
 	private ArrayList<TableRow> rows;
@@ -245,15 +246,15 @@ public class DataTable {
 
 		int nextRow = createSpreadsheetHeader(sheet, columns.size());
 		HSSFRow row = sheet.createRow(nextRow);
-		for(int i=0; i < columns.size() ; i++) {
+		for (int i = 0; i < columns.size(); i++) {
 			row.createCell(i).setCellValue(columns.get(i));
 		}
 
-		for(final TableRow tableRow: rows) {
+		for (final TableRow tableRow : rows) {
 			row = sheet.createRow(++nextRow);
-			for(int i=0; i < columns.size() ; i++) {
+			for (int i = 0; i < columns.size(); i++) {
 				Object value = tableRow.get(columns.get(i));
-				if(value != null) {
+				if (value != null) {
 					try {
 						row.createCell(i).setCellValue(Double.parseDouble(value.toString()));
 					} catch (NumberFormatException e) {
@@ -266,17 +267,22 @@ public class DataTable {
 			}
 		}
 
-		return  workbook;
+		return workbook;
 	}
 
 	private int createSpreadsheetHeader(@NotNull final HSSFSheet worksheet, final int numberOfColumns) {
 		int rowNumber = 0;
 		HSSFRow row = worksheet.createRow(rowNumber);
 		row.createCell(0).setCellValue(OpenmrsUtil.getMessage(MessageId.LOCATION));
-		row.createCell(1).setCellValue(getLocation());
 
-		// Add cells to be merged in order to align with the columns to be created in subsequent data rows.
-		for(int i=2; i < numberOfColumns; i++) {
+		if (getLocation() != null) {
+			row.createCell(1).setCellValue(getLocation());
+		} else {
+			row.createCell(1).setCellValue(getParentLocation());
+		}
+		// Add cells to be merged in order to align with the columns to be created in
+		// subsequent data rows.
+		for (int i = 2; i < numberOfColumns; i++) {
 			row.createCell(i);
 		}
 
@@ -290,13 +296,14 @@ public class DataTable {
 
 		row.createCell(1).setCellValue(getReportType());
 
-		// Add cells to be merged in order to align with the columns to be created in subsequent data rows.
-		for(int i=2; i < numberOfColumns; i++) {
+		// Add cells to be merged in order to align with the columns to be created in
+		// subsequent data rows.
+		for (int i = 2; i < numberOfColumns; i++) {
 			row.createCell(i);
 		}
 
 		// Merge the cells.
-		worksheet.addMergedRegion(new CellRangeAddress(1, 1, 1, numberOfColumns -1));
+		worksheet.addMergedRegion(new CellRangeAddress(1, 1, 1, numberOfColumns - 1));
 
 		// From date header
 		rowNumber++;
@@ -305,8 +312,9 @@ public class DataTable {
 
 		row.createCell(1).setCellValue(getFromDate());
 
-		// Add cells to be merged in order to align with the columns to be created in subsequent data rows.
-		for(int i=2; i < numberOfColumns; i++) {
+		// Add cells to be merged in order to align with the columns to be created in
+		// subsequent data rows.
+		for (int i = 2; i < numberOfColumns; i++) {
 			row.createCell(i);
 		}
 
@@ -320,8 +328,9 @@ public class DataTable {
 
 		row.createCell(1).setCellValue(getToDate());
 
-		// Add cells to be merged in order to align with the columns to be created in subsequent data rows.
-		for(int i=2; i < numberOfColumns; i++) {
+		// Add cells to be merged in order to align with the columns to be created in
+		// subsequent data rows.
+		for (int i = 2; i < numberOfColumns; i++) {
 			row.createCell(i);
 		}
 
@@ -333,15 +342,19 @@ public class DataTable {
 
 	private String getHtmlHeader(final int columnsSize) {
 		final StringBuilder builder = new StringBuilder();
-		
+
 		builder.append("<tr><th><strong>").append(OpenmrsUtil.getMessage(MessageId.LOCATION).toUpperCase())
-				.append(":</strong></th><th colspan=").append(columnsSize).append(">").append(this.getLocation()).append("</th></tr>");
+				.append(":</strong></th><th colspan=").append(columnsSize).append(">").append(this.getLocation())
+				.append("</th></tr>");
 		builder.append("<tr><th><strong>").append(OpenmrsUtil.getMessage(MessageId.REPORT_TYPE).toUpperCase())
-				.append(":</strong><th colspan=").append(columnsSize).append(" id=\"reportSelected\">").append(this.getReportType()).append("</th></tr>");
+				.append(":</strong><th colspan=").append(columnsSize).append(" id=\"reportSelected\">")
+				.append(this.getReportType()).append("</th></tr>");
 		builder.append("<tr><th><strong>").append(OpenmrsUtil.getMessage(MessageId.START_DATE).toUpperCase())
-				.append(":</strong><th colspan=").append(columnsSize).append(">").append(this.getFromDate()).append("</th></tr>");
+				.append(":</strong><th colspan=").append(columnsSize).append(">").append(this.getFromDate())
+				.append("</th></tr>");
 		builder.append("<tr><th><strong>").append(OpenmrsUtil.getMessage(MessageId.END_DATE).toUpperCase())
-				.append(":</strong><th colspan=").append(columnsSize).append(">").append(this.getToDate()).append("</th></tr>");
+				.append(":</strong><th colspan=").append(columnsSize).append(">").append(this.getToDate())
+				.append("</th></tr>");
 
 		return builder.toString();
 	}
