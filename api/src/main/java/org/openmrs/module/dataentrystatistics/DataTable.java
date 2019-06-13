@@ -277,8 +277,6 @@ public class DataTable {
 
 		if (getLocation() != null) {
 			row.createCell(1).setCellValue(getLocation());
-		} else {
-			row.createCell(1).setCellValue(getParentLocation());
 		}
 		// Add cells to be merged in order to align with the columns to be created in
 		// subsequent data rows.
