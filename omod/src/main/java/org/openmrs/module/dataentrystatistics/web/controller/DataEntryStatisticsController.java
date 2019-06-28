@@ -328,6 +328,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 			}
 			this.entryObject.setTable(this.table);
 		}
+
 		if (request.getParameterMap().containsKey("download")) {
 			Biff8EncryptionKey.setCurrentUserPassword(fetchSpreadsheetPassword(request));
 
@@ -342,9 +343,10 @@ public class DataEntryStatisticsController extends SimpleFormController {
 				Biff8EncryptionKey.setCurrentUserPassword(null);
 				return null;
 			}
-		} else {
-			return this.showForm(request, response, errors);
 		}
+
+		return this.showForm(request, response, errors);
+
 	}
 
 	public DataEntryStatisticService getDataEntryStatisticService() {

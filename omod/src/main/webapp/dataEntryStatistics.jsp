@@ -11,17 +11,17 @@
 
 <openmrs:htmlInclude file="/scripts/calendar/calendar.js" />
 
-<!-- <script type='text/javascript' -->
-<!-- 	src='https://code.jquery.com/jquery-1.11.0.min.js'></script> -->
-<!-- <script -->
-<!-- 	src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> -->
-<!-- <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script> -->
 
 <openmrs:htmlInclude file="/scripts/validation.js" />
 
 <h2>
 	<spring:message code="dataentrystatistics.title" />
 </h2>
+
+<p align="right">
+	<a href="#" id="export" role='button'>Export Table Data Into a
+		Excel File</a>
+</p>
 
 <form method="post">
 	<fieldset>
@@ -61,7 +61,7 @@
 						</select>
 					</spring:bind></td>
 			</tr>
-			<tr id="locationTr" style="display: none;">
+			<tr id="locationTr" style="display: true;">
 				<td><spring:message code="dataentrystatistics.location" /></td>
 				<td><spring:bind path="command.location">
 						<openmrs_tag:locationField formFieldName="location"
@@ -150,10 +150,9 @@
 
 			<tr>
 				<td></td>
-				<td>
-					<input type="submit" name="view" value="<spring:message code="general.view"/>" />&nbsp;&nbsp;
-					<input type="submit" name="download" value="Download Excel file" />
-				</td>
+				<td><input type="submit" name="view"
+					value="<spring:message code="general.view"/>" />&nbsp;&nbsp; <input
+					type="submit" name="download" value="Download Excel file" /></td>
 			</tr>
 		</table>
 	</fieldset>
@@ -164,19 +163,19 @@
 <c:out value="${command.table.htmlTable}" escapeXml="false" />
 
 <openmrs:htmlInclude
-	file="/moduleResources/dataentrystatistics/jquery-1.11.0.min.js"/>
-	<openmrs:htmlInclude
-	file="/moduleResources/dataentrystatistics/jquery.min.js"/>	
-		<openmrs:htmlInclude
-	file="/moduleResources/dataentrystatistics/jquery-ui.min.js"/>	
-	
+	file="/moduleResources/dataentrystatistics/jquery-1.11.0.min.js" />
+<openmrs:htmlInclude
+	file="/moduleResources/dataentrystatistics/jquery.min.js" />
+<openmrs:htmlInclude
+	file="/moduleResources/dataentrystatistics/jquery-ui.min.js" />
+
 <openmrs:htmlInclude
 	file="/moduleResources/dataentrystatistics/form-type.css" />
 <openmrs:htmlInclude
 	file="/moduleResources/dataentrystatistics/form-type.js" />
-	
-	
 
-			
+
+
+
 
 <%@ include file="/WEB-INF/template/footer.jsp"%>

@@ -228,7 +228,7 @@ public class DataTable {
 	public HSSFWorkbook generateSpreadsheet() {
 		HSSFWorkbook workbook = new HSSFWorkbook();
 
-		HSSFSheet sheet = workbook.createSheet("statistics");
+		HSSFSheet sheet = workbook.createSheet("DATA_ENTRY_STATISTIC");
 		if (rows.size() == 0) {
 			HSSFRow row0 = sheet.createRow(0);
 			HSSFCell cellA1 = row0.createCell(0);
