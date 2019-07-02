@@ -18,10 +18,7 @@
 	<spring:message code="dataentrystatistics.title" />
 </h2>
 
-<p align="right">
-	<a href="#" id="export" role='button'>Export Table Data Into a
-		Excel File</a>
-</p>
+
 
 <form method="post">
 	<fieldset>
@@ -151,8 +148,10 @@
 			<tr>
 				<td></td>
 				<td><input type="submit" name="view"
-					value="<spring:message code="general.view"/>" />&nbsp;&nbsp; <input
-					type="submit" name="download" value="Download Excel file" /></td>
+					value="<spring:message code="general.view"/>" />&nbsp;&nbsp; 
+					<td><input type="submit" name="downloadWithPassword" value="Download Protected Excel File " /></td>
+					<td><input type="submit" name="downloadWithoutPassword" value="Download Unprotected Excel File"></td>
+					
 			</tr>
 		</table>
 	</fieldset>

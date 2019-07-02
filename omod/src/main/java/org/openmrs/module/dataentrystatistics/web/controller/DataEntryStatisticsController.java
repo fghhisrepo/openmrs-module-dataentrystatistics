@@ -329,7 +329,7 @@ public class DataEntryStatisticsController extends SimpleFormController {
 			this.entryObject.setTable(this.table);
 		}
 
-		if (request.getParameterMap().containsKey("download")) {
+		if (request.getParameterMap().containsKey("downloadWithPassword")) {
 			Biff8EncryptionKey.setCurrentUserPassword(fetchSpreadsheetPassword(request));
 
 			response.setContentType("application/vnd.ms-excel");
@@ -343,6 +343,20 @@ public class DataEntryStatisticsController extends SimpleFormController {
 				Biff8EncryptionKey.setCurrentUserPassword(null);
 				return null;
 			}
+		}
+		if (request.getParameterMap().containsKey("downloadWithoutPassword")) {
+
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + generateSpreadsheetFilename() + "\"");
+			try {
+				table.generateSpreadsheet().write(response.getOutputStream());
+			} catch (Exception e) {
+				log.error(e.getMessage());
+				e.printStackTrace();
+			} finally {
+				return null;
+			}
+
 		}
 
 		return this.showForm(request, response, errors);
