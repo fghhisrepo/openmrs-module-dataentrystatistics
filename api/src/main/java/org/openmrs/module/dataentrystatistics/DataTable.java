@@ -13,6 +13,17 @@
  */
 package org.openmrs.module.dataentrystatistics;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -21,15 +32,6 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.openmrs.util.OpenmrsUtil;
-
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class DataTable {
 	protected static final Log log = LogFactory.getLog(DataTable.class);
@@ -225,10 +227,10 @@ public class DataTable {
 		return sb.toString();
 	}
 
-	public HSSFWorkbook generateSpreadsheet() {
+	public HSSFWorkbook generateSpreadsheet() throws IOException {
 		HSSFWorkbook workbook = new HSSFWorkbook();
 
-		HSSFSheet sheet = workbook.createSheet("statistics");
+		HSSFSheet sheet = workbook.createSheet("DATA_ENTRY_STATISTIC");
 		if (rows.size() == 0) {
 			HSSFRow row0 = sheet.createRow(0);
 			HSSFCell cellA1 = row0.createCell(0);

@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.openmrs.module</groupId>
@@ -12,14 +13,9 @@
 	<description>API project for Data Entry Statistics</description>
 
 	<dependencies>
-		<!-- 
-		Add other dependencies from lib:
-		<dependency>
-			<groupId>org.other.library</groupId>
-			<artifactId>library-name</artifactId>
-		</dependency>
-		-->
-		
+		<!-- Add other dependencies from lib: <dependency> <groupId>org.other.library</groupId> 
+			<artifactId>library-name</artifactId> </dependency> -->
+
 		<dependency>
 			<groupId>org.openmrs.api</groupId>
 			<artifactId>openmrs-api</artifactId>
@@ -51,8 +47,21 @@
 			<artifactId>poi</artifactId>
 			<version>3.17</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.18</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.17</version>
+		</dependency>
+
 	</dependencies>
-	
+
 	<build>
 		<resources>
 			<resource>
@@ -60,7 +69,7 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		
+
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
@@ -68,8 +77,8 @@
 			</testResource>
 		</testResources>
 	</build>
-	
-	
+
+
 	<properties>
 		<MODULE_ID>${project.parent.artifactId}</MODULE_ID>
 		<MODULE_NAME>${project.parent.name}</MODULE_NAME>

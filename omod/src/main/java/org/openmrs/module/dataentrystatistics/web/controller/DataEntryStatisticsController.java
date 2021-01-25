@@ -24,7 +24,6 @@ import java.util.Properties;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -328,9 +327,11 @@ public class DataEntryStatisticsController extends SimpleFormController {
 			}
 			this.entryObject.setTable(this.table);
 		}
-		if (request.getParameterMap().containsKey("download")) {
-			Biff8EncryptionKey.setCurrentUserPassword(fetchSpreadsheetPassword(request));
 
+		if (request.getParameterMap().containsKey("downloadWithPassword")) {
+			Biff8EncryptionKey.setCurrentUserPassword(fetchSpreadsheetPassword(request));
+			
+			response.setCharacterEncoding("UTF-8");
 			response.setContentType("application/vnd.ms-excel");
 			response.setHeader("Content-Disposition", "attachment; filename=\"" + generateSpreadsheetFilename() + "\"");
 			try {
@@ -342,9 +343,24 @@ public class DataEntryStatisticsController extends SimpleFormController {
 				Biff8EncryptionKey.setCurrentUserPassword(null);
 				return null;
 			}
-		} else {
-			return this.showForm(request, response, errors);
 		}
+		if (request.getParameterMap().containsKey("downloadWithoutPassword")) {
+
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + generateSpreadsheetFilename() + "\"");
+			try {
+				table.generateSpreadsheet().write(response.getOutputStream());
+			} catch (Exception e) {
+				log.error(e.getMessage());
+				e.printStackTrace();
+			} finally {
+				return null;
+			}
+
+		}
+
+		return this.showForm(request, response, errors);
+
 	}
 
 	public DataEntryStatisticService getDataEntryStatisticService() {
