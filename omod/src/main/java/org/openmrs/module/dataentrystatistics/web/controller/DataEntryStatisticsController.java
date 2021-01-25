@@ -24,7 +24,6 @@ import java.util.Properties;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -331,7 +330,8 @@ public class DataEntryStatisticsController extends SimpleFormController {
 
 		if (request.getParameterMap().containsKey("downloadWithPassword")) {
 			Biff8EncryptionKey.setCurrentUserPassword(fetchSpreadsheetPassword(request));
-
+			
+			response.setCharacterEncoding("UTF-8");
 			response.setContentType("application/vnd.ms-excel");
 			response.setHeader("Content-Disposition", "attachment; filename=\"" + generateSpreadsheetFilename() + "\"");
 			try {

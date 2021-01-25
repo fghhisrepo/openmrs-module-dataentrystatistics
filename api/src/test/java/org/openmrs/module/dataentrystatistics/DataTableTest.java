@@ -1,14 +1,16 @@
 package org.openmrs.module.dataentrystatistics;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+
+import org.junit.Test;
 
 public class DataTableTest {
 
     @Test
-    public void generateSpreadsheetShouldWork() {
+    public void generateSpreadsheetShouldWork() throws IOException {
         DataTable dataTable = new DataTable();
         TableRow tableRow = new TableRow("form", "form1");
         tableRow.put("user1", Integer.valueOf(100));
